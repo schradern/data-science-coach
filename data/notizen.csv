@@ -1,0 +1,501 @@
+patient_id,notiz,verschlechterung
+1,"Selbstvorstellung in der Notaufnahme. 69-jährige:r Patient:in. Tachykardie und Hypotonie, CRP deutlich erhöht, Schüttelfrost vor Aufnahme. Gutes Ansprechen auf Therapie.",0
+2,"Selbstvorstellung in der Notaufnahme. 47-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte. Sauerstoff reduzierbar.",0
+3,"Patient:in zur stationären Aufnahme. 76-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, Zunahme der Atemnot seit Tagen, verlängertes Exspirium. Im Verlauf stabil.",0
+4,"Aufnahme über die Notaufnahme. 79-jährige:r Patient:in, Sturz in der häuslichen Umgebung, unspezifische Beschwerden. Azidose progredient.",0
+5,"Vorstellung in Begleitung des Rettungsdienstes. 33-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen. Sauerstoffbedarf zunehmend.",1
+6,"Selbstvorstellung in der Notaufnahme. 43-jährige:r Patient:in, Beinödeme beidseits, feuchte Rasselgeräusche basal beidseits, bekannte reduzierte Auswurffraktion. Verlegung auf Intensivstation erwogen.",1
+7,"Selbstvorstellung in der Notaufnahme. 66-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, vermehrter Auswurf, Giemen. Zunehmende Somnolenz.",1
+8,"Zuweisung durch den Hausarzt. 59-jährige:r Patient:in, Procalcitonin erhöht, CRP deutlich erhöht, Schüttelfrost vor Aufnahme. Sauerstoff reduzierbar.",0
+9,"Aufnahme über die Notaufnahme. 64-jährige:r Patient:in, Giemen, bekannte COPD, Sauerstoffsättigung grenzwertig. Kardiopulmonal stabil.",1
+10,"Elektive Aufnahme nach Zuweisung. 50-jährige:r Patient:in, Beinödeme beidseits, Gewichtszunahme innerhalb weniger Tage, bekannte reduzierte Auswurffraktion. Gutes Ansprechen auf Therapie.",0
+11,"Vorstellung in Begleitung des Rettungsdienstes. 78-jährige:r Patient:in, Allgemeinzustand reduziert, unspezifische Beschwerden, Sturz in der häuslichen Umgebung. Beschwerdefreiheit im Tagesverlauf.",0
+12,"Patient:in zur stationären Aufnahme. 76-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, Sturz in der häuslichen Umgebung. Kreislauf zunehmend katecholaminpflichtig.",1
+13,"Zuweisung durch den Hausarzt. 65-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen. Kardiopulmonal stabil.",0
+14,"Elektive Aufnahme nach Zuweisung. 82-jährige:r Patient:in. Beinödeme beidseits, Gewichtszunahme innerhalb weniger Tage, Orthopnoe. Gutes Ansprechen auf Therapie.",0
+15,"Vorstellung in Begleitung des Rettungsdienstes. 71-jährige:r Patient:in. NT-proBNP erhöht, Beinödeme beidseits, Orthopnoe. Afebril im Verlauf.",0
+16,"Selbstvorstellung in der Notaufnahme. 50-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, pleuritischer Thoraxschmerz, Fieber bis 39,2 °C. Zunehmende Somnolenz.",0
+17,"Selbstvorstellung in der Notaufnahme. 70-jährige:r Patient:in. CRP deutlich erhöht, Schüttelfrost vor Aufnahme, Tachykardie und Hypotonie. Im Verlauf stabil.",0
+18,"Selbstvorstellung in der Notaufnahme. 49-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, unspezifische Beschwerden. Afebril im Verlauf.",0
+19,"Patient:in zur stationären Aufnahme. 78-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme. Beschwerdefreiheit im Tagesverlauf.",0
+20,"Vorstellung in Begleitung des Rettungsdienstes. 63-jährige:r Patient:in. Beinödeme beidseits, Orthopnoe, Gewichtszunahme innerhalb weniger Tage. Afebril im Verlauf.",0
+21,"Patient:in zur stationären Aufnahme. 61-jährige:r Patient:in, unspezifische Beschwerden, Allgemeinzustand reduziert. Laktat steigend, Kreislauf instabil.",1
+22,"Selbstvorstellung in der Notaufnahme. 53-jährige:r Patient:in, Procalcitonin erhöht, Verdacht auf fokale Infektion, Tachykardie und Hypotonie. Befundkonstellation komplex.",1
+23,"Patient:in zur stationären Aufnahme. 84-jährige:r Patient:in. Beinödeme beidseits, gestaute Halsvenen, bekannte reduzierte Auswurffraktion. Sauerstoff reduzierbar.",0
+24,"Zuweisung durch den Hausarzt. 62-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, unspezifische Beschwerden. Laktat steigend, Kreislauf instabil.",1
+25,"Selbstvorstellung in der Notaufnahme. 57-jährige:r Patient:in. Beinödeme beidseits, feuchte Rasselgeräusche basal beidseits, gestaute Halsvenen. Kreislauf zunehmend katecholaminpflichtig.",0
+26,"Elektive Aufnahme nach Zuweisung. 58-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, Fieber bis 39,2 °C. Sauerstoff reduzierbar.",0
+27,"Patient:in zur stationären Aufnahme. 73-jährige:r Patient:in, Tachypnoe bei Aufnahme, grippaler Infekt in der Vorgeschichte. Afebril im Verlauf.",0
+28,"Zuweisung durch den Hausarzt. 70-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, unspezifische Beschwerden. Kardiopulmonal stabil.",0
+29,"Elektive Aufnahme nach Zuweisung. 71-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, warme Peripherie. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+30,"Aufnahme über die Notaufnahme. 71-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, gestaute Halsvenen. Im Verlauf stabil.",0
+31,"Elektive Aufnahme nach Zuweisung. 98-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz. Gutes Ansprechen auf Therapie.",0
+32,"Vorstellung in Begleitung des Rettungsdienstes. 57-jährige:r Patient:in. Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie. Sauerstoff reduzierbar.",0
+33,"Patient:in zur stationären Aufnahme. 56-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, Allgemeinzustand reduziert, weitere Abklärung geplant. Sauerstoff reduzierbar.",0
+34,"Aufnahme über die Notaufnahme. 51-jährige:r Patient:in. Beinödeme beidseits, gestaute Halsvenen. Laktat steigend, Kreislauf instabil.",0
+35,"Aufnahme über die Notaufnahme. 74-jährige:r Patient:in, Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert. Afebril im Verlauf.",0
+36,"Elektive Aufnahme nach Zuweisung. 82-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz, grippaler Infekt in der Vorgeschichte. Im Verlauf stabil.",0
+37,"Patient:in zur stationären Aufnahme. 62-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, gestaute Halsvenen. Kardiopulmonal stabil.",1
+38,"Zuweisung durch den Hausarzt. 51-jährige:r Patient:in. Weitere Abklärung geplant, Exsikkose bei verminderter Trinkmenge, Allgemeinzustand reduziert. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",1
+39,"Elektive Aufnahme nach Zuweisung. 51-jährige:r Patient:in, gestaute Halsvenen, Beinödeme beidseits. Gute Rekonvaleszenz.",0
+40,"Vorstellung in Begleitung des Rettungsdienstes. 74-jährige:r Patient:in. Procalcitonin erhöht, Schüttelfrost vor Aufnahme. Azidose progredient.",1
+41,"Aufnahme über die Notaufnahme. 76-jährige:r Patient:in, unspezifische Beschwerden, Allgemeinzustand reduziert. Im Verlauf zunehmende Dyspnoe.",1
+42,"Elektive Aufnahme nach Zuweisung. 73-jährige:r Patient:in, warme Peripherie, Verdacht auf fokale Infektion. Verlegung auf Intensivstation erwogen.",1
+43,"Zuweisung durch den Hausarzt. 53-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, Gewichtszunahme innerhalb weniger Tage. Zunehmende Somnolenz.",0
+44,"Aufnahme über die Notaufnahme. 68-jährige:r Patient:in. Allgemeinzustand reduziert, weitere Abklärung geplant. Gutes Ansprechen auf Therapie.",0
+45,"Zuweisung durch den Hausarzt. 66-jährige:r Patient:in, produktiver Husten seit drei Tagen, grippaler Infekt in der Vorgeschichte, Infiltrat im Röntgen-Thorax. Beschwerdefreiheit im Tagesverlauf.",0
+46,"Selbstvorstellung in der Notaufnahme. 67-jährige:r Patient:in, CRP deutlich erhöht, Procalcitonin erhöht. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+47,"Patient:in zur stationären Aufnahme. 78-jährige:r Patient:in, pleuritischer Thoraxschmerz, Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche. Sauerstoff reduzierbar.",0
+48,"Patient:in zur stationären Aufnahme. 68-jährige:r Patient:in, Tachykardie und Hypotonie, Schüttelfrost vor Aufnahme. Gute Rekonvaleszenz.",0
+49,"Vorstellung in Begleitung des Rettungsdienstes. 75-jährige:r Patient:in. Produktiver Husten seit drei Tagen, Tachypnoe bei Aufnahme. Mobilisation problemlos.",0
+50,"Patient:in zur stationären Aufnahme. 65-jährige:r Patient:in, vermehrter Auswurf, Einsatz der Atemhilfsmuskulatur. Respiratorische Verschlechterung im Tagesverlauf.",1
+51,"Elektive Aufnahme nach Zuweisung. 69-jährige:r Patient:in. Fieber bis 39,2 °C, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax. Beschwerdefreiheit im Tagesverlauf.",0
+52,"Selbstvorstellung in der Notaufnahme. 74-jährige:r Patient:in, Giemen, Sauerstoffsättigung grenzwertig. Verlegung auf Intensivstation erwogen.",1
+53,"Patient:in zur stationären Aufnahme. 41-jährige:r Patient:in. Procalcitonin erhöht, Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie. Sauerstoff reduzierbar.",0
+54,"Aufnahme über die Notaufnahme. 59-jährige:r Patient:in, warme Peripherie, Verdacht auf fokale Infektion, Procalcitonin erhöht. Beschwerdefreiheit im Tagesverlauf.",0
+55,"Elektive Aufnahme nach Zuweisung. 56-jährige:r Patient:in, CRP deutlich erhöht, Verdacht auf fokale Infektion. Gute Rekonvaleszenz.",0
+56,"Selbstvorstellung in der Notaufnahme. 54-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, Zunahme der Atemnot seit Tagen, bekannte COPD. Beschwerdefreiheit im Tagesverlauf.",0
+57,"Selbstvorstellung in der Notaufnahme. 60-jährige:r Patient:in, Orthopnoe, NT-proBNP erhöht, feuchte Rasselgeräusche basal beidseits. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+58,"Vorstellung in Begleitung des Rettungsdienstes. 88-jährige:r Patient:in, Tachykardie und Hypotonie, Schüttelfrost vor Aufnahme, Verdacht auf Harnwegsinfekt als Fokus. Azidose progredient.",1
+59,"Patient:in zur stationären Aufnahme. 50-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, Exsikkose bei verminderter Trinkmenge, Allgemeinzustand reduziert. Gutes Ansprechen auf Therapie.",0
+60,"Selbstvorstellung in der Notaufnahme. 79-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, bekannte reduzierte Auswurffraktion. Mobilisation problemlos.",0
+61,"Zuweisung durch den Hausarzt. 37-jährige:r Patient:in, produktiver Husten seit drei Tagen, Infiltrat im Röntgen-Thorax. Beschwerdefreiheit im Tagesverlauf.",0
+62,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in, weitere Abklärung geplant, Sturz in der häuslichen Umgebung. Im Verlauf stabil.",0
+63,"Selbstvorstellung in der Notaufnahme. 67-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Procalcitonin erhöht, Schüttelfrost vor Aufnahme. Laktat steigend, Kreislauf instabil.",1
+64,"Selbstvorstellung in der Notaufnahme. 73-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, Tachypnoe bei Aufnahme. Gute Rekonvaleszenz.",0
+65,"Aufnahme über die Notaufnahme. 75-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, Orthopnoe, NT-proBNP erhöht. Verlegung auf Intensivstation erwogen.",0
+66,"Zuweisung durch den Hausarzt. 77-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, produktiver Husten seit drei Tagen. Kardiopulmonal stabil.",0
+67,"Elektive Aufnahme nach Zuweisung. 58-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte. Kreislauf zunehmend katecholaminpflichtig.",1
+68,"Patient:in zur stationären Aufnahme. 57-jährige:r Patient:in. Vermehrter Auswurf, verlängertes Exspirium, bekannte COPD. Afebril im Verlauf.",0
+69,"Elektive Aufnahme nach Zuweisung. 78-jährige:r Patient:in, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen, Tachypnoe bei Aufnahme. Verlauf abwartend.",0
+70,"Selbstvorstellung in der Notaufnahme. 61-jährige:r Patient:in, verlängertes Exspirium, Einsatz der Atemhilfsmuskulatur, Sauerstoffsättigung grenzwertig. Weitere Beobachtung erforderlich.",1
+71,"Elektive Aufnahme nach Zuweisung. 44-jährige:r Patient:in. Unspezifische Beschwerden, weitere Abklärung geplant. Gute Rekonvaleszenz.",0
+72,"Zuweisung durch den Hausarzt. 46-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, Beinödeme beidseits, NT-proBNP erhöht. Gute Rekonvaleszenz.",0
+73,"Vorstellung in Begleitung des Rettungsdienstes. 49-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, bekannte COPD. Afebril im Verlauf.",0
+74,"Patient:in zur stationären Aufnahme. 72-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, bekannte COPD. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+75,"Selbstvorstellung in der Notaufnahme. 66-jährige:r Patient:in. Weitere Abklärung geplant, unspezifische Beschwerden. Afebril im Verlauf.",0
+76,"Selbstvorstellung in der Notaufnahme. 75-jährige:r Patient:in, CRP deutlich erhöht, Tachykardie und Hypotonie, Schüttelfrost vor Aufnahme. Sauerstoff reduzierbar.",0
+77,"Zuweisung durch den Hausarzt. 57-jährige:r Patient:in. Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+78,"Aufnahme über die Notaufnahme. 67-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, Gewichtszunahme innerhalb weniger Tage. Vigilanz im Verlauf gemindert.",0
+79,"Selbstvorstellung in der Notaufnahme. 74-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, gestaute Halsvenen, Beinödeme beidseits. Mobilisation problemlos.",0
+80,"Aufnahme über die Notaufnahme. 59-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, Tachypnoe bei Aufnahme, grippaler Infekt in der Vorgeschichte. Vigilanz im Verlauf gemindert.",1
+81,"Aufnahme über die Notaufnahme. 71-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, NT-proBNP erhöht. Kardiopulmonal stabil.",0
+82,"Zuweisung durch den Hausarzt. 53-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz, produktiver Husten seit drei Tagen. Gutes Ansprechen auf Therapie.",0
+83,"Patient:in zur stationären Aufnahme. 58-jährige:r Patient:in, unspezifische Beschwerden, weitere Abklärung geplant. Vigilanz im Verlauf gemindert.",0
+84,"Selbstvorstellung in der Notaufnahme. 58-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, CRP deutlich erhöht. Steigender Katecholaminbedarf.",1
+85,"Aufnahme über die Notaufnahme. 45-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche. Mobilisation problemlos.",1
+86,"Aufnahme über die Notaufnahme. 72-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Infiltrat im Röntgen-Thorax, pleuritischer Thoraxschmerz. Kreislauf zunehmend katecholaminpflichtig.",1
+87,"Selbstvorstellung in der Notaufnahme. 56-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Beschwerdefreiheit im Tagesverlauf.",0
+88,"Aufnahme über die Notaufnahme. 64-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, Schüttelfrost vor Aufnahme. Afebril im Verlauf.",1
+89,"Selbstvorstellung in der Notaufnahme. 72-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax. Kreislauf zunehmend katecholaminpflichtig.",1
+90,"Zuweisung durch den Hausarzt. 71-jährige:r Patient:in, Tachykardie und Hypotonie, CRP deutlich erhöht. Gutes Ansprechen auf Therapie.",0
+91,"Aufnahme über die Notaufnahme. 75-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C, pleuritischer Thoraxschmerz. Zunehmende Somnolenz.",1
+92,"Selbstvorstellung in der Notaufnahme. 62-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, Schüttelfrost vor Aufnahme. Respiratorische Verschlechterung im Tagesverlauf.",0
+93,"Aufnahme über die Notaufnahme. 57-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Verdacht auf fokale Infektion, Tachykardie und Hypotonie. Verlauf abwartend.",1
+94,"Patient:in zur stationären Aufnahme. 63-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Verdacht auf fokale Infektion. Verlegung auf Intensivstation erwogen.",1
+95,"Patient:in zur stationären Aufnahme. 37-jährige:r Patient:in, Schüttelfrost vor Aufnahme, Verdacht auf fokale Infektion. Kardiopulmonal stabil.",0
+96,"Aufnahme über die Notaufnahme. 41-jährige:r Patient:in, Tachypnoe bei Aufnahme, pleuritischer Thoraxschmerz, rechtsbasal feuchte Rasselgeräusche. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+97,"Aufnahme über die Notaufnahme. 43-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Gutes Ansprechen auf Therapie.",1
+98,"Elektive Aufnahme nach Zuweisung. 48-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, Fieber bis 39,2 °C, Tachypnoe bei Aufnahme. Steigender Katecholaminbedarf.",1
+99,"Patient:in zur stationären Aufnahme. 70-jährige:r Patient:in, Giemen, bekannte COPD. Im Verlauf stabil.",0
+100,"Vorstellung in Begleitung des Rettungsdienstes. 50-jährige:r Patient:in. Sturz in der häuslichen Umgebung, unspezifische Beschwerden, weitere Abklärung geplant. Afebril im Verlauf.",0
+101,"Patient:in zur stationären Aufnahme. 58-jährige:r Patient:in. Allgemeinzustand reduziert, Elektrolytstörung bei Aufnahme. Kardiopulmonal stabil.",0
+102,"Aufnahme über die Notaufnahme. 85-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, gestaute Halsvenen. Im Verlauf zunehmende Dyspnoe.",1
+103,"Patient:in zur stationären Aufnahme. 58-jährige:r Patient:in, NT-proBNP erhöht, Beinödeme beidseits, Orthopnoe. Gute Rekonvaleszenz.",0
+104,"Vorstellung in Begleitung des Rettungsdienstes. 76-jährige:r Patient:in. Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie. Gute Rekonvaleszenz.",0
+105,"Patient:in zur stationären Aufnahme. 49-jährige:r Patient:in, Giemen, Zunahme der Atemnot seit Tagen, vermehrter Auswurf. Sauerstoffbedarf zunehmend.",1
+106,"Patient:in zur stationären Aufnahme. 61-jährige:r Patient:in. Bekannte COPD, vermehrter Auswurf, Giemen. Engmaschige Kontrolle geplant.",0
+107,"Selbstvorstellung in der Notaufnahme. 49-jährige:r Patient:in, weitere Abklärung geplant, unspezifische Beschwerden, Allgemeinzustand reduziert. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+108,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in. Sturz in der häuslichen Umgebung, Exsikkose bei verminderter Trinkmenge, Elektrolytstörung bei Aufnahme. Kreislauf zunehmend katecholaminpflichtig.",1
+109,"Vorstellung in Begleitung des Rettungsdienstes. 77-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Procalcitonin erhöht. Verlegung auf Intensivstation erwogen.",1
+110,"Zuweisung durch den Hausarzt. 36-jährige:r Patient:in. Giemen, verlängertes Exspirium, Sauerstoffsättigung grenzwertig. Azidose progredient.",0
+111,"Elektive Aufnahme nach Zuweisung. 71-jährige:r Patient:in. Giemen, Zunahme der Atemnot seit Tagen. Beschwerdefreiheit im Tagesverlauf.",0
+112,"Patient:in zur stationären Aufnahme. 68-jährige:r Patient:in. Verdacht auf fokale Infektion, Tachykardie und Hypotonie. Beschwerdefreiheit im Tagesverlauf.",0
+113,"Patient:in zur stationären Aufnahme. 54-jährige:r Patient:in, unspezifische Beschwerden, Exsikkose bei verminderter Trinkmenge. Gute Rekonvaleszenz.",0
+114,"Elektive Aufnahme nach Zuweisung. 41-jährige:r Patient:in, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche. Gute Rekonvaleszenz.",0
+115,"Aufnahme über die Notaufnahme. 65-jährige:r Patient:in, weitere Abklärung geplant, unspezifische Beschwerden, Allgemeinzustand reduziert. Im Verlauf stabil.",0
+116,"Aufnahme über die Notaufnahme. 56-jährige:r Patient:in, vermehrter Auswurf, Einsatz der Atemhilfsmuskulatur. Kreislauf zunehmend katecholaminpflichtig.",0
+117,"Selbstvorstellung in der Notaufnahme. 68-jährige:r Patient:in, Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche. Mobilisation problemlos.",0
+118,"Zuweisung durch den Hausarzt. 64-jährige:r Patient:in. Gestaute Halsvenen, Gewichtszunahme innerhalb weniger Tage. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+119,"Vorstellung in Begleitung des Rettungsdienstes. 90-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Afebril im Verlauf.",0
+120,"Selbstvorstellung in der Notaufnahme. 60-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, Einsatz der Atemhilfsmuskulatur. Laktat steigend, Kreislauf instabil.",1
+121,"Elektive Aufnahme nach Zuweisung. 48-jährige:r Patient:in, Zunahme der Atemnot seit Tagen, verlängertes Exspirium. Im Verlauf stabil.",0
+122,"Selbstvorstellung in der Notaufnahme. 67-jährige:r Patient:in. Orthopnoe, feuchte Rasselgeräusche basal beidseits. Kreislauf zunehmend katecholaminpflichtig.",1
+123,"Vorstellung in Begleitung des Rettungsdienstes. 68-jährige:r Patient:in, weitere Abklärung geplant, Allgemeinzustand reduziert, Exsikkose bei verminderter Trinkmenge. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+124,"Patient:in zur stationären Aufnahme. 86-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz. Kardiopulmonal stabil.",0
+125,"Aufnahme über die Notaufnahme. 77-jährige:r Patient:in. Verdacht auf fokale Infektion, Schüttelfrost vor Aufnahme. Rücksprache mit Oberarzt.",1
+126,"Patient:in zur stationären Aufnahme. 70-jährige:r Patient:in, Verdacht auf fokale Infektion, Schüttelfrost vor Aufnahme. Laktat steigend, Kreislauf instabil.",0
+127,"Aufnahme über die Notaufnahme. 87-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+128,"Aufnahme über die Notaufnahme. 45-jährige:r Patient:in, Beinödeme beidseits, NT-proBNP erhöht. Rücksprache mit Oberarzt.",1
+129,"Aufnahme über die Notaufnahme. 54-jährige:r Patient:in, CRP deutlich erhöht, Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus. Sauerstoffbedarf zunehmend.",1
+130,"Elektive Aufnahme nach Zuweisung. 49-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, warme Peripherie. Kreislauf zunehmend katecholaminpflichtig.",1
+131,"Aufnahme über die Notaufnahme. 58-jährige:r Patient:in, Verdacht auf fokale Infektion, CRP deutlich erhöht. Sauerstoffbedarf zunehmend.",0
+132,"Zuweisung durch den Hausarzt. 42-jährige:r Patient:in. Unspezifische Beschwerden, Allgemeinzustand reduziert. Beschwerdefreiheit im Tagesverlauf.",1
+133,"Patient:in zur stationären Aufnahme. 74-jährige:r Patient:in, CRP deutlich erhöht, Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus. Verlegung auf Intensivstation erwogen.",0
+134,"Zuweisung durch den Hausarzt. 60-jährige:r Patient:in, Sturz in der häuslichen Umgebung, Exsikkose bei verminderter Trinkmenge, unspezifische Beschwerden. Steigender Katecholaminbedarf.",1
+135,"Elektive Aufnahme nach Zuweisung. 40-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, warme Peripherie, Verdacht auf fokale Infektion. Azidose progredient.",1
+136,"Patient:in zur stationären Aufnahme. 48-jährige:r Patient:in, Tachykardie und Hypotonie, Verdacht auf fokale Infektion. Sauerstoffbedarf zunehmend.",0
+137,"Patient:in zur stationären Aufnahme. 69-jährige:r Patient:in. Gestaute Halsvenen, bekannte reduzierte Auswurffraktion. Verlegung auf Intensivstation erwogen.",1
+138,"Elektive Aufnahme nach Zuweisung. 77-jährige:r Patient:in, Procalcitonin erhöht, CRP deutlich erhöht. Mobilisation problemlos.",0
+139,"Elektive Aufnahme nach Zuweisung. 96-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Infiltrat im Röntgen-Thorax. Steigender Katecholaminbedarf.",1
+140,"Selbstvorstellung in der Notaufnahme. 98-jährige:r Patient:in. Gestaute Halsvenen, Orthopnoe, Beinödeme beidseits. Laktat steigend, Kreislauf instabil.",1
+141,"Selbstvorstellung in der Notaufnahme. 71-jährige:r Patient:in. Produktiver Husten seit drei Tagen, Infiltrat im Röntgen-Thorax, grippaler Infekt in der Vorgeschichte. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+142,"Selbstvorstellung in der Notaufnahme. 48-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, Procalcitonin erhöht, Verdacht auf fokale Infektion. Azidose progredient.",1
+143,"Zuweisung durch den Hausarzt. 30-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, Beinödeme beidseits, bekannte reduzierte Auswurffraktion. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+144,"Patient:in zur stationären Aufnahme. 68-jährige:r Patient:in, Schüttelfrost vor Aufnahme, Tachykardie und Hypotonie. Kardiopulmonal stabil.",1
+145,"Patient:in zur stationären Aufnahme. 51-jährige:r Patient:in, Elektrolytstörung bei Aufnahme, Sturz in der häuslichen Umgebung. Beschwerdefreiheit im Tagesverlauf.",0
+146,"Vorstellung in Begleitung des Rettungsdienstes. 57-jährige:r Patient:in. Pleuritischer Thoraxschmerz, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte. Beschwerdefreiheit im Tagesverlauf.",0
+147,"Selbstvorstellung in der Notaufnahme. 54-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, weitere Abklärung geplant. Laktat steigend, Kreislauf instabil.",0
+148,"Zuweisung durch den Hausarzt. 62-jährige:r Patient:in. Bekannte COPD, verlängertes Exspirium. Zunehmende Somnolenz.",1
+149,"Elektive Aufnahme nach Zuweisung. 81-jährige:r Patient:in, Sturz in der häuslichen Umgebung, Exsikkose bei verminderter Trinkmenge. Mobilisation problemlos.",0
+150,"Selbstvorstellung in der Notaufnahme. 67-jährige:r Patient:in. Unspezifische Beschwerden, weitere Abklärung geplant, Allgemeinzustand reduziert. Gutes Ansprechen auf Therapie.",0
+151,"Vorstellung in Begleitung des Rettungsdienstes. 61-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, Fieber bis 39,2 °C, pleuritischer Thoraxschmerz. Kardiopulmonal stabil.",0
+152,"Patient:in zur stationären Aufnahme. 47-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, NT-proBNP erhöht, Orthopnoe. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+153,"Aufnahme über die Notaufnahme. 37-jährige:r Patient:in. Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen, Fieber bis 39,2 °C. Vigilanz im Verlauf gemindert.",0
+154,"Elektive Aufnahme nach Zuweisung. 56-jährige:r Patient:in, verlängertes Exspirium, Giemen, Sauerstoffsättigung grenzwertig. Afebril im Verlauf.",0
+155,"Elektive Aufnahme nach Zuweisung. 63-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, Orthopnoe. Sauerstoffbedarf zunehmend.",1
+156,"Zuweisung durch den Hausarzt. 92-jährige:r Patient:in. Tachykardie und Hypotonie, Verdacht auf fokale Infektion, Schüttelfrost vor Aufnahme. Laktat steigend, Kreislauf instabil.",0
+157,"Zuweisung durch den Hausarzt. 66-jährige:r Patient:in, weitere Abklärung geplant, Sturz in der häuslichen Umgebung, unspezifische Beschwerden. Mobilisation problemlos.",0
+158,"Elektive Aufnahme nach Zuweisung. 80-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, Tachypnoe bei Aufnahme, Infiltrat im Röntgen-Thorax. Gute Rekonvaleszenz.",0
+159,"Aufnahme über die Notaufnahme. 56-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, feuchte Rasselgeräusche basal beidseits. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+160,"Aufnahme über die Notaufnahme. 45-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, Giemen, Zunahme der Atemnot seit Tagen. Sauerstoffbedarf zunehmend.",0
+161,"Aufnahme über die Notaufnahme. 49-jährige:r Patient:in, pleuritischer Thoraxschmerz, Tachypnoe bei Aufnahme. Gute Rekonvaleszenz.",0
+162,"Zuweisung durch den Hausarzt. 52-jährige:r Patient:in, gestaute Halsvenen, Orthopnoe, bekannte reduzierte Auswurffraktion. Gute Rekonvaleszenz.",0
+163,"Elektive Aufnahme nach Zuweisung. 98-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, Sauerstoffsättigung grenzwertig, vermehrter Auswurf. Verlegung auf Intensivstation erwogen.",0
+164,"Zuweisung durch den Hausarzt. 51-jährige:r Patient:in. Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen, grippaler Infekt in der Vorgeschichte. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+165,"Elektive Aufnahme nach Zuweisung. 77-jährige:r Patient:in. Beinödeme beidseits, NT-proBNP erhöht. Afebril im Verlauf.",0
+166,"Zuweisung durch den Hausarzt. 50-jährige:r Patient:in, pleuritischer Thoraxschmerz, grippaler Infekt in der Vorgeschichte. Sauerstoff reduzierbar.",0
+167,"Aufnahme über die Notaufnahme. 79-jährige:r Patient:in. Zunahme der Atemnot seit Tagen, bekannte COPD. Vigilanz im Verlauf gemindert.",1
+168,"Aufnahme über die Notaufnahme. 70-jährige:r Patient:in, Tachypnoe bei Aufnahme, Fieber bis 39,2 °C, pleuritischer Thoraxschmerz. Azidose progredient.",1
+169,"Selbstvorstellung in der Notaufnahme. 61-jährige:r Patient:in. Sturz in der häuslichen Umgebung, unspezifische Beschwerden. Im Verlauf stabil.",0
+170,"Vorstellung in Begleitung des Rettungsdienstes. 63-jährige:r Patient:in, Sturz in der häuslichen Umgebung, Allgemeinzustand reduziert. Gute Rekonvaleszenz.",0
+171,"Selbstvorstellung in der Notaufnahme. 54-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche. Kardiopulmonal stabil.",0
+172,"Elektive Aufnahme nach Zuweisung. 71-jährige:r Patient:in, Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus. Laktat steigend, Kreislauf instabil.",1
+173,"Elektive Aufnahme nach Zuweisung. 57-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, gestaute Halsvenen. Beschwerdefreiheit im Tagesverlauf.",0
+174,"Vorstellung in Begleitung des Rettungsdienstes. 44-jährige:r Patient:in, Einsatz der Atemhilfsmuskulatur, Giemen. Gutes Ansprechen auf Therapie.",0
+175,"Vorstellung in Begleitung des Rettungsdienstes. 44-jährige:r Patient:in, Orthopnoe, feuchte Rasselgeräusche basal beidseits. Im Verlauf zunehmende Dyspnoe.",1
+176,"Zuweisung durch den Hausarzt. 67-jährige:r Patient:in, Fieber bis 39,2 °C, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte. Beschwerdefreiheit im Tagesverlauf.",0
+177,"Aufnahme über die Notaufnahme. 89-jährige:r Patient:in, Fieber bis 39,2 °C, Infiltrat im Röntgen-Thorax. Befundkonstellation komplex.",0
+178,"Vorstellung in Begleitung des Rettungsdienstes. 67-jährige:r Patient:in. Weitere Abklärung geplant, Elektrolytstörung bei Aufnahme, Exsikkose bei verminderter Trinkmenge. Sauerstoffbedarf zunehmend.",0
+179,"Zuweisung durch den Hausarzt. 62-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, gestaute Halsvenen, feuchte Rasselgeräusche basal beidseits. Beschwerdefreiheit im Tagesverlauf.",0
+180,"Zuweisung durch den Hausarzt. 69-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, Elektrolytstörung bei Aufnahme, weitere Abklärung geplant. Steigender Katecholaminbedarf.",0
+181,"Zuweisung durch den Hausarzt. 85-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, Beinödeme beidseits, bekannte reduzierte Auswurffraktion. Respiratorische Verschlechterung im Tagesverlauf.",1
+182,"Zuweisung durch den Hausarzt. 68-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert, weitere Abklärung geplant. Afebril im Verlauf.",0
+183,"Zuweisung durch den Hausarzt. 57-jährige:r Patient:in. Fieber bis 39,2 °C, Tachypnoe bei Aufnahme. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+184,"Vorstellung in Begleitung des Rettungsdienstes. 82-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, Tachypnoe bei Aufnahme. Afebril im Verlauf.",0
+185,"Zuweisung durch den Hausarzt. 71-jährige:r Patient:in, weitere Abklärung geplant, Allgemeinzustand reduziert. Vigilanz im Verlauf gemindert.",1
+186,"Zuweisung durch den Hausarzt. 89-jährige:r Patient:in. Unspezifische Beschwerden, Sturz in der häuslichen Umgebung, Elektrolytstörung bei Aufnahme. Gutes Ansprechen auf Therapie.",0
+187,"Patient:in zur stationären Aufnahme. 67-jährige:r Patient:in. Procalcitonin erhöht, warme Peripherie. Steigender Katecholaminbedarf.",0
+188,"Patient:in zur stationären Aufnahme. 44-jährige:r Patient:in, warme Peripherie, Verdacht auf fokale Infektion. Zunehmende Somnolenz.",1
+189,"Vorstellung in Begleitung des Rettungsdienstes. 42-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, Orthopnoe. Kardiopulmonal stabil.",0
+190,"Elektive Aufnahme nach Zuweisung. 90-jährige:r Patient:in. Tachykardie und Hypotonie, Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus. Sauerstoffbedarf zunehmend.",1
+191,"Vorstellung in Begleitung des Rettungsdienstes. 92-jährige:r Patient:in, Fieber bis 39,2 °C, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax. Im Verlauf stabil.",0
+192,"Vorstellung in Begleitung des Rettungsdienstes. 61-jährige:r Patient:in, Elektrolytstörung bei Aufnahme, Exsikkose bei verminderter Trinkmenge. Sauerstoff reduzierbar.",0
+193,"Selbstvorstellung in der Notaufnahme. 58-jährige:r Patient:in, pleuritischer Thoraxschmerz, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen. Steigender Katecholaminbedarf.",0
+194,"Zuweisung durch den Hausarzt. 87-jährige:r Patient:in. Bekannte COPD, verlängertes Exspirium, Sauerstoffsättigung grenzwertig. Kreislauf zunehmend katecholaminpflichtig.",1
+195,"Vorstellung in Begleitung des Rettungsdienstes. 46-jährige:r Patient:in, produktiver Husten seit drei Tagen, Fieber bis 39,2 °C, grippaler Infekt in der Vorgeschichte. Kardiopulmonal stabil.",0
+196,"Elektive Aufnahme nach Zuweisung. 50-jährige:r Patient:in. Produktiver Husten seit drei Tagen, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche. Gute Rekonvaleszenz.",0
+197,"Patient:in zur stationären Aufnahme. 74-jährige:r Patient:in, NT-proBNP erhöht, Orthopnoe. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+198,"Elektive Aufnahme nach Zuweisung. 58-jährige:r Patient:in, Verdacht auf fokale Infektion, Verdacht auf Harnwegsinfekt als Fokus, Procalcitonin erhöht. Sauerstoff reduzierbar.",1
+199,"Selbstvorstellung in der Notaufnahme. 64-jährige:r Patient:in, gestaute Halsvenen, Gewichtszunahme innerhalb weniger Tage. Gute Rekonvaleszenz.",0
+200,"Aufnahme über die Notaufnahme. 61-jährige:r Patient:in, Fieber bis 39,2 °C, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche. Sauerstoff reduzierbar.",0
+201,"Elektive Aufnahme nach Zuweisung. 69-jährige:r Patient:in, Allgemeinzustand reduziert, unspezifische Beschwerden, Sturz in der häuslichen Umgebung. Laktat steigend, Kreislauf instabil.",1
+202,"Aufnahme über die Notaufnahme. 87-jährige:r Patient:in. Vermehrter Auswurf, bekannte COPD. Im Verlauf zunehmende Dyspnoe.",1
+203,"Vorstellung in Begleitung des Rettungsdienstes. 65-jährige:r Patient:in, weitere Abklärung geplant, unspezifische Beschwerden. Verlauf abwartend.",1
+204,"Elektive Aufnahme nach Zuweisung. 74-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C. Gutes Ansprechen auf Therapie.",0
+205,"Patient:in zur stationären Aufnahme. 31-jährige:r Patient:in. Warme Peripherie, Verdacht auf fokale Infektion. Vigilanz im Verlauf gemindert.",1
+206,"Zuweisung durch den Hausarzt. 63-jährige:r Patient:in. Schüttelfrost vor Aufnahme, CRP deutlich erhöht, Procalcitonin erhöht. Gute Rekonvaleszenz.",0
+207,"Patient:in zur stationären Aufnahme. 51-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, bekannte reduzierte Auswurffraktion. Beschwerdefreiheit im Tagesverlauf.",0
+208,"Elektive Aufnahme nach Zuweisung. 44-jährige:r Patient:in, Verdacht auf fokale Infektion, CRP deutlich erhöht, Tachykardie und Hypotonie. Afebril im Verlauf.",0
+209,"Vorstellung in Begleitung des Rettungsdienstes. 50-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte, pleuritischer Thoraxschmerz. Mobilisation problemlos.",0
+210,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie, Schüttelfrost vor Aufnahme. Gute Rekonvaleszenz.",0
+211,"Zuweisung durch den Hausarzt. 79-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche. Azidose progredient.",1
+212,"Aufnahme über die Notaufnahme. 43-jährige:r Patient:in. Warme Peripherie, CRP deutlich erhöht, Procalcitonin erhöht. Mobilisation problemlos.",0
+213,"Aufnahme über die Notaufnahme. 64-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Infiltrat im Röntgen-Thorax. Kardiopulmonal stabil.",0
+214,"Zuweisung durch den Hausarzt. 56-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, CRP deutlich erhöht. Afebril im Verlauf.",0
+215,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, Orthopnoe. Beschwerdefreiheit im Tagesverlauf.",0
+216,"Selbstvorstellung in der Notaufnahme. 80-jährige:r Patient:in, CRP deutlich erhöht, Schüttelfrost vor Aufnahme. Vigilanz im Verlauf gemindert.",0
+217,"Aufnahme über die Notaufnahme. 73-jährige:r Patient:in. Tachykardie und Hypotonie, warme Peripherie. Respiratorische Verschlechterung im Tagesverlauf.",1
+218,"Vorstellung in Begleitung des Rettungsdienstes. 85-jährige:r Patient:in, NT-proBNP erhöht, feuchte Rasselgeräusche basal beidseits, Gewichtszunahme innerhalb weniger Tage. Kreislauf zunehmend katecholaminpflichtig.",1
+219,"Aufnahme über die Notaufnahme. 62-jährige:r Patient:in, vermehrter Auswurf, Sauerstoffsättigung grenzwertig. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+220,"Zuweisung durch den Hausarzt. 53-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie, warme Peripherie. Kardiopulmonal stabil.",0
+221,"Selbstvorstellung in der Notaufnahme. 60-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, gestaute Halsvenen. Sauerstoffbedarf zunehmend.",1
+222,"Elektive Aufnahme nach Zuweisung. 68-jährige:r Patient:in. Sturz in der häuslichen Umgebung, unspezifische Beschwerden. Verlauf abwartend.",1
+223,"Zuweisung durch den Hausarzt. 67-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, NT-proBNP erhöht, feuchte Rasselgeräusche basal beidseits. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+224,"Patient:in zur stationären Aufnahme. 47-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert. Respiratorische Verschlechterung im Tagesverlauf.",0
+225,"Zuweisung durch den Hausarzt. 65-jährige:r Patient:in. Verlängertes Exspirium, Giemen, vermehrter Auswurf. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+226,"Vorstellung in Begleitung des Rettungsdienstes. 68-jährige:r Patient:in, produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Mobilisation problemlos.",0
+227,"Selbstvorstellung in der Notaufnahme. 98-jährige:r Patient:in, warme Peripherie, Procalcitonin erhöht, Verdacht auf fokale Infektion. Sauerstoffbedarf zunehmend.",1
+228,"Elektive Aufnahme nach Zuweisung. 94-jährige:r Patient:in, Einsatz der Atemhilfsmuskulatur, Zunahme der Atemnot seit Tagen, Giemen. Weitere Beobachtung erforderlich.",1
+229,"Elektive Aufnahme nach Zuweisung. 50-jährige:r Patient:in. Unspezifische Beschwerden, Elektrolytstörung bei Aufnahme. Laktat steigend, Kreislauf instabil.",1
+230,"Zuweisung durch den Hausarzt. 59-jährige:r Patient:in, NT-proBNP erhöht, gestaute Halsvenen. Im Verlauf stabil.",0
+231,"Aufnahme über die Notaufnahme. 41-jährige:r Patient:in, pleuritischer Thoraxschmerz, grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen. Beschwerdefreiheit im Tagesverlauf.",0
+232,"Patient:in zur stationären Aufnahme. 55-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, Orthopnoe. Im Verlauf stabil.",0
+233,"Patient:in zur stationären Aufnahme. 69-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C, Tachypnoe bei Aufnahme. Beschwerdefreiheit im Tagesverlauf.",0
+234,"Elektive Aufnahme nach Zuweisung. 83-jährige:r Patient:in. Zunahme der Atemnot seit Tagen, vermehrter Auswurf. Gute Rekonvaleszenz.",0
+235,"Aufnahme über die Notaufnahme. 52-jährige:r Patient:in. Beinödeme beidseits, bekannte reduzierte Auswurffraktion, Orthopnoe. Gutes Ansprechen auf Therapie.",0
+236,"Vorstellung in Begleitung des Rettungsdienstes. 54-jährige:r Patient:in. Giemen, Einsatz der Atemhilfsmuskulatur. Kardiopulmonal stabil.",0
+237,"Patient:in zur stationären Aufnahme. 30-jährige:r Patient:in, Sturz in der häuslichen Umgebung, weitere Abklärung geplant. Im Verlauf stabil.",0
+238,"Selbstvorstellung in der Notaufnahme. 61-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, bekannte reduzierte Auswurffraktion, gestaute Halsvenen. Zunehmende Somnolenz.",0
+239,"Elektive Aufnahme nach Zuweisung. 47-jährige:r Patient:in. Orthopnoe, gestaute Halsvenen, Gewichtszunahme innerhalb weniger Tage. Engmaschige Kontrolle geplant.",1
+240,"Elektive Aufnahme nach Zuweisung. 56-jährige:r Patient:in. Sauerstoffsättigung grenzwertig, vermehrter Auswurf, Zunahme der Atemnot seit Tagen. Afebril im Verlauf.",0
+241,"Patient:in zur stationären Aufnahme. 50-jährige:r Patient:in, Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert. Gutes Ansprechen auf Therapie.",0
+242,"Selbstvorstellung in der Notaufnahme. 62-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, Sturz in der häuslichen Umgebung. Vigilanz im Verlauf gemindert.",1
+243,"Patient:in zur stationären Aufnahme. 36-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+244,"Elektive Aufnahme nach Zuweisung. 41-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, Orthopnoe. Afebril im Verlauf.",0
+245,"Elektive Aufnahme nach Zuweisung. 98-jährige:r Patient:in, Tachypnoe bei Aufnahme, Fieber bis 39,2 °C. Im Verlauf stabil.",0
+246,"Vorstellung in Begleitung des Rettungsdienstes. 43-jährige:r Patient:in. Weitere Abklärung geplant, Exsikkose bei verminderter Trinkmenge. Gutes Ansprechen auf Therapie.",0
+247,"Patient:in zur stationären Aufnahme. 46-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, Orthopnoe, NT-proBNP erhöht. Zunehmende Somnolenz.",0
+248,"Vorstellung in Begleitung des Rettungsdienstes. 93-jährige:r Patient:in. CRP deutlich erhöht, Schüttelfrost vor Aufnahme. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",1
+249,"Aufnahme über die Notaufnahme. 98-jährige:r Patient:in, produktiver Husten seit drei Tagen, Fieber bis 39,2 °C. Mobilisation problemlos.",0
+250,"Elektive Aufnahme nach Zuweisung. 45-jährige:r Patient:in, Verdacht auf fokale Infektion, Schüttelfrost vor Aufnahme. Gutes Ansprechen auf Therapie.",1
+251,"Patient:in zur stationären Aufnahme. 58-jährige:r Patient:in. Giemen, vermehrter Auswurf. Sauerstoff reduzierbar.",0
+252,"Selbstvorstellung in der Notaufnahme. 69-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz. Vigilanz im Verlauf gemindert.",1
+253,"Aufnahme über die Notaufnahme. 92-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme. Azidose progredient.",0
+254,"Zuweisung durch den Hausarzt. 48-jährige:r Patient:in, Sturz in der häuslichen Umgebung, Allgemeinzustand reduziert. Gute Rekonvaleszenz.",0
+255,"Elektive Aufnahme nach Zuweisung. 60-jährige:r Patient:in. Zunahme der Atemnot seit Tagen, Einsatz der Atemhilfsmuskulatur. Afebril im Verlauf.",0
+256,"Aufnahme über die Notaufnahme. 76-jährige:r Patient:in, Fieber bis 39,2 °C, rechtsbasal feuchte Rasselgeräusche, produktiver Husten seit drei Tagen. Kardiopulmonal stabil.",0
+257,"Elektive Aufnahme nach Zuweisung. 71-jährige:r Patient:in. CRP deutlich erhöht, warme Peripherie. Befundkonstellation komplex.",1
+258,"Zuweisung durch den Hausarzt. 58-jährige:r Patient:in, weitere Abklärung geplant, unspezifische Beschwerden, Exsikkose bei verminderter Trinkmenge. Mobilisation problemlos.",0
+259,"Elektive Aufnahme nach Zuweisung. 62-jährige:r Patient:in, Zunahme der Atemnot seit Tagen, Sauerstoffsättigung grenzwertig, Einsatz der Atemhilfsmuskulatur. Gutes Ansprechen auf Therapie.",0
+260,"Aufnahme über die Notaufnahme. 42-jährige:r Patient:in, gestaute Halsvenen, Beinödeme beidseits. Mobilisation problemlos.",0
+261,"Patient:in zur stationären Aufnahme. 60-jährige:r Patient:in, CRP deutlich erhöht, warme Peripherie, Tachykardie und Hypotonie. Sauerstoff reduzierbar.",0
+262,"Elektive Aufnahme nach Zuweisung. 60-jährige:r Patient:in, Verdacht auf fokale Infektion, Tachykardie und Hypotonie. Im Verlauf stabil.",0
+263,"Elektive Aufnahme nach Zuweisung. 68-jährige:r Patient:in. Produktiver Husten seit drei Tagen, Tachypnoe bei Aufnahme. Steigender Katecholaminbedarf.",1
+264,"Aufnahme über die Notaufnahme. 55-jährige:r Patient:in, Zunahme der Atemnot seit Tagen, bekannte COPD. Afebril im Verlauf.",0
+265,"Elektive Aufnahme nach Zuweisung. 72-jährige:r Patient:in, Tachypnoe bei Aufnahme, Infiltrat im Röntgen-Thorax. Im Verlauf zunehmende Dyspnoe.",1
+266,"Selbstvorstellung in der Notaufnahme. 80-jährige:r Patient:in. Pleuritischer Thoraxschmerz, rechtsbasal feuchte Rasselgeräusche. Zunehmende Somnolenz.",1
+267,"Elektive Aufnahme nach Zuweisung. 66-jährige:r Patient:in, bekannte COPD, Einsatz der Atemhilfsmuskulatur, Giemen. Beschwerdefreiheit im Tagesverlauf.",0
+268,"Selbstvorstellung in der Notaufnahme. 70-jährige:r Patient:in, Allgemeinzustand reduziert, Sturz in der häuslichen Umgebung. Im Verlauf stabil.",0
+269,"Vorstellung in Begleitung des Rettungsdienstes. 65-jährige:r Patient:in, Einsatz der Atemhilfsmuskulatur, vermehrter Auswurf, Giemen. Rücksprache mit Oberarzt.",1
+270,"Vorstellung in Begleitung des Rettungsdienstes. 64-jährige:r Patient:in, Orthopnoe, Gewichtszunahme innerhalb weniger Tage. Gutes Ansprechen auf Therapie.",0
+271,"Selbstvorstellung in der Notaufnahme. 52-jährige:r Patient:in, NT-proBNP erhöht, gestaute Halsvenen. Gute Rekonvaleszenz.",0
+272,"Aufnahme über die Notaufnahme. 69-jährige:r Patient:in. Procalcitonin erhöht, Verdacht auf fokale Infektion. Afebril im Verlauf.",0
+273,"Elektive Aufnahme nach Zuweisung. 62-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, CRP deutlich erhöht. Laktat steigend, Kreislauf instabil.",1
+274,"Zuweisung durch den Hausarzt. 97-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, gestaute Halsvenen. Im Verlauf stabil.",0
+275,"Elektive Aufnahme nach Zuweisung. 89-jährige:r Patient:in. Warme Peripherie, CRP deutlich erhöht. Vigilanz im Verlauf gemindert.",1
+276,"Vorstellung in Begleitung des Rettungsdienstes. 70-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, bekannte reduzierte Auswurffraktion. Mobilisation problemlos.",0
+277,"Patient:in zur stationären Aufnahme. 52-jährige:r Patient:in. Weitere Abklärung geplant, unspezifische Beschwerden. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+278,"Vorstellung in Begleitung des Rettungsdienstes. 46-jährige:r Patient:in, Sturz in der häuslichen Umgebung, Exsikkose bei verminderter Trinkmenge, Allgemeinzustand reduziert. Vigilanz im Verlauf gemindert.",1
+279,"Selbstvorstellung in der Notaufnahme. 83-jährige:r Patient:in, Tachypnoe bei Aufnahme, pleuritischer Thoraxschmerz, rechtsbasal feuchte Rasselgeräusche. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",1
+280,"Vorstellung in Begleitung des Rettungsdienstes. 68-jährige:r Patient:in, Procalcitonin erhöht, CRP deutlich erhöht. Vigilanz im Verlauf gemindert.",1
+281,"Selbstvorstellung in der Notaufnahme. 72-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz. Respiratorische Verschlechterung im Tagesverlauf.",1
+282,"Zuweisung durch den Hausarzt. 36-jährige:r Patient:in. Procalcitonin erhöht, Verdacht auf Harnwegsinfekt als Fokus, CRP deutlich erhöht. Im Verlauf stabil.",0
+283,"Selbstvorstellung in der Notaufnahme. 79-jährige:r Patient:in. Warme Peripherie, Verdacht auf fokale Infektion. Kardiopulmonal stabil.",1
+284,"Zuweisung durch den Hausarzt. 71-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme, Fieber bis 39,2 °C. Azidose progredient.",1
+285,"Selbstvorstellung in der Notaufnahme. 46-jährige:r Patient:in, Einsatz der Atemhilfsmuskulatur, bekannte COPD, Giemen. Respiratorische Verschlechterung im Tagesverlauf.",0
+286,"Aufnahme über die Notaufnahme. 56-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, Gewichtszunahme innerhalb weniger Tage. Im Verlauf stabil.",0
+287,"Aufnahme über die Notaufnahme. 68-jährige:r Patient:in, unspezifische Beschwerden, weitere Abklärung geplant. Gute Rekonvaleszenz.",0
+288,"Patient:in zur stationären Aufnahme. 65-jährige:r Patient:in. Pleuritischer Thoraxschmerz, produktiver Husten seit drei Tagen. Kreislauf zunehmend katecholaminpflichtig.",0
+289,"Selbstvorstellung in der Notaufnahme. 59-jährige:r Patient:in. Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche. Afebril im Verlauf.",0
+290,"Aufnahme über die Notaufnahme. 62-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie, warme Peripherie. Zunehmende Somnolenz.",1
+291,"Zuweisung durch den Hausarzt. 60-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte, Infiltrat im Röntgen-Thorax. Kardiopulmonal stabil.",1
+292,"Vorstellung in Begleitung des Rettungsdienstes. 66-jährige:r Patient:in. Schüttelfrost vor Aufnahme, Verdacht auf Harnwegsinfekt als Fokus. Azidose progredient.",1
+293,"Patient:in zur stationären Aufnahme. 88-jährige:r Patient:in. Unspezifische Beschwerden, Exsikkose bei verminderter Trinkmenge. Gute Rekonvaleszenz.",0
+294,"Vorstellung in Begleitung des Rettungsdienstes. 23-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen. Azidose progredient.",1
+295,"Vorstellung in Begleitung des Rettungsdienstes. 60-jährige:r Patient:in, Fieber bis 39,2 °C, pleuritischer Thoraxschmerz. Sauerstoffbedarf zunehmend.",1
+296,"Zuweisung durch den Hausarzt. 67-jährige:r Patient:in, gestaute Halsvenen, feuchte Rasselgeräusche basal beidseits. Steigender Katecholaminbedarf.",1
+297,"Patient:in zur stationären Aufnahme. 69-jährige:r Patient:in. Gestaute Halsvenen, Beinödeme beidseits, feuchte Rasselgeräusche basal beidseits. Gutes Ansprechen auf Therapie.",0
+298,"Zuweisung durch den Hausarzt. 58-jährige:r Patient:in. Orthopnoe, NT-proBNP erhöht. Azidose progredient.",1
+299,"Zuweisung durch den Hausarzt. 36-jährige:r Patient:in, warme Peripherie, CRP deutlich erhöht, Verdacht auf Harnwegsinfekt als Fokus. Sauerstoff reduzierbar.",1
+300,"Patient:in zur stationären Aufnahme. 69-jährige:r Patient:in, weitere Abklärung geplant, Allgemeinzustand reduziert, unspezifische Beschwerden. Mobilisation problemlos.",0
+301,"Elektive Aufnahme nach Zuweisung. 92-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, pleuritischer Thoraxschmerz. Sauerstoff reduzierbar.",0
+302,"Selbstvorstellung in der Notaufnahme. 39-jährige:r Patient:in, warme Peripherie, Verdacht auf fokale Infektion. Kardiopulmonal stabil.",0
+303,"Vorstellung in Begleitung des Rettungsdienstes. 78-jährige:r Patient:in, Sauerstoffsättigung grenzwertig, bekannte COPD, vermehrter Auswurf. Im Verlauf stabil.",0
+304,"Aufnahme über die Notaufnahme. 59-jährige:r Patient:in. Sturz in der häuslichen Umgebung, Elektrolytstörung bei Aufnahme. Gute Rekonvaleszenz.",0
+305,"Selbstvorstellung in der Notaufnahme. 63-jährige:r Patient:in, Verdacht auf Harnwegsinfekt als Fokus, Verdacht auf fokale Infektion, CRP deutlich erhöht. Verlegung auf Intensivstation erwogen.",0
+306,"Selbstvorstellung in der Notaufnahme. 47-jährige:r Patient:in. Orthopnoe, Gewichtszunahme innerhalb weniger Tage. Sauerstoffbedarf zunehmend.",0
+307,"Zuweisung durch den Hausarzt. 59-jährige:r Patient:in. Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+308,"Patient:in zur stationären Aufnahme. 85-jährige:r Patient:in, Fieber bis 39,2 °C, Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche. Beschwerdefreiheit im Tagesverlauf.",0
+309,"Selbstvorstellung in der Notaufnahme. 73-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, Fieber bis 39,2 °C, Tachypnoe bei Aufnahme. Im Verlauf stabil.",0
+310,"Selbstvorstellung in der Notaufnahme. 92-jährige:r Patient:in, Zunahme der Atemnot seit Tagen, Einsatz der Atemhilfsmuskulatur, bekannte COPD. Kreislauf zunehmend katecholaminpflichtig.",1
+311,"Selbstvorstellung in der Notaufnahme. 83-jährige:r Patient:in, warme Peripherie, Verdacht auf fokale Infektion, Schüttelfrost vor Aufnahme. Mobilisation problemlos.",0
+312,"Selbstvorstellung in der Notaufnahme. 71-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, Sauerstoffsättigung grenzwertig. Sauerstoffbedarf zunehmend.",1
+313,"Patient:in zur stationären Aufnahme. 92-jährige:r Patient:in, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Kreislauf zunehmend katecholaminpflichtig.",1
+314,"Vorstellung in Begleitung des Rettungsdienstes. 71-jährige:r Patient:in. Allgemeinzustand reduziert, unspezifische Beschwerden. Gute Rekonvaleszenz.",0
+315,"Aufnahme über die Notaufnahme. 77-jährige:r Patient:in, Allgemeinzustand reduziert, unspezifische Beschwerden. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+316,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in, Fieber bis 39,2 °C, rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz. Laktat steigend, Kreislauf instabil.",0
+317,"Patient:in zur stationären Aufnahme. 65-jährige:r Patient:in, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen. Sauerstoffbedarf zunehmend.",1
+318,"Aufnahme über die Notaufnahme. 53-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, Fieber bis 39,2 °C. Beschwerdefreiheit im Tagesverlauf.",0
+319,"Patient:in zur stationären Aufnahme. 80-jährige:r Patient:in, weitere Abklärung geplant, Allgemeinzustand reduziert, Elektrolytstörung bei Aufnahme. Gutes Ansprechen auf Therapie.",0
+320,"Patient:in zur stationären Aufnahme. 45-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, Tachypnoe bei Aufnahme. Zunehmende Somnolenz.",1
+321,"Aufnahme über die Notaufnahme. 77-jährige:r Patient:in, Beinödeme beidseits, NT-proBNP erhöht. Laktat steigend, Kreislauf instabil.",0
+322,"Aufnahme über die Notaufnahme. 61-jährige:r Patient:in, CRP deutlich erhöht, Verdacht auf Harnwegsinfekt als Fokus, Tachykardie und Hypotonie. Im Verlauf stabil.",0
+323,"Patient:in zur stationären Aufnahme. 83-jährige:r Patient:in, Einsatz der Atemhilfsmuskulatur, Giemen, vermehrter Auswurf. Azidose progredient.",0
+324,"Zuweisung durch den Hausarzt. 76-jährige:r Patient:in. Gewichtszunahme innerhalb weniger Tage, NT-proBNP erhöht. Vigilanz im Verlauf gemindert.",0
+325,"Vorstellung in Begleitung des Rettungsdienstes. 93-jährige:r Patient:in, Beinödeme beidseits, Orthopnoe, Gewichtszunahme innerhalb weniger Tage. Vigilanz im Verlauf gemindert.",1
+326,"Patient:in zur stationären Aufnahme. 76-jährige:r Patient:in, weitere Abklärung geplant, Sturz in der häuslichen Umgebung. Kreislauf zunehmend katecholaminpflichtig.",1
+327,"Vorstellung in Begleitung des Rettungsdienstes. 39-jährige:r Patient:in. Tachypnoe bei Aufnahme, pleuritischer Thoraxschmerz. Vigilanz im Verlauf gemindert.",1
+328,"Zuweisung durch den Hausarzt. 63-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, weitere Abklärung geplant, Sturz in der häuslichen Umgebung. Kardiopulmonal stabil.",0
+329,"Aufnahme über die Notaufnahme. 45-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C. Sauerstoff reduzierbar.",0
+330,"Elektive Aufnahme nach Zuweisung. 56-jährige:r Patient:in, gestaute Halsvenen, Beinödeme beidseits. Im Verlauf stabil.",0
+331,"Aufnahme über die Notaufnahme. 88-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, Elektrolytstörung bei Aufnahme. Mobilisation problemlos.",0
+332,"Zuweisung durch den Hausarzt. 74-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, Zunahme der Atemnot seit Tagen. Rücksprache mit Oberarzt.",0
+333,"Zuweisung durch den Hausarzt. 53-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, Giemen, vermehrter Auswurf. Beschwerdefreiheit im Tagesverlauf.",0
+334,"Vorstellung in Begleitung des Rettungsdienstes. 48-jährige:r Patient:in. Schüttelfrost vor Aufnahme, warme Peripherie, Verdacht auf fokale Infektion. Im Verlauf zunehmende Dyspnoe.",1
+335,"Elektive Aufnahme nach Zuweisung. 65-jährige:r Patient:in, Schüttelfrost vor Aufnahme, Verdacht auf Harnwegsinfekt als Fokus. Verlegung auf Intensivstation erwogen.",1
+336,"Selbstvorstellung in der Notaufnahme. 45-jährige:r Patient:in, CRP deutlich erhöht, warme Peripherie. Mobilisation problemlos.",0
+337,"Selbstvorstellung in der Notaufnahme. 53-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, feuchte Rasselgeräusche basal beidseits. Im Verlauf stabil.",0
+338,"Aufnahme über die Notaufnahme. 69-jährige:r Patient:in. Orthopnoe, Gewichtszunahme innerhalb weniger Tage. Im Verlauf zunehmende Dyspnoe.",0
+339,"Aufnahme über die Notaufnahme. 82-jährige:r Patient:in, Tachykardie und Hypotonie, Schüttelfrost vor Aufnahme, Verdacht auf fokale Infektion. Steigender Katecholaminbedarf.",1
+340,"Zuweisung durch den Hausarzt. 74-jährige:r Patient:in. Verdacht auf Harnwegsinfekt als Fokus, CRP deutlich erhöht, Verdacht auf fokale Infektion. Verlegung auf Intensivstation erwogen.",1
+341,"Selbstvorstellung in der Notaufnahme. 27-jährige:r Patient:in. Tachypnoe bei Aufnahme, Infiltrat im Röntgen-Thorax. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",1
+342,"Vorstellung in Begleitung des Rettungsdienstes. 69-jährige:r Patient:in. Warme Peripherie, Tachykardie und Hypotonie. Vigilanz im Verlauf gemindert.",1
+343,"Zuweisung durch den Hausarzt. 65-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, pleuritischer Thoraxschmerz, grippaler Infekt in der Vorgeschichte. Gute Rekonvaleszenz.",0
+344,"Zuweisung durch den Hausarzt. 71-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, Allgemeinzustand reduziert. Im Verlauf zunehmende Dyspnoe.",0
+345,"Selbstvorstellung in der Notaufnahme. 90-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, bekannte reduzierte Auswurffraktion. Laktat steigend, Kreislauf instabil.",1
+346,"Elektive Aufnahme nach Zuweisung. 31-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C, rechtsbasal feuchte Rasselgeräusche. Afebril im Verlauf.",0
+347,"Elektive Aufnahme nach Zuweisung. 55-jährige:r Patient:in, verlängertes Exspirium, Zunahme der Atemnot seit Tagen, bekannte COPD. Steigender Katecholaminbedarf.",1
+348,"Selbstvorstellung in der Notaufnahme. 73-jährige:r Patient:in, Allgemeinzustand reduziert, Elektrolytstörung bei Aufnahme. Laktat steigend, Kreislauf instabil.",1
+349,"Aufnahme über die Notaufnahme. 39-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, grippaler Infekt in der Vorgeschichte. Gute Rekonvaleszenz.",0
+350,"Selbstvorstellung in der Notaufnahme. 88-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax. Zunehmende Somnolenz.",0
+351,"Zuweisung durch den Hausarzt. 70-jährige:r Patient:in, rechtsbasal feuchte Rasselgeräusche, Tachypnoe bei Aufnahme. Mobilisation problemlos.",1
+352,"Selbstvorstellung in der Notaufnahme. 78-jährige:r Patient:in. Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Afebril im Verlauf.",0
+353,"Aufnahme über die Notaufnahme. 55-jährige:r Patient:in. Sauerstoffsättigung grenzwertig, Giemen. Gutes Ansprechen auf Therapie.",0
+354,"Vorstellung in Begleitung des Rettungsdienstes. 77-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, unspezifische Beschwerden, Elektrolytstörung bei Aufnahme. Gute Rekonvaleszenz.",0
+355,"Patient:in zur stationären Aufnahme. 81-jährige:r Patient:in, Fieber bis 39,2 °C, grippaler Infekt in der Vorgeschichte, Infiltrat im Röntgen-Thorax. Zunehmende Somnolenz.",1
+356,"Elektive Aufnahme nach Zuweisung. 68-jährige:r Patient:in, Giemen, Zunahme der Atemnot seit Tagen. Kardiopulmonal stabil.",0
+357,"Zuweisung durch den Hausarzt. 68-jährige:r Patient:in. Infiltrat im Röntgen-Thorax, rechtsbasal feuchte Rasselgeräusche, Fieber bis 39,2 °C. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+358,"Patient:in zur stationären Aufnahme. 68-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, feuchte Rasselgeräusche basal beidseits, NT-proBNP erhöht. Befundkonstellation komplex.",1
+359,"Patient:in zur stationären Aufnahme. 50-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, vermehrter Auswurf, verlängertes Exspirium. Kardiopulmonal stabil.",0
+360,"Elektive Aufnahme nach Zuweisung. 62-jährige:r Patient:in, CRP deutlich erhöht, Schüttelfrost vor Aufnahme, Verdacht auf fokale Infektion. Sauerstoff reduzierbar.",1
+361,"Selbstvorstellung in der Notaufnahme. 62-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen. Sauerstoff reduzierbar.",0
+362,"Aufnahme über die Notaufnahme. 70-jährige:r Patient:in, Beinödeme beidseits, NT-proBNP erhöht. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+363,"Zuweisung durch den Hausarzt. 80-jährige:r Patient:in. Allgemeinzustand reduziert, weitere Abklärung geplant. Zunehmende Somnolenz.",1
+364,"Aufnahme über die Notaufnahme. 47-jährige:r Patient:in, pleuritischer Thoraxschmerz, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Gute Rekonvaleszenz.",0
+365,"Vorstellung in Begleitung des Rettungsdienstes. 62-jährige:r Patient:in, Fieber bis 39,2 °C, Infiltrat im Röntgen-Thorax. Im Verlauf stabil.",0
+366,"Vorstellung in Begleitung des Rettungsdienstes. 88-jährige:r Patient:in, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Verlegung auf Intensivstation erwogen.",1
+367,"Zuweisung durch den Hausarzt. 52-jährige:r Patient:in. NT-proBNP erhöht, feuchte Rasselgeräusche basal beidseits. Mobilisation problemlos.",0
+368,"Selbstvorstellung in der Notaufnahme. 51-jährige:r Patient:in, Orthopnoe, feuchte Rasselgeräusche basal beidseits. Gutes Ansprechen auf Therapie.",0
+369,"Patient:in zur stationären Aufnahme. 67-jährige:r Patient:in, vermehrter Auswurf, Giemen. Sauerstoff reduzierbar.",0
+370,"Selbstvorstellung in der Notaufnahme. 78-jährige:r Patient:in, Giemen, Sauerstoffsättigung grenzwertig, Einsatz der Atemhilfsmuskulatur. Verlegung auf Intensivstation erwogen.",1
+371,"Aufnahme über die Notaufnahme. 64-jährige:r Patient:in. Weitere Abklärung geplant, Allgemeinzustand reduziert, Elektrolytstörung bei Aufnahme. Afebril im Verlauf.",0
+372,"Vorstellung in Begleitung des Rettungsdienstes. 85-jährige:r Patient:in. Verlängertes Exspirium, Giemen. Afebril im Verlauf.",1
+373,"Aufnahme über die Notaufnahme. 78-jährige:r Patient:in, pleuritischer Thoraxschmerz, rechtsbasal feuchte Rasselgeräusche. Rücksprache mit Oberarzt.",0
+374,"Patient:in zur stationären Aufnahme. 77-jährige:r Patient:in. Orthopnoe, Beinödeme beidseits, bekannte reduzierte Auswurffraktion. Mobilisation problemlos.",0
+375,"Selbstvorstellung in der Notaufnahme. 73-jährige:r Patient:in. Schüttelfrost vor Aufnahme, Verdacht auf fokale Infektion, warme Peripherie. Im Verlauf zunehmende Dyspnoe.",1
+376,"Patient:in zur stationären Aufnahme. 98-jährige:r Patient:in. Tachykardie und Hypotonie, Schüttelfrost vor Aufnahme. Im Verlauf zunehmende Dyspnoe.",1
+377,"Vorstellung in Begleitung des Rettungsdienstes. 61-jährige:r Patient:in. Sturz in der häuslichen Umgebung, weitere Abklärung geplant, Elektrolytstörung bei Aufnahme. Befundkonstellation komplex.",1
+378,"Zuweisung durch den Hausarzt. 32-jährige:r Patient:in. Giemen, vermehrter Auswurf, verlängertes Exspirium. Im Verlauf stabil.",0
+379,"Aufnahme über die Notaufnahme. 90-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, Sturz in der häuslichen Umgebung. Gute Rekonvaleszenz.",0
+380,"Selbstvorstellung in der Notaufnahme. 57-jährige:r Patient:in, Verdacht auf fokale Infektion, Schüttelfrost vor Aufnahme, Tachykardie und Hypotonie. Afebril im Verlauf.",0
+381,"Elektive Aufnahme nach Zuweisung. 66-jährige:r Patient:in, Beinödeme beidseits, gestaute Halsvenen, NT-proBNP erhöht. Steigender Katecholaminbedarf.",1
+382,"Selbstvorstellung in der Notaufnahme. 85-jährige:r Patient:in. Gestaute Halsvenen, Orthopnoe, Gewichtszunahme innerhalb weniger Tage. Kreislauf zunehmend katecholaminpflichtig.",1
+383,"Selbstvorstellung in der Notaufnahme. 38-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, Tachypnoe bei Aufnahme, Infiltrat im Röntgen-Thorax. Beschwerdefreiheit im Tagesverlauf.",0
+384,"Vorstellung in Begleitung des Rettungsdienstes. 44-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche. Gutes Ansprechen auf Therapie.",0
+385,"Zuweisung durch den Hausarzt. 38-jährige:r Patient:in. Orthopnoe, Beinödeme beidseits, Gewichtszunahme innerhalb weniger Tage. Gutes Ansprechen auf Therapie.",0
+386,"Elektive Aufnahme nach Zuweisung. 51-jährige:r Patient:in. Tachypnoe bei Aufnahme, Infiltrat im Röntgen-Thorax, Fieber bis 39,2 °C. Sauerstoffbedarf zunehmend.",1
+387,"Zuweisung durch den Hausarzt. 71-jährige:r Patient:in. Weitere Abklärung geplant, Allgemeinzustand reduziert. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+388,"Elektive Aufnahme nach Zuweisung. 72-jährige:r Patient:in, Fieber bis 39,2 °C, Tachypnoe bei Aufnahme. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+389,"Selbstvorstellung in der Notaufnahme. 68-jährige:r Patient:in, grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Im Verlauf zunehmende Dyspnoe.",0
+390,"Zuweisung durch den Hausarzt. 41-jährige:r Patient:in. Einsatz der Atemhilfsmuskulatur, Giemen. Vigilanz im Verlauf gemindert.",1
+391,"Elektive Aufnahme nach Zuweisung. 27-jährige:r Patient:in. Produktiver Husten seit drei Tagen, grippaler Infekt in der Vorgeschichte. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+392,"Patient:in zur stationären Aufnahme. 65-jährige:r Patient:in. Weitere Abklärung geplant, Allgemeinzustand reduziert. Azidose progredient.",0
+393,"Elektive Aufnahme nach Zuweisung. 56-jährige:r Patient:in. Zunahme der Atemnot seit Tagen, bekannte COPD, vermehrter Auswurf. Im Verlauf zunehmende Dyspnoe.",1
+394,"Zuweisung durch den Hausarzt. 71-jährige:r Patient:in, Tachypnoe bei Aufnahme, rechtsbasal feuchte Rasselgeräusche, produktiver Husten seit drei Tagen. Kardiopulmonal stabil.",0
+395,"Aufnahme über die Notaufnahme. 75-jährige:r Patient:in. Zunahme der Atemnot seit Tagen, verlängertes Exspirium, Giemen. Gute Rekonvaleszenz.",0
+396,"Patient:in zur stationären Aufnahme. 66-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, feuchte Rasselgeräusche basal beidseits. Mobilisation problemlos.",0
+397,"Zuweisung durch den Hausarzt. 76-jährige:r Patient:in, bekannte COPD, Sauerstoffsättigung grenzwertig. Sauerstoff reduzierbar.",1
+398,"Selbstvorstellung in der Notaufnahme. 68-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, weitere Abklärung geplant, unspezifische Beschwerden. Steigender Katecholaminbedarf.",1
+399,"Vorstellung in Begleitung des Rettungsdienstes. 72-jährige:r Patient:in, Zunahme der Atemnot seit Tagen, Einsatz der Atemhilfsmuskulatur, verlängertes Exspirium. Respiratorische Verschlechterung im Tagesverlauf.",1
+400,"Elektive Aufnahme nach Zuweisung. 53-jährige:r Patient:in. Beinödeme beidseits, Orthopnoe, gestaute Halsvenen. Azidose progredient.",1
+401,"Vorstellung in Begleitung des Rettungsdienstes. 61-jährige:r Patient:in, Schüttelfrost vor Aufnahme, Tachykardie und Hypotonie. Sauerstoff reduzierbar.",1
+402,"Vorstellung in Begleitung des Rettungsdienstes. 67-jährige:r Patient:in. Giemen, vermehrter Auswurf. Respiratorische Verschlechterung im Tagesverlauf.",1
+403,"Vorstellung in Begleitung des Rettungsdienstes. 77-jährige:r Patient:in, Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert. Im Verlauf zunehmende Dyspnoe.",1
+404,"Elektive Aufnahme nach Zuweisung. 58-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, Gewichtszunahme innerhalb weniger Tage. Engmaschige Kontrolle geplant.",1
+405,"Vorstellung in Begleitung des Rettungsdienstes. 72-jährige:r Patient:in, Giemen, Sauerstoffsättigung grenzwertig. Sauerstoff reduzierbar.",0
+406,"Aufnahme über die Notaufnahme. 60-jährige:r Patient:in. Procalcitonin erhöht, warme Peripherie. Kreislauf zunehmend katecholaminpflichtig.",1
+407,"Aufnahme über die Notaufnahme. 62-jährige:r Patient:in. Giemen, bekannte COPD. Kreislauf zunehmend katecholaminpflichtig.",1
+408,"Zuweisung durch den Hausarzt. 77-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, weitere Abklärung geplant. Kardiopulmonal stabil.",0
+409,"Selbstvorstellung in der Notaufnahme. 32-jährige:r Patient:in, Fieber bis 39,2 °C, Infiltrat im Röntgen-Thorax, produktiver Husten seit drei Tagen. Afebril im Verlauf.",0
+410,"Vorstellung in Begleitung des Rettungsdienstes. 43-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Im Verlauf stabil.",0
+411,"Zuweisung durch den Hausarzt. 40-jährige:r Patient:in. Bekannte reduzierte Auswurffraktion, NT-proBNP erhöht. Zunehmende Somnolenz.",1
+412,"Selbstvorstellung in der Notaufnahme. 27-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, Gewichtszunahme innerhalb weniger Tage. Kreislauf zunehmend katecholaminpflichtig.",1
+413,"Elektive Aufnahme nach Zuweisung. 53-jährige:r Patient:in. Gestaute Halsvenen, Orthopnoe. Afebril im Verlauf.",0
+414,"Selbstvorstellung in der Notaufnahme. 76-jährige:r Patient:in, Fieber bis 39,2 °C, rechtsbasal feuchte Rasselgeräusche, Infiltrat im Röntgen-Thorax. Kardiopulmonal stabil.",0
+415,"Selbstvorstellung in der Notaufnahme. 59-jährige:r Patient:in, warme Peripherie, Tachykardie und Hypotonie, CRP deutlich erhöht. Gutes Ansprechen auf Therapie.",0
+416,"Zuweisung durch den Hausarzt. 67-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, NT-proBNP erhöht. Mobilisation problemlos.",0
+417,"Selbstvorstellung in der Notaufnahme. 81-jährige:r Patient:in, Orthopnoe, NT-proBNP erhöht. Laktat steigend, Kreislauf instabil.",1
+418,"Aufnahme über die Notaufnahme. 85-jährige:r Patient:in, Gewichtszunahme innerhalb weniger Tage, feuchte Rasselgeräusche basal beidseits. Sauerstoff reduzierbar.",0
+419,"Zuweisung durch den Hausarzt. 63-jährige:r Patient:in. Bekannte COPD, Einsatz der Atemhilfsmuskulatur. Gutes Ansprechen auf Therapie.",1
+420,"Selbstvorstellung in der Notaufnahme. 86-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, NT-proBNP erhöht, Orthopnoe. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+421,"Zuweisung durch den Hausarzt. 65-jährige:r Patient:in, vermehrter Auswurf, Einsatz der Atemhilfsmuskulatur. Mobilisation problemlos.",0
+422,"Vorstellung in Begleitung des Rettungsdienstes. 51-jährige:r Patient:in, Beinödeme beidseits, feuchte Rasselgeräusche basal beidseits, NT-proBNP erhöht. Verlegung auf Intensivstation erwogen.",1
+423,"Vorstellung in Begleitung des Rettungsdienstes. 54-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, Beinödeme beidseits, Gewichtszunahme innerhalb weniger Tage. Kardiopulmonal stabil.",0
+424,"Zuweisung durch den Hausarzt. 40-jährige:r Patient:in, Beinödeme beidseits, gestaute Halsvenen, NT-proBNP erhöht. Gute Rekonvaleszenz.",0
+425,"Zuweisung durch den Hausarzt. 50-jährige:r Patient:in. Fieber bis 39,2 °C, pleuritischer Thoraxschmerz. Sauerstoff reduzierbar.",0
+426,"Zuweisung durch den Hausarzt. 58-jährige:r Patient:in, Tachykardie und Hypotonie, Verdacht auf fokale Infektion. Im Verlauf zunehmende Dyspnoe.",1
+427,"Patient:in zur stationären Aufnahme. 77-jährige:r Patient:in, Beinödeme beidseits, gestaute Halsvenen. Azidose progredient.",1
+428,"Patient:in zur stationären Aufnahme. 92-jährige:r Patient:in. Allgemeinzustand reduziert, Sturz in der häuslichen Umgebung, Elektrolytstörung bei Aufnahme. Beschwerdefreiheit im Tagesverlauf.",0
+429,"Vorstellung in Begleitung des Rettungsdienstes. 42-jährige:r Patient:in. Bekannte COPD, Sauerstoffsättigung grenzwertig, vermehrter Auswurf. Respiratorische Verschlechterung im Tagesverlauf.",1
+430,"Vorstellung in Begleitung des Rettungsdienstes. 70-jährige:r Patient:in. Fieber bis 39,2 °C, Infiltrat im Röntgen-Thorax. Kardiopulmonal stabil.",0
+431,"Patient:in zur stationären Aufnahme. 47-jährige:r Patient:in, NT-proBNP erhöht, Beinödeme beidseits, bekannte reduzierte Auswurffraktion. Im Verlauf stabil.",0
+432,"Selbstvorstellung in der Notaufnahme. 72-jährige:r Patient:in, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax. Gutes Ansprechen auf Therapie.",0
+433,"Vorstellung in Begleitung des Rettungsdienstes. 62-jährige:r Patient:in. Verlängertes Exspirium, Einsatz der Atemhilfsmuskulatur, Zunahme der Atemnot seit Tagen. Gute Rekonvaleszenz.",0
+434,"Vorstellung in Begleitung des Rettungsdienstes. 35-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, weitere Abklärung geplant, Sturz in der häuslichen Umgebung. Afebril im Verlauf.",0
+435,"Selbstvorstellung in der Notaufnahme. 79-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, Orthopnoe. Sauerstoff reduzierbar.",0
+436,"Patient:in zur stationären Aufnahme. 54-jährige:r Patient:in. Orthopnoe, Beinödeme beidseits, NT-proBNP erhöht. Laktat steigend, Kreislauf instabil.",1
+437,"Patient:in zur stationären Aufnahme. 55-jährige:r Patient:in, Procalcitonin erhöht, Verdacht auf Harnwegsinfekt als Fokus. Laktat steigend, Kreislauf instabil.",1
+438,"Selbstvorstellung in der Notaufnahme. 47-jährige:r Patient:in. Feuchte Rasselgeräusche basal beidseits, bekannte reduzierte Auswurffraktion, Orthopnoe. Sauerstoff reduzierbar.",0
+439,"Aufnahme über die Notaufnahme. 54-jährige:r Patient:in, unspezifische Beschwerden, weitere Abklärung geplant. Respiratorische Verschlechterung im Tagesverlauf.",1
+440,"Vorstellung in Begleitung des Rettungsdienstes. 71-jährige:r Patient:in, Giemen, bekannte COPD. Mobilisation problemlos.",0
+441,"Aufnahme über die Notaufnahme. 61-jährige:r Patient:in. Orthopnoe, bekannte reduzierte Auswurffraktion, gestaute Halsvenen. Kardiopulmonal stabil.",0
+442,"Patient:in zur stationären Aufnahme. 69-jährige:r Patient:in, warme Peripherie, Verdacht auf Harnwegsinfekt als Fokus. Azidose progredient.",1
+443,"Patient:in zur stationären Aufnahme. 70-jährige:r Patient:in, Fieber bis 39,2 °C, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Respiratorische Verschlechterung im Tagesverlauf.",0
+444,"Aufnahme über die Notaufnahme. 85-jährige:r Patient:in, Tachypnoe bei Aufnahme, grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",0
+445,"Patient:in zur stationären Aufnahme. 59-jährige:r Patient:in, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen, grippaler Infekt in der Vorgeschichte. Sauerstoffbedarf zunehmend.",1
+446,"Aufnahme über die Notaufnahme. 40-jährige:r Patient:in. Procalcitonin erhöht, CRP deutlich erhöht. Gutes Ansprechen auf Therapie.",0
+447,"Selbstvorstellung in der Notaufnahme. 81-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert. Steigender Katecholaminbedarf.",1
+448,"Elektive Aufnahme nach Zuweisung. 59-jährige:r Patient:in. Orthopnoe, Gewichtszunahme innerhalb weniger Tage, NT-proBNP erhöht. Im Verlauf stabil.",0
+449,"Patient:in zur stationären Aufnahme. 82-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, pleuritischer Thoraxschmerz. Im Verlauf stabil.",0
+450,"Zuweisung durch den Hausarzt. 70-jährige:r Patient:in. Fieber bis 39,2 °C, pleuritischer Thoraxschmerz, produktiver Husten seit drei Tagen. Vigilanz im Verlauf gemindert.",0
+451,"Aufnahme über die Notaufnahme. 62-jährige:r Patient:in. CRP deutlich erhöht, Verdacht auf Harnwegsinfekt als Fokus, Procalcitonin erhöht. Beschwerdefreiheit im Tagesverlauf.",0
+452,"Zuweisung durch den Hausarzt. 70-jährige:r Patient:in, Einsatz der Atemhilfsmuskulatur, Sauerstoffsättigung grenzwertig. Beschwerdefreiheit im Tagesverlauf.",0
+453,"Aufnahme über die Notaufnahme. 95-jährige:r Patient:in, Procalcitonin erhöht, Schüttelfrost vor Aufnahme. Kreislauf stabil, kein zusätzlicher O2-Bedarf.",1
+454,"Zuweisung durch den Hausarzt. 97-jährige:r Patient:in. Verlängertes Exspirium, bekannte COPD. Vigilanz im Verlauf gemindert.",1
+455,"Aufnahme über die Notaufnahme. 65-jährige:r Patient:in, Zunahme der Atemnot seit Tagen, verlängertes Exspirium. Azidose progredient.",1
+456,"Patient:in zur stationären Aufnahme. 67-jährige:r Patient:in. Produktiver Husten seit drei Tagen, pleuritischer Thoraxschmerz. Im Verlauf zunehmende Dyspnoe.",1
+457,"Patient:in zur stationären Aufnahme. 81-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, bekannte reduzierte Auswurffraktion. Sauerstoffbedarf zunehmend.",1
+458,"Patient:in zur stationären Aufnahme. 50-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, unspezifische Beschwerden, Allgemeinzustand reduziert. Azidose progredient.",1
+459,"Vorstellung in Begleitung des Rettungsdienstes. 69-jährige:r Patient:in, warme Peripherie, Schüttelfrost vor Aufnahme, CRP deutlich erhöht. Sauerstoff reduzierbar.",0
+460,"Vorstellung in Begleitung des Rettungsdienstes. 64-jährige:r Patient:in, Fieber bis 39,2 °C, grippaler Infekt in der Vorgeschichte. Afebril im Verlauf.",0
+461,"Selbstvorstellung in der Notaufnahme. 69-jährige:r Patient:in. Allgemeinzustand reduziert, Sturz in der häuslichen Umgebung, weitere Abklärung geplant. Vigilanz im Verlauf gemindert.",1
+462,"Patient:in zur stationären Aufnahme. 51-jährige:r Patient:in, unspezifische Beschwerden, Allgemeinzustand reduziert, Exsikkose bei verminderter Trinkmenge. Gutes Ansprechen auf Therapie.",0
+463,"Vorstellung in Begleitung des Rettungsdienstes. 39-jährige:r Patient:in. NT-proBNP erhöht, feuchte Rasselgeräusche basal beidseits, Gewichtszunahme innerhalb weniger Tage. Azidose progredient.",0
+464,"Aufnahme über die Notaufnahme. 31-jährige:r Patient:in, gestaute Halsvenen, Beinödeme beidseits. Mobilisation problemlos.",0
+465,"Zuweisung durch den Hausarzt. 46-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, Infiltrat im Röntgen-Thorax, Tachypnoe bei Aufnahme. Vigilanz im Verlauf gemindert.",1
+466,"Selbstvorstellung in der Notaufnahme. 57-jährige:r Patient:in. Bekannte COPD, Einsatz der Atemhilfsmuskulatur, Zunahme der Atemnot seit Tagen. Sauerstoffbedarf zunehmend.",0
+467,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in. Gestaute Halsvenen, NT-proBNP erhöht. Im Verlauf zunehmende Dyspnoe.",1
+468,"Aufnahme über die Notaufnahme. 95-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Tachypnoe bei Aufnahme. Mobilisation problemlos.",0
+469,"Aufnahme über die Notaufnahme. 82-jährige:r Patient:in, bekannte COPD, Einsatz der Atemhilfsmuskulatur. Afebril im Verlauf.",0
+470,"Selbstvorstellung in der Notaufnahme. 49-jährige:r Patient:in, unspezifische Beschwerden, Allgemeinzustand reduziert, Sturz in der häuslichen Umgebung. Beschwerdefreiheit im Tagesverlauf.",0
+471,"Selbstvorstellung in der Notaufnahme. 70-jährige:r Patient:in. Elektrolytstörung bei Aufnahme, Allgemeinzustand reduziert, unspezifische Beschwerden. Kardiopulmonal stabil.",0
+472,"Zuweisung durch den Hausarzt. 57-jährige:r Patient:in, CRP deutlich erhöht, Procalcitonin erhöht, Verdacht auf Harnwegsinfekt als Fokus. Im Verlauf stabil.",1
+473,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in. Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Afebril im Verlauf.",0
+474,"Vorstellung in Begleitung des Rettungsdienstes. 67-jährige:r Patient:in, Exsikkose bei verminderter Trinkmenge, Sturz in der häuslichen Umgebung. Im Verlauf stabil.",0
+475,"Selbstvorstellung in der Notaufnahme. 74-jährige:r Patient:in, unspezifische Beschwerden, Allgemeinzustand reduziert, Sturz in der häuslichen Umgebung. Gutes Ansprechen auf Therapie.",0
+476,"Zuweisung durch den Hausarzt. 59-jährige:r Patient:in. NT-proBNP erhöht, Orthopnoe. Sauerstoffbedarf zunehmend.",1
+477,"Patient:in zur stationären Aufnahme. 81-jährige:r Patient:in, bekannte reduzierte Auswurffraktion, gestaute Halsvenen, Gewichtszunahme innerhalb weniger Tage. Sauerstoff reduzierbar.",0
+478,"Aufnahme über die Notaufnahme. 46-jährige:r Patient:in. Gestaute Halsvenen, feuchte Rasselgeräusche basal beidseits. Kardiopulmonal stabil.",0
+479,"Vorstellung in Begleitung des Rettungsdienstes. 64-jährige:r Patient:in, warme Peripherie, Procalcitonin erhöht, CRP deutlich erhöht. Mobilisation problemlos.",0
+480,"Patient:in zur stationären Aufnahme. 98-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, Tachypnoe bei Aufnahme. Verlegung auf Intensivstation erwogen.",1
+481,"Zuweisung durch den Hausarzt. 68-jährige:r Patient:in. Pleuritischer Thoraxschmerz, rechtsbasal feuchte Rasselgeräusche, Tachypnoe bei Aufnahme. Laktat steigend, Kreislauf instabil.",1
+482,"Patient:in zur stationären Aufnahme. 87-jährige:r Patient:in, Fieber bis 39,2 °C, Infiltrat im Röntgen-Thorax. Beschwerdefreiheit im Tagesverlauf.",1
+483,"Patient:in zur stationären Aufnahme. 65-jährige:r Patient:in. Sturz in der häuslichen Umgebung, weitere Abklärung geplant. Vigilanz im Verlauf gemindert.",1
+484,"Elektive Aufnahme nach Zuweisung. 73-jährige:r Patient:in. Grippaler Infekt in der Vorgeschichte, Fieber bis 39,2 °C. Laktat steigend, Kreislauf instabil.",0
+485,"Aufnahme über die Notaufnahme. 63-jährige:r Patient:in. Tachypnoe bei Aufnahme, Fieber bis 39,2 °C, produktiver Husten seit drei Tagen. Kardiopulmonal stabil.",0
+486,"Patient:in zur stationären Aufnahme. 61-jährige:r Patient:in, Orthopnoe, Beinödeme beidseits. Weitere Beobachtung erforderlich.",0
+487,"Elektive Aufnahme nach Zuweisung. 52-jährige:r Patient:in, pleuritischer Thoraxschmerz, Infiltrat im Röntgen-Thorax, grippaler Infekt in der Vorgeschichte. Mobilisation problemlos.",0
+488,"Patient:in zur stationären Aufnahme. 71-jährige:r Patient:in, Infiltrat im Röntgen-Thorax, Tachypnoe bei Aufnahme, produktiver Husten seit drei Tagen. Kardiopulmonal stabil.",0
+489,"Zuweisung durch den Hausarzt. 50-jährige:r Patient:in. Beinödeme beidseits, bekannte reduzierte Auswurffraktion, Orthopnoe. Sauerstoffbedarf zunehmend.",1
+490,"Selbstvorstellung in der Notaufnahme. 75-jährige:r Patient:in, Schüttelfrost vor Aufnahme, CRP deutlich erhöht. Gutes Ansprechen auf Therapie.",0
+491,"Zuweisung durch den Hausarzt. 81-jährige:r Patient:in. Beinödeme beidseits, Gewichtszunahme innerhalb weniger Tage, Orthopnoe. Respiratorische Verschlechterung im Tagesverlauf.",0
+492,"Aufnahme über die Notaufnahme. 70-jährige:r Patient:in. Exsikkose bei verminderter Trinkmenge, weitere Abklärung geplant, unspezifische Beschwerden. Gute Rekonvaleszenz.",0
+493,"Aufnahme über die Notaufnahme. 59-jährige:r Patient:in. Rechtsbasal feuchte Rasselgeräusche, grippaler Infekt in der Vorgeschichte, produktiver Husten seit drei Tagen. Afebril im Verlauf.",0
+494,"Selbstvorstellung in der Notaufnahme. 71-jährige:r Patient:in, unspezifische Beschwerden, Elektrolytstörung bei Aufnahme. Mobilisation problemlos.",0
+495,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in. Sturz in der häuslichen Umgebung, Elektrolytstörung bei Aufnahme. Sauerstoff reduzierbar.",0
+496,"Selbstvorstellung in der Notaufnahme. 79-jährige:r Patient:in, unspezifische Beschwerden, Elektrolytstörung bei Aufnahme, Exsikkose bei verminderter Trinkmenge. Zunehmende Somnolenz.",1
+497,"Zuweisung durch den Hausarzt. 35-jährige:r Patient:in, Orthopnoe, gestaute Halsvenen. Vigilanz im Verlauf gemindert.",0
+498,"Vorstellung in Begleitung des Rettungsdienstes. 59-jährige:r Patient:in, feuchte Rasselgeräusche basal beidseits, Gewichtszunahme innerhalb weniger Tage. Gute Rekonvaleszenz.",1
+499,"Elektive Aufnahme nach Zuweisung. 32-jährige:r Patient:in, gestaute Halsvenen, NT-proBNP erhöht, Orthopnoe. Kreislauf zunehmend katecholaminpflichtig.",0
+500,"Aufnahme über die Notaufnahme. 40-jährige:r Patient:in. Verlängertes Exspirium, bekannte COPD. Engmaschige Kontrolle geplant.",0

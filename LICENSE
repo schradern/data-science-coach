@@ -1,0 +1,51 @@
+Data Science für Ärztinnen und Ärzte — Lizenzübersicht
+Copyright (c) 2026 Dr. Nikolas B. Schrader
+
+This project uses two licenses, one for the course content and one for the
+source code. Creative Commons itself advises against applying a CC license to
+software (no patent grant, no warranty/liability terms suited to code), so the
+code is released under the permissive MIT license instead.
+
+────────────────────────────────────────────────────────────────────────────
+1. Course content — Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+   International (CC BY-NC-SA 4.0)
+────────────────────────────────────────────────────────────────────────────
+
+Applies to all instructional material, including:
+- Markdown lessons, exercises and solutions (module/*/*.md, docs/*.md, *.md)
+- figures and diagrams (module/*/assets/*, generated figures)
+- datasets (data/*.csv, data/*.xlsx, data/*.json)
+
+The full CC BY-NC-SA 4.0 terms follow below.
+
+────────────────────────────────────────────────────────────────────────────
+2. Source code — MIT License (see the LICENSE-CODE file for the full text)
+────────────────────────────────────────────────────────────────────────────
+
+Applies to all code that builds, loads or generates the course, including:
+- website/build.py, website/app.js, website/style.css
+- lib/*
+- data/*.py
+- module/*/code/*
+- tools/*
+
+The complete MIT license text lives in the file LICENSE-CODE next to this file.
+
+════════════════════════════════════════════════════════════════════════════
+Full text: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International (CC BY-NC-SA 4.0) — applies to the course content described above
+════════════════════════════════════════════════════════════════════════════
+
+You are free to:
+- Share: Copy and redistribute the material in any medium or format.
+- Adapt: Remix, transform, and build upon the material.
+
+Under the following terms:
+- Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+- NonCommercial: You may not use the material for commercial purposes.
+- ShareAlike: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+
+No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+For the full legal text of this license, please visit:
+https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode

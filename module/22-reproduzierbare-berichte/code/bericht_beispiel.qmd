@@ -1,0 +1,121 @@
+---
+title: "Intensivkohorte – Kurzauswertung"
+author: "Ihr Name"
+date: today
+lang: de
+format:
+  html:
+    toc: true
+    echo: true          # Code im Bericht sichtbar (Transparenz!)
+    warning: false
+    code-fold: true     # Code einklappbar, aber vorhanden
+execute:
+  freeze: false         # bei jedem Render neu ausfuehren
+---
+
+## Hintergrund
+
+Dieser Bericht wertet die synthetische Intensivkohorte des Data-Science-Kurses
+aus. Er demonstriert das Quarto-Prinzip: **Analyse und Text in einer Datei**.
+Beim Rendern wird der Code ausgeführt und das Ergebnis direkt eingebettet — kein
+Copy-Paste, keine manuellen Übertragungsfehler.
+
+> **Datenschutz-Hinweis:** Dieser Bericht enthält ausschließlich **fiktive**
+> Daten. Für echte Patientendaten gilt: Datei nie committen, nur auf genehmigten
+> Systemen auswerten, `.gitignore` korrekt konfigurieren.
+
+## Einrichtung
+
+```{python}
+#| label: setup
+#| echo: true
+
+import sys
+from pathlib import Path
+
+# ROOT detection: Quarto runs Python chunks in a persistent Jupyter kernel,
+# where `__file__` is never defined - the __file__ trick that plain .py
+# scripts use does NOT work here. Quarto's default execute-dir is this .qmd
+# file's own directory (code/), no matter where `quarto render` is invoked
+# from. So we walk upward from the working directory until we find the repo
+# root (identified by the `lib/` package shared by every module).
+ROOT = Path.cwd().resolve()
+while not (ROOT / "lib").exists() and ROOT != ROOT.parent:
+    ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT))
+
+import numpy as np
+import pandas as pd
+from lib.helpers import SEED, load_cohort, load_labs
+
+# Seed setzen — Pflicht fuer Reproduzierbarkeit
+np.random.seed(SEED)
+
+cohort = load_cohort()
+labs   = load_labs()
+df = cohort.merge(labs, on="patient_id", how="left")
+
+print(f"Kohorte: {len(df)} Patient:innen geladen (Seed {SEED})")
+```
+
+## Patientencharakteristika
+
+```{python}
+#| label: tbl-characteristics
+#| tbl-cap: "Deskriptive Statistik der Gesamtkohorte"
+
+characteristics = pd.Series({
+    "N":                  df["patient_id"].count(),
+    "Alter Median":       df["alter"].median(),
+    "Alter IQR 25.":      df["alter"].quantile(0.25),
+    "Alter IQR 75.":      df["alter"].quantile(0.75),
+    "30-Tage-Mortalität": df["verstorben_30d"].mean(),
+})
+print(characteristics.to_frame(name="Wert").round(2).to_string())
+```
+
+Die Kohorte umfasst **`{python} len(df)`** Patient:innen. Die
+30-Tage-Mortalität beträgt
+**`{python} f"{df['verstorben_30d'].mean():.1%}"`**.
+
+## Mortalität nach Aufnahmegrund
+
+```{python}
+#| label: tbl-mortality-by-reason
+#| tbl-cap: "30-Tage-Mortalität nach Aufnahmegrund"
+
+mortality_table = (
+    df
+    .groupby("aufnahmegrund")
+    .agg(
+        n=("patient_id", "count"),
+        verstorben=("verstorben_30d", "sum"),
+        mortalitaet=("verstorben_30d", "mean"),
+    )
+    .assign(mortalitaet=lambda d: d["mortalitaet"].map("{:.1%}".format))
+    .sort_values("verstorben", ascending=False)
+)
+print(mortality_table.to_string())
+```
+
+## Paketversionen
+
+```{python}
+#| label: package-versions
+
+import importlib.metadata
+
+tracked_packages = ["numpy", "pandas", "scipy", "scikit-learn"]
+for pkg in tracked_packages:
+    try:
+        ver = importlib.metadata.version(pkg)
+    except importlib.metadata.PackageNotFoundError:
+        ver = "nicht installiert"
+    print(f"{pkg}: {ver}")
+
+print(f"Python: {sys.version.split()[0]}")
+```
+
+---
+
+*Erzeugt mit Quarto · Code und Text in einer Quelle — vollständig reproduzierbar.*

@@ -1,0 +1,26 @@
+{
+  "_comment": [
+    "Single source of truth for all published URLs of this course.",
+    "Read by website/build.py, lib/helpers.py, lib/helpers.R and notebooks/start.ipynb.",
+    "",
+    "data_base_url points at the course website's own data/ directory: the",
+    "build copies data/*.csv|json|xlsx next to the lessons, so a learner's",
+    "copy-pasted pd.read_csv(...) fetches the same file the page documents.",
+    "No dependency on raw.githubusercontent.com and no second copy to keep",
+    "in sync.",
+    "",
+    "file_base_url prefixes every file reference in the lessons and the docs, so",
+    "a path such as `lib/helpers.py` links to exactly that file in the repository.",
+    "",
+    "For local verification without publishing, override at build time:",
+    "  DSC_DATA_BASE_URL=http://localhost:8000/data/ python website/build.py"
+  ],
+  "owner": "schradern",
+  "repo": "data-science-coach",
+  "branch": "main",
+  "pages_base_url": "https://schradern.github.io/data-science-coach/",
+  "data_base_url": "https://schradern.github.io/data-science-coach/data/",
+  "repo_url": "https://github.com/schradern/data-science-coach",
+  "file_base_url": "https://github.com/schradern/data-science-coach/blob/main/",
+  "colab_url": "https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb"
+}

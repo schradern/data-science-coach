@@ -1,0 +1,132 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat-1",
+        "gender": "female",
+        "birthDate": "1955-01-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-sofa-1",
+        "status": "final",
+        "code": {
+          "text": "SOFA score"
+        },
+        "subject": {
+          "reference": "Patient/pat-1"
+        },
+        "valueQuantity": {
+          "value": 6,
+          "unit": "score"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-crp-1",
+        "status": "final",
+        "code": {
+          "text": "C-reactive protein"
+        },
+        "subject": {
+          "reference": "Patient/pat-1"
+        },
+        "valueQuantity": {
+          "value": 22.9,
+          "unit": "mg/L"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat-2",
+        "gender": "female",
+        "birthDate": "1977-01-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-sofa-2",
+        "status": "final",
+        "code": {
+          "text": "SOFA score"
+        },
+        "subject": {
+          "reference": "Patient/pat-2"
+        },
+        "valueQuantity": {
+          "value": 4,
+          "unit": "score"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-crp-2",
+        "status": "final",
+        "code": {
+          "text": "C-reactive protein"
+        },
+        "subject": {
+          "reference": "Patient/pat-2"
+        },
+        "valueQuantity": {
+          "value": 39.7,
+          "unit": "mg/L"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat-3",
+        "gender": "male",
+        "birthDate": "1948-01-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-sofa-3",
+        "status": "final",
+        "code": {
+          "text": "SOFA score"
+        },
+        "subject": {
+          "reference": "Patient/pat-3"
+        },
+        "valueQuantity": {
+          "value": 3,
+          "unit": "score"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-crp-3",
+        "status": "final",
+        "code": {
+          "text": "C-reactive protein"
+        },
+        "subject": {
+          "reference": "Patient/pat-3"
+        },
+        "valueQuantity": {
+          "value": 35.0,
+          "unit": "mg/L"
+        }
+      }
+    }
+  ]
+}

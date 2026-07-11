@@ -1,0 +1,18 @@
+# Optional ML/AI extras (Teil 5: fortgeschrittene Machine-Learning-Module).
+# NOT needed for the core course path. Install only if you want to reproduce the
+# figures of the advanced modules yourself; the lesson code degrades cleanly and
+# falls back to scikit-learn equivalents when one of these is missing.
+#
+# Install (after the core requirements):
+#   pip install -r requirements-ml.txt
+#
+# Hinweis (macOS): xgboost/lightgbm benötigen die OpenMP-Laufzeit. Vor der
+# Installation einmalig:
+#   brew install libomp
+# Linux/Windows-Wheels bringen sie in der Regel mit.
+
+xgboost==2.1.4          # Baum-Ensembles / Boosting (Modul 26)
+lightgbm==4.6.0         # Boosting-Alternative (Modul 26)
+umap-learn==0.5.12      # Dimensionsreduktion (Modul 29); fällt sonst auf t-SNE zurück
+shap==0.49.1            # Erklärbarkeit (Modul 27)
+scikit-survival==0.23.1 # Überlebens-ML / Random Survival Forest (Modul 28)

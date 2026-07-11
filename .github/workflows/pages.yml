@@ -1,0 +1,63 @@
+name: Build and Deploy Course Website
+
+# Builds the static course site from the Markdown sources and publishes it to
+# GitHub Pages. Figures (PNG) are committed under module/*/assets and rendered
+# as-is, so the build only needs markdown + pygments — fast and reliable.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; cancel superseded runs.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: pip install markdown pygments
+
+      # Fängt genau die Fehler ab, die schon einmal ausgeliefert wurden:
+      # tote interne Links, verletzter {{DATEN}}-Vertrag, fremde Seeds,
+      # Abbildungen unter code/, nicht konfigurierte URLs.
+      - name: Repo-Konsistenz prüfen
+        run: python tools/check_repo.py
+
+      # build.py bricht selbst ab, wenn config.json noch den Platzhalter trägt,
+      # wenn ein {{DATEN}}/{{REPO}} unersetzt bleibt oder ein interner Link
+      # ins Leere zeigt.
+      - name: Build site
+        run: |
+          python website/build.py
+          touch website/site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

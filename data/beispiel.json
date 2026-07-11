@@ -1,0 +1,52 @@
+[
+  {
+    "patient_id": 1,
+    "alter": 69,
+    "aufnahmegrund": "Sepsis"
+  },
+  {
+    "patient_id": 2,
+    "alter": 47,
+    "aufnahmegrund": "Pneumonie"
+  },
+  {
+    "patient_id": 3,
+    "alter": 76,
+    "aufnahmegrund": "COPD-Exazerbation"
+  },
+  {
+    "patient_id": 4,
+    "alter": 79,
+    "aufnahmegrund": "Sonstiges"
+  },
+  {
+    "patient_id": 5,
+    "alter": 33,
+    "aufnahmegrund": "Pneumonie"
+  },
+  {
+    "patient_id": 6,
+    "alter": 43,
+    "aufnahmegrund": "Herzinsuffizienz"
+  },
+  {
+    "patient_id": 7,
+    "alter": 66,
+    "aufnahmegrund": "COPD-Exazerbation"
+  },
+  {
+    "patient_id": 8,
+    "alter": 59,
+    "aufnahmegrund": "Sepsis"
+  },
+  {
+    "patient_id": 9,
+    "alter": 64,
+    "aufnahmegrund": "COPD-Exazerbation"
+  },
+  {
+    "patient_id": 10,
+    "alter": 50,
+    "aufnahmegrund": "Herzinsuffizienz"
+  }
+]

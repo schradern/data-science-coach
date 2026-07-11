@@ -1,0 +1,78 @@
+name: Zahlen gegen den Code prüfen
+
+# Der hartnäckigste Fehler dieses Kurses ist eine Zahl in der Prosa, die der Code
+# nicht mehr produziert. Fünf Review-Runden fanden ihn fünfmal an neuer Stelle.
+# Dieser Lauf führt jedes Modul-Skript aus (Python und R) und prüft jede Zahl,
+# die eine Lektion in einer Tabelle oder einem ```text-Block behauptet.
+#
+# Er dauert ~8 Minuten, deshalb läuft er nicht bei jedem Push, sondern bei
+# Pull Requests, die Lektionen oder Code berühren, plus wöchentlich.
+
+on:
+  pull_request:
+    paths:
+      - "module/**"
+      - "data/**"
+      - "lib/**"
+      - "tools/check_numbers.py"
+      - "tools/numbers_allow.json"
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+jobs:
+  zahlen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+
+      - name: Python-Abhängigkeiten
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-ml.txt
+
+      # 30 R-Pakete, teils mit System-Bibliotheken (libcurl, libxml2). Genau ein
+      # sprödes davon würde den ganzen Lauf rot färben, bevor eine einzige Zahl
+      # geprüft ist. Deshalb darf dieser Schritt scheitern: check_numbers.py
+      # unterscheidet inzwischen sauber zwischen
+      #   * ein Skript lief nicht, seine Zahlen fehlen  -> Exit 3, Umgebung
+      #   * eine Zahl in der Prosa stimmt nicht          -> Exit 1, Drift
+      # Fehlt cmprsk, kann Modul 20 (Fine-Gray gibt es nur in R) nicht geprüft
+      # werden und der Lauf wird über Exit 3 trotzdem rot — aber mit der
+      # richtigen Begründung.
+      - name: R-Pakete
+        run: Rscript tools/install_r_packages.R
+        continue-on-error: true
+
+      - name: Datensätze und Wahrheits-Snapshot erzeugen
+        run: |
+          python data/generate_data.py
+          python lib/ground_truth.py
+
+      # Zwei Fehler auf einmal: (1) eine nicht-reproduzierbare Erzeugung, (2) eine
+      # eingecheckte Datei, die zum aktuellen Code nicht mehr passt — etwa
+      # lib/ground_truth.json, nachdem jemand einen Koeffizienten geändert hat,
+      # ohne das Skript neu laufen zu lassen. Ein Vergleich zweier frischer Läufe
+      # würde beides übersehen; der Vergleich gegen den Commit findet beides.
+      - name: Erzeugte Dateien stimmen mit dem Commit überein
+        run: |
+          git diff --exit-code --stat -- data lib/ground_truth.json \
+            || { echo "::error::Erzeugte Dateien weichen vom Commit ab. Bitte 'python data/generate_data.py' und 'python lib/ground_truth.py' laufen lassen und das Ergebnis committen."; exit 1; }
+
+      - name: Struktur- und API-Prüfungen
+        run: python tools/check_repo.py
+
+      # Exit 1 = eine Zahl in der Prosa stimmt nicht mehr mit dem Code überein.
+      # Exit 3 = ein Skript lief nicht (Umgebung kaputt), nichts wurde geprüft.
+      - name: Jede behauptete Zahl gegen den Code prüfen
+        run: python tools/check_numbers.py

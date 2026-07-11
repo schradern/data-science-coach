@@ -1,0 +1,124 @@
+{
+  "_note": [
+    "Numbers a lesson asserts that no shipped script prints. Every entry needs a",
+    "reason, and check_numbers.py refuses an entry without one. Keep this file",
+    "small: each line is a number nobody will ever re-check.",
+    "",
+    "Statistical conventions (95, 0.05, 0.001, 1.96, ...) are handled globally in",
+    "check_numbers.py and must NOT be listed here."
+  ],
+  "12-regression": {
+    "reason": "Aufgabe 2 fits a five-term model (without active_smoker) that the lesson script deliberately does not fit — printing it would give away the exercise. Estimated ORs are reproducible by running the solution's own snippet; the true ORs come from lib.ground_truth.true_odds_ratios_for on that same five-term spec. '64' is the age-centring constant, not a result.",
+    "numbers": [
+      "1,486",
+      "1,75",
+      "1,384",
+      "1,001",
+      "1,110",
+      "0,58",
+      "2,14",
+      "1,703",
+      "2,013",
+      "4,08",
+      "2,036",
+      "64"
+    ]
+  },
+  "21-statistik-entscheidung": {
+    "reason": "A worked reporting sentence in the solutions uses an illustrative sample size (n = 13); the module teaches method choice and runs no such analysis.",
+    "numbers": [
+      "13"
+    ]
+  },
+  "25-modellguete-validierung": {
+    "reason": "The TRIPOD reporting checklist references item numbers 9 and 13, not computed values.",
+    "numbers": [
+      "9",
+      "13"
+    ]
+  },
+  "26-ensembles-boosting": {
+    "reason": "Hyperparameter grid values quoted in a table (n_estimators 100 and 2000, learning rate 0.5) — configuration, not results.",
+    "numbers": [
+      "100",
+      "2 000",
+      "0,5"
+    ]
+  },
+  "19-propensity-score-causal": {
+    "reason": "Aufgabe 1 is a pen-and-paper SMD calculation from given group means and SDs (68.5/69.1, 8.2/7.8). Its intermediates exist only in the solution; that is the point of the exercise.",
+    "numbers": [
+      "8",
+      "7",
+      "67,24",
+      "60,84",
+      "64,04",
+      "8,00",
+      "68,5",
+      "69,1",
+      "0,075",
+      "7,5"
+    ]
+  },
+  "20-competing-risks-timevariant": {
+    "reason": "Aufgabe 2 builds a start-stop table for a hypothetical patient (event day 42, exposure from day 10). Übung 3 gives a hand-worked 20-patient risk-set table (nⱼ = 20, 18, 14, 12) to compute 1−KM vs. CIF by hand. None of these are produced by a script.",
+    "numbers": [
+      "42",
+      "10",
+      "18",
+      "14"
+    ]
+  },
+  "01-einfuehrung": {
+    "reason": "The Teil-overview table lists module-number ranges (01-03, 09-17, 28-30). They are identifiers, not measurements.",
+    "numbers": [
+      "06",
+      "08",
+      "17",
+      "28",
+      "18",
+      "27",
+      "31",
+      "33"
+    ]
+  },
+  "10-inferenzstatistik": {
+    "reason": "Aufgabe 5's per-group lactate table (n, mean, 95% CI) is the answer the exercise asks the learner to compute; the lesson script deliberately does not print it. Values re-verified 2026-07: Sepsis 87/2.38/[2.08,2.69], Herzinsuffizienz 90/2.33/[2.02,2.65], Pneumonie 105/2.00/[1.71,2.28].",
+    "numbers": [
+      "105",
+      "2,02",
+      "2,28",
+      "2,33",
+      "2,65",
+      "90"
+    ]
+  },
+  "11-bayes-inferenz": {
+    "reason": "loesungen.md walks the Beta-Binomial arithmetic by hand: posterior parameters (Beta(7,23), Beta(102,308)), means (7/30=0,233; 102/410=0,249), the data proportion 5/20=0,250, the prior mean, and a small posterior-variance side-calculation (0,00122; 0,12). All are pen-and-paper exercise values, not cohort-code output. '20,80' is the Beta(20,80) prior notation in the README sensitivity table (the results in that row ARE produced by python.py).",
+    "numbers": [
+      "0,00122",
+      "0,12",
+      "0,233",
+      "0,2333",
+      "0,24878",
+      "0,249",
+      "0,250",
+      "100",
+      "102",
+      "20,80",
+      "23",
+      "308",
+      "400",
+      "410",
+      "5",
+      "8"
+    ]
+  },
+  "33-rag-llm-pipelines": {
+    "reason": "Übung 3 supplies a hand-crafted table of Top-1 similarity scores (0,35; 0,22; 0,14; 0,28; 0,10; 0,05) as exercise input for a precision/recall-at-threshold calculation. These are invented inputs, not retrieval-code output.",
+    "numbers": [
+      "0,10",
+      "0,35"
+    ]
+  }
+}
