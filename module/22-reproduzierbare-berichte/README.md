@@ -116,7 +116,13 @@ Warum das besser ist als „Kopieren aus dem Skript":
 
 Ein vollständiges Beispiel-Dokument findest du unter [`code/bericht_beispiel.qmd`](code/bericht_beispiel.qmd).
 
-Einrichten: `pip install jupyter` (Python-Kernel), `quarto install` von [quarto.org](https://quarto.org). Rendern: `quarto render code/bericht_beispiel.qmd`.
+**Einrichten** (einmalig):
+
+1. **Quarto-CLI installieren** über [quarto.org/docs/get-started](https://quarto.org/docs/get-started/) — macOS: `brew install quarto`, Windows: `winget install quarto` oder der Installer. Prüfen mit `quarto --version`.
+2. **Python-Kernel bereitstellen:** `pip install jupyter` in der Kursumgebung aus Modul 02. Quarto führt die `{python}`-Chunks über Jupyter aus (für R-Chunks stattdessen das Paket `rmarkdown`).
+3. **Nur für PDF:** eine LaTeX-Distribution, am einfachsten `quarto install tinytex`.
+
+**Rendern:** `quarto render code/bericht_beispiel.qmd` erzeugt HTML (das im YAML-Header gesetzte `format`). Mit `--to pdf` oder `--to docx` entstehen die anderen Formate aus **derselben** Quelle. `quarto preview code/bericht_beispiel.qmd` rendert bei jedem Speichern neu und zeigt den Bericht live im Browser — praktisch beim Schreiben.
 
 **Stolperstein:** Enthält der YAML-Header `echo: false`, bleibt der Code im gerenderten Bericht unsichtbar, Gutachter können die Analyse nicht nachvollziehen. Für Publikationen immer `echo: true` setzen. `code-fold: true` ist ein guter Kompromiss: Der Code ist vorhanden, aber standardmäßig eingeklappt.
 

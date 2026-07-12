@@ -794,7 +794,7 @@ def seite(titel: str, titleblock: str, body: str, aktiv: str, tiefe: int,
   <div class="body" id="body">{body}</div>
   <footer class="seitenfuss">
     <span>Data Science für Ärztinnen und Ärzte</span>
-    <span><a href="{r}index.html">Kursübersicht</a> · <a href="https://nikolasschrader.com">Nikolas B. Schrader</a> · medizin.dev</span>
+    <span><a href="{r}index.html">Kursübersicht</a> · <a href="https://nikolasschrader.com">Nikolas B. Schrader</a> · <a href="https://medizin.dev">medizin.dev</a></span>
   </footer>
 </article></main>
 <button class="fab" id="topBtn" aria-label="Nach oben" title="Nach oben">{ICON_TOP}</button>
@@ -1725,7 +1725,10 @@ def code_intro(slug: str, quelle: Path) -> str:
 def baue_code_seite(quelle, slug, code_dateien):
     text = quelle.read_text(encoding="utf-8")
     lexer = CODE_LEXER.get(quelle.suffix, "text")
-    body = code_intro(slug, quelle) + md_to_html(f"```{lexer}\n{text}\n```")
+    # Direkt hervorheben statt in einen ```-Zaun zu wickeln und neu zu parsen:
+    # .qmd- und .md-Quellen enthalten selbst ```-Zäune, die den äußeren Zaun
+    # sonst vorzeitig schließen und den Rest der Datei als Seiten-Markdown ausgeben.
+    body = code_intro(slug, quelle) + highlight_block(lexer, text)
     label = CODE_LABEL.get(quelle.suffix, quelle.name)
     tb = titleblock(f"{slug.split('-')[0]} · {TITEL[slug]}", quelle.name, f"Quelltext · {label}", [],
                     sub_nav(slug, quelle.name + ".html", code_dateien, von_code=True), None)
@@ -1861,6 +1864,10 @@ def wrap_landing_sections(html: str) -> str:
     schluessel = [("direkt einsteigen", "start"), ("schnellstart", "start"), ("danach", "ergebnis"), ("rechtliches", "rechtliches"), ("lizenz", "lizenz")]
     out, parts = [], re.split(r'(?=<h2)', html)
     for p in parts:
+        # Ein `---` in der README trennt auf GitHub die Abschnitte; auf der
+        # Website zieht die Section-Grenze bereits eine Linie. Der abschließende
+        # <hr> wäre sonst eine doppelte Trennlinie — hier entfernen.
+        p = re.sub(r'\s*<hr\s*/?>\s*$', '', p)
         m = re.match(r'<h2[^>]*>(.*?)</h2>', p, re.S)
         if not m:
             if p.strip():
