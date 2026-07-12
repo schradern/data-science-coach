@@ -106,7 +106,7 @@ funktioniert" nur eine Behauptung.
 
 ---
 
-**Praxis:** `code/python.py` und `code/r.R` implementieren exakt dasselbe Verfahren (TF-IDF + Cosinus-Ähnlichkeit) — in R ohne Zusatzpakete direkt in Basis-R nachgebaut, damit beide Sprachversionen offline laufen und **dieselbe** Logik zeigen, statt wie zuvor zwei unterschiedliche (und unterschiedlich fehleranfällige) Ähnlichkeitsmaße.
+**Praxis:** `code/python.py` und `code/r.R` implementieren exakt dasselbe Verfahren (TF-IDF + Cosinus-Ähnlichkeit) — in R ohne Zusatzpakete direkt in Basis-R nachgebaut, damit beide Sprachversionen offline laufen und **dieselbe** Logik zeigen.
 
 ## 4 Halluzinationsvermeidung und Prompt-Design
 

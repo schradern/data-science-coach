@@ -89,7 +89,7 @@ wf <- workflow() |> add_recipe(rec) |> add_model(spec_nnet)
 fit <- fit(wf, data = train)
 ```
 
-**Darüber hinaus:** Das R-Beispiel nutzt `nnet::nnet()` (über `parsnip::mlp()` mit `set_engine("nnet")`) und baut damit ein neuronales Netz mit genau **einer** versteckten Schicht (`hidden_units = 64`), während die Python-Pipeline oben ein `MLPClassifier` mit **zwei** Schichten (`hidden_layer_sizes=(64, 32)`) verwendet. Das ist kein Versehen: `nnet` ist über 25 Jahre alt und unterstützt architektonisch keine mehrschichtigen Netze; ergonomische Mehrschicht-MLPs sind in R selten (am ehesten über `brulee`, ein torch-Backend, das hier bewusst nicht vorausgesetzt wird, um die Abhängigkeiten schlank zu halten). Die AUC-Zahlen aus Python und R sind wegen dieses Architekturunterschieds nicht 1:1 vergleichbar.
+**Darüber hinaus:** Das R-Beispiel nutzt `nnet::nnet()` (über `parsnip::mlp()` mit `set_engine("nnet")`) und baut damit ein neuronales Netz mit genau **einer** versteckten Schicht (`hidden_units = 64`), während die Python-Pipeline oben ein `MLPClassifier` mit **zwei** Schichten (`hidden_layer_sizes=(64, 32)`) verwendet. Das ist kein Versehen: `nnet` ist über 25 Jahre alt und unterstützt architektonisch keine mehrschichtigen Netze; ergonomische Mehrschicht-MLPs sind in R selten (am ehesten über `brulee`, ein torch-Backend). Die AUC-Zahlen aus Python und R sind wegen dieses Architekturunterschieds nicht 1:1 vergleichbar.
 
 ## 2 Lernkurve lesen
 

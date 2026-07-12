@@ -439,7 +439,7 @@ zurück, und der Gibbs-Sampler dreht sich im Kreis.
 
 **Stolperstein:** `statsmodels` kennt keine passive Imputation. In Python muss man
 `gewicht_kg` imputieren und `bmi` anschließend selbst neu berechnen — eine echte
-Funktionslücke, kein Versäumnis der Kursautoren.
+Funktionslücke.
 
 ### Grenzen: imputierte Werte müssen möglich sein
 

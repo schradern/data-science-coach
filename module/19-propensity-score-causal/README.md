@@ -218,7 +218,7 @@ Fehlerschätzern, nicht aus den Voreinstellungen:
 - **IPW (ATE):** Nicht-ganzzahlige IPW-Gewichte sind **keine Häufigkeiten**. Behandelt man sie als
   `freq_weights` (Python) oder mit `family = quasibinomial` und Modell-SE (R), bläht das die Pseudo-Fallzahl
   auf ≈ 2 × N auf bzw. schätzt einen Dispersionsparameter – beides ergibt ein **zu schmales, antikonservatives**
-  CI (die alte Zahl `[1,35; 2,57]` schloss die 1 fälschlich sicher aus). IPW braucht einen **robusten
+  CI (`[1,35; 2,57]` schließt die 1 dann fälschlich sicher aus). IPW braucht einen **robusten
   (Sandwich-)Schätzer**: `var_weights` + `cov_type="HC0"` in Python, `lmtest::coeftest(fit, vcov = sandwich::vcovHC(fit, "HC0"))`
   in R. Das breitere CI `[1,03; 3,36]` schließt die 1 nur noch knapp aus.
 

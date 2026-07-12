@@ -42,7 +42,7 @@ durchschritten wurde.
 
 ### Der Datensatz: eine kohärent erzeugte 3-Zustands-Variable
 
-Für dieses Modul liegt ein eigener, **sauber generierter** Datensatz bereit,
+Für dieses Modul liegt ein eigener Datensatz bereit,
 `konkurrenz_risiken.csv` (erzeugt von `data/generate_data.py` mit einem eigenen
 Zufallsstrom, siehe `data/README.md`). Er enthält pro Patient:in:
 

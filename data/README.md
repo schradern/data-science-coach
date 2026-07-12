@@ -36,7 +36,7 @@ Modul 20, s. u.).
 | `status` | Ereignisindikator: `1` = verstorben (Ereignis), `0` = zensiert | int |
 | `verstorben_30d` | 30-Tage-Mortalität (Outcome, 0/1) — **abgeleitet** aus `status`/`fu_zeit_tage` | int |
 
-`verstorben_30d` ist keine eigenständige Ziehung mehr, sondern folgt
+`verstorben_30d` ist keine eigenständige Ziehung, sondern folgt
 zwangsläufig aus `status` und `fu_zeit_tage` (`verstorben_30d = 1`, wenn
 `status == 1` und `fu_zeit_tage <= 30`). Klassifikations- und
 Survival-Module sind damit per Konstruktion konsistent: Module 12, 16, 23–27
@@ -200,7 +200,7 @@ Imputationsmodell steht**. Lässt man es weg, bricht stattdessen das Odds Ratio
 ab, ist also MAR und nicht MNAR.
 
 Beide Mechanismen sind seed-fest (`bga_ph` nutzt einen eigenen RNG-Strom,
-`SEED + 1`, damit das Hinzufügen der Spalte keine andere Zahl im Kurs verändert).
+`SEED + 1`, sodass die übrigen Spalten unverändert bleiben).
 
 **Nebenwirkung, die Modul 06 nutzt:** Nach dem Join von `kohorte.csv` und
 `labor.csv` löscht ein nacktes `dropna()` jetzt **192 von 500 Zeilen (38,4 %)** —
@@ -274,8 +274,8 @@ Zeitvarianter Vasopressor: naiv-zeitfix HR 0,73 (Immortal Time Bias), korrekt
 zeitvariant HR 0,95.
 
 Beide Prozesse sind seed-fest und nutzen **eigene RNG-Ströme** (`SEED + 2` für
-die Entlassungszeit, `SEED + 3` für die Exposition), damit das Hinzufügen dieser
-Datei **keine** andere Zahl im Kurs verändert (`kohorte.csv`, `labor.csv`,
+die Entlassungszeit, `SEED + 3` für die Exposition), sodass die übrigen
+Datensätze **unverändert** bleiben (`kohorte.csv`, `labor.csv`,
 `vitalwerte.csv`, `notizen.csv`, `bga_ph_wahrheit.csv` bleiben byte-identisch).
 
 ## Klinische Notizen: synthetisch, mit fixem (aber angereichertem) Vokabular
@@ -291,7 +291,7 @@ ist (Wörterbuch bekannter Phrasen statt echter klinischer Sprachvielfalt),
 **überschätzt** diese demonstrierte AUC systematisch die tatsächlich zu
 erwartende Performance auf echten, unstrukturierten klinischen Freitexten —
 echte Notizen sind lexikalisch weit vielfältiger, fehlerbehafteter und
-domänenspezifischer. Modul 31 sollte diesen Vorbehalt explizit machen.
+domänenspezifischer.
 
 ## Reale offene Datensätze (zum Weiterlernen, nicht Teil des Kurses)
 Kein Modul verwendet diese Datensätze — der gesamte Kurs läuft mit den

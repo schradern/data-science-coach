@@ -275,9 +275,10 @@ Die vollständige Liste **pro Modul** steht in
 [`DEPENDENCIES-R.md`](../../DEPENDENCIES-R.md).
 
 **Stolperstein:** Fehlt ein Paket, **bricht das R-Skript ab** (Exitcode 1) und
-nennt dir den passenden `install.packages(...)`-Befehl. Das ist Absicht: früher
-lief das Skript scheinbar durch, produzierte aber stillschweigend **keine
-einzige Zeile Lektionsausgabe**. Ein lautes Scheitern ist besser als ein leises.
+nennt dir den passenden `install.packages(...)`-Befehl. Das ist Absicht: ein
+Skript, das scheinbar durchläuft, aber stillschweigend **keine einzige Zeile
+Lektionsausgabe** produziert, ist die schlechtere Alternative — ein lautes
+Scheitern ist besser als ein leises.
 
 ### R-Pakete isolieren mit `renv`
 
