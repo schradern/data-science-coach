@@ -1,19 +1,21 @@
 # 22 · Reproduzierbare Berichte mit Quarto
 
-> **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~60 min · Voraussetzung: Module 06, 08–10, 12 (Aufbereitung bis Regression)
+> **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~60 min · Voraussetzung: Modul 02 (Git & Projektordner), 06, 08–10, 12 (Aufbereitung bis Regression)
 
 ## Lernziele
 - Verstehen, warum **Reproduzierbarkeit** in der klinischen Forschung keine Kür, sondern eine wissenschaftliche Pflicht ist.
-- Eine bewährte **Projektstruktur** anlegen und mit Git versionieren.
+- Ein **Analyseprojekt** als Git-Repository anlegen und nachvollziehbar strukturieren.
 - **Datenschutz-Hygiene** im Versionskontrollsystem einhalten: was nie in ein Repository darf.
+- Den **Analyse-Code** reproduzierbar schreiben: Seed, relative Pfade, Paketversionen.
 - Analyse und Bericht **aus einer einzigen Quelle** erzeugen (Quarto).
-- **Seeds, relative Pfade und Paketversionen** sichern, damit Ergebnisse langfristig nachvollziehbar bleiben.
 
 ## Klinischer Aufhänger
 
 Deine Analyse ist fertig, und sechs Monate später fragt ein Gutachter: *„Kannst du zeigen, wie genau Tabelle 2 entstanden ist?"* Ohne reproduzierbaren Workflow lautet die ehrliche Antwort oft: *„Nicht mehr genau."* Nicht nachvollziehbare Ergebnisse gefährden Folgepublikationen, Peer-Review-Entscheidungen und letztlich klinische Schlussfolgerungen, die auf deiner Arbeit beruhen.
 
-## 1 Reproduzierbarkeit: was, warum, wie
+Dieses Modul baut **ein** reproduzierbares Projekt von Grund auf: erst die Struktur und das Repository, dann die Datenschutz-Regeln, dann der Analyse-Code und zuletzt der Bericht, der alles zusammenführt.
+
+## 1 Reproduzierbarkeit: was & warum
 
 **Was** bedeutet reproduzierbar? Dieselbe Analyse, von einer anderen Person oder von dir selbst in zwei Jahren, auf demselben Datensatz, liefert **bitgenau dasselbe Ergebnis.**
 
@@ -27,7 +29,7 @@ Deine Analyse ist fertig, und sechs Monate später fragt ein Gutachter: *„Kann
 | Manuelle Zwischenschritte (Excel-Kopieren) | Nicht rekonstruierbar |
 | PHI im Repository | Datenschutzverletzung, rechtliche Konsequenzen |
 
-**Wie** lösen wir es? Mit drei Prinzipien:
+**Wie** lösen wir es? Mit drei Prinzipien, die sich durch dieses Modul ziehen:
 
 1. **Alles Code**, kein Klicken, kein Kopieren.
 2. **Seed setzen**, Zufall muss deterministisch sein.
@@ -37,14 +39,17 @@ Deine Analyse ist fertig, und sechs Monate später fragt ein Gutachter: *„Kann
 
 **Darüber hinaus:** Containerisierung (Docker, Singularity) sichert die gesamte Softwareumgebung inklusive Betriebssystem-Bibliotheken. Für Publikationen in Hochrisiko-Journals ist das zunehmend gefordert; für die meisten klinischen Projekte reicht eine virtuelle Python-Umgebung mit dokumentierten Versionen.
 
-## 2 Projektstruktur
+## 2 Das Projekt: Struktur und Repository
+
+Ein **Repository** ist ein mit Git versioniertes Projektverzeichnis: Git speichert bei jedem `git commit` einen Snapshot, sodass jeder Stand später abrufbar bleibt. [Modul 02](../02-werkzeuge/README.md) hat das eingerichtet (`git init`, `git add`, `git commit`) — hier geht es darum, **was** in dieses Repository gehört und **wie** es geordnet ist. Reproduzierbarkeit beginnt damit, dass alles zur Analyse Gehörende in einer klaren Struktur an einem Ort liegt.
 
 Eine bewährte Struktur für ein klinisches Analyseprojekt:
 
 ```
 mein-projekt/
 ├── README.md              # Kurzbeschreibung, Ansprechpersonen, Laufanleitung
-├── .gitignore             # was Git ignorieren soll (s. u.)
+├── .gitignore             # was Git ignorieren soll (s. Abschnitt 3)
+├── _quarto.yml            # Quarto-Projektkonfiguration (s. Abschnitt 6)
 ├── data/
 │   ├── roh/               # unveränderliche Rohdaten — nie committen!
 │   └── aufbereitet/       # durch Skripte erzeugt, ggf. committen
@@ -59,7 +64,7 @@ mein-projekt/
     └── figures/
 ```
 
-Die nummerierten Skripte machen die Ausführungsreihenfolge sofort erkennbar. Wer vier Monate nach Abgabe zurückkommt, weiß sofort, wo er anfangen muss.
+Die nummerierten Skripte in `code/` machen die Ausführungsreihenfolge sofort erkennbar; der Bericht in `berichte/` fügt ihre Ergebnisse zu einem Dokument zusammen. Wer vier Monate nach Abgabe zurückkommt, weiß sofort, wo er anfangen muss.
 
 **Stolperstein:** Versionierung durch Dateinamen (`analyse_FINAL_v3_neu.py`) ist kein Ersatz für Git. Sobald zwei Personen am Projekt arbeiten, sind Namenskollisionen und verlorene Änderungen unvermeidlich. Git ist kein Luxus, sondern Grundlage kollaborativer Reproduzierbarkeit.
 
@@ -102,9 +107,58 @@ Zusätzliche Schutzmaßnahmen:
 
 **Darüber hinaus:** Automatisierte Pre-Commit-Hooks (z. B. `detect-secrets` oder `git-secrets`) scannen jeden Commit nach Mustern, die wie PHI oder API-Schlüssel aussehen, und blockieren ihn, bevor der Schaden entsteht. In Teams sind solche Hooks eine sinnvolle Pflicht.
 
-## 4 Quarto: Analyse und Bericht aus einer Quelle
+## 4 Der Analyse-Code in Python
 
-**Quarto** ist ein modernes Format (`.qmd`), das Fließtext (Markdown) und Code (Python oder R) in einem Dokument vereint. `quarto render` führt alle Code-Chunks aus und bettet die Ergebnisse direkt ein.
+Der eigentliche Analyse-Code lebt als Skript in `code/`. Damit seine Zahlen morgen und auf einem anderen Rechner identisch sind, muss er die drei Prinzipien aus Abschnitt 1 einlösen: **fester Seed**, **relative Pfade** (nie `C:\Users\…`) und **dokumentierte Paketversionen**. [`code/python.py`](code/python.py) zeigt alle drei an der Kurs-Kohorte.
+
+```python
+SEED = 42
+import numpy as np
+import pandas as pd
+np.random.seed(SEED)                       # Pflicht vor jeder Zufallsoperation
+
+cohort = pd.read_csv("{{DATEN}}kohorte.csv")
+sample = cohort.sample(n=50, random_state=SEED)   # eigener Seed, unabhaengig von numpy
+print("Mittleres Alter:", sample["alter"].mean().round(1))
+
+import importlib.metadata                   # Paketversionen fuers Manifest
+for pkg in ["numpy", "pandas", "scikit-learn"]:
+    print(pkg, importlib.metadata.version(pkg))
+```
+
+`random_state` in pandas und scikit-learn ist **unabhängig** von `np.random.seed()`, beide müssen gesetzt werden, wenn beide genutzt werden. Das vollständige [`code/python.py`](code/python.py) lädt die Daten über `lib.helpers` (relative Pfade, läuft vom Projektstamm aus) und schreibt die Versionsliste in ein **Manifest** (`manifest.md`), das du neben der Analyse committest — so ist die Umgebung dokumentiert, ohne dass jemand sie aus dem Gedächtnis rekonstruieren muss.
+
+**Stolperstein:** `np.random.seed()` beeinflusst nur den globalen NumPy-Zufallsgenerator. Bei parallelen Ausführungen oder verschachtelten Zufallsgeneratoren kann das zu unerwarteten Interaktionen führen. Robuster ist der neuere Ansatz: `rng = np.random.default_rng(SEED)` erzeugen und explizit weitergeben.
+
+**Darüber hinaus:** `pip freeze > anforderungen.txt` oder `pip-compile` (pip-tools) erzeugt eine vollständige, nachvollziehbare Liste aller installierten Versionen. Zusammen mit einer virtuellen Umgebung ist das die einfachste Form von Environments-as-Code, der erste Schritt zu vollständiger Reproduzierbarkeit.
+
+## 5 Der Analyse-Code in R
+
+Dieselben drei Garantien in R: `set.seed()` statt `np.random.seed()`, relative Pfade über die `lib/`-Helfer und `sessionInfo()` bzw. `packageVersion()` für die Versionsdokumentation. [`code/r.R`](code/r.R) zeigt sie an derselben Kohorte.
+
+```r
+SEED <- 42
+library(tidyverse)
+set.seed(SEED)                             # vor jeder Zufallsoperation
+
+cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
+sample <- cohort |> slice_sample(n = 50)
+cat("Mittleres Alter:", mean(sample$alter), "\n")
+
+si <- sessionInfo()                        # Versionen fuer den Bericht
+cat("R:", si$R.version$version.string, "\n")
+cat("tidyverse:", as.character(packageVersion("tidyverse")), "\n")
+```
+
+Das vollständige [`code/r.R`](code/r.R) lädt die Daten über `lib/helpers.R` (relative Pfade) und listet die Versionen der zentralen Pakete auf, das R-Gegenstück zum Python-Manifest.
+
+**Stolperstein:** `set.seed()` setzt den Zufallsgenerator global. Ein späterer `set.seed()`-Aufruf innerhalb einer Funktion kann den äußeren State überschreiben, das passiert leicht, wenn Hilfsfunktionen aus Paketen intern Seeds setzen. Robuster: `withr::with_seed(SEED, expr)` für lokal kontrollierte Reproduzierbarkeit.
+
+**Darüber hinaus:** `renv` ist das R-Äquivalent zu Pythons venv mit pip-tools: Es hält alle Paketversionen in einer `renv.lock`-Datei fest, die committet wird. Wer das Projekt klont, ruft `renv::restore()` auf und erhält exakt dieselbe Paketumgebung, ohne manuelle Installation.
+
+## 6 Der Bericht: Quarto — aus einer Quelle
+
+Skript und Bericht getrennt zu pflegen heißt: die Zahlen aus dem Skript per Copy-Paste in ein Word-Dokument übertragen — genau die manuelle Kette, die Reproduzierbarkeit bricht. **Quarto** (`.qmd`) legt Fließtext (Markdown) und Analyse-Code in **eine** Datei. `quarto render` führt jeden Code-Chunk aus und bettet Tabelle, Abbildung und Zahl direkt an Ort und Stelle ein.
 
 ![Abbildung: Eine Quelle, viele Formate, aus einer .qmd-Datei (Code, Text und Ergebnis vereint) erzeugt quarto render zugleich HTML, PDF und Word.](assets/eine_quelle.svg)
 
@@ -114,76 +168,55 @@ Warum das besser ist als „Kopieren aus dem Skript":
 - Datensatz geändert? Einfach neu rendern, die Tabelle aktualisiert sich automatisch.
 - Gutachter erhalten den Bericht inklusive Code; manuelle Übertragungsfehler entfallen.
 
-Ein vollständiges Beispiel-Dokument findest du unter [`code/bericht_beispiel.qmd`](code/bericht_beispiel.qmd).
+### Ein Quarto-Projekt anlegen
 
-**Einrichten** (einmalig):
+`quarto create project default mein-bericht` legt ein Projektverzeichnis mit einer **`_quarto.yml`** an. Diese Datei bündelt die Einstellungen, die für **alle** `.qmd`-Dateien des Projekts gelten — Ausgabeformat, Inhaltsverzeichnis, Ausgabeverzeichnis —, sodass einzelne Berichte nur noch ihren Titel und Inhalt tragen:
+
+```yaml
+# _quarto.yml — gemeinsame Einstellungen fuer alle .qmd im Projekt
+project:
+  type: default
+format:
+  html:
+    toc: true
+    code-fold: true       # Code vorhanden, aber standardmaessig eingeklappt
+```
+
+In der Projektstruktur aus Abschnitt 2 liegt der Bericht dann unter `berichte/`. Ein einzelnes `.qmd` funktioniert aber auch ohne Projekt und ohne `_quarto.yml` — dann stehen alle Einstellungen im Kopf des Dokuments selbst.
+
+### Aufbau einer `.qmd`-Datei
+
+Jedes Dokument beginnt mit einem **YAML-Header** zwischen zwei `---`-Zeilen; er steuert Titel, Format und Ausführung:
+
+```yaml
+title: "Intensivkohorte — Kurzauswertung"
+author: "Dr. med. Muster"
+date: today
+format: html
+execute:
+  echo: true              # Code im Bericht sichtbar (Transparenz!)
+```
+
+Darunter folgt der Bericht: normaler Markdown-Text, unterbrochen von **Code-Chunks** — Codeblöcken, deren Sprache in geschweiften Klammern hinter dem Code-Zaun steht (`{python}` oder `{r}`). Beim Rendern ersetzt Quarto jeden Chunk durch seine Ausgabe (Tabelle, Zahl, Abbildung). Ein vollständiges, lauffähiges Beispiel steht in [`code/bericht_beispiel.qmd`](code/bericht_beispiel.qmd) — es lädt die Kohorte, rechnet eine Table 1 und rendert sie zu HTML. (Im Kurs liegt das Beispiel unter `code/`, weil jedes Modul seinen Code dort bündelt; in einem eigenen Projekt gehört der Bericht nach `berichte/`.)
+
+### Einrichten (einmalig)
 
 1. **Quarto-CLI installieren** über [quarto.org/docs/get-started](https://quarto.org/docs/get-started/) — macOS: `brew install quarto`, Windows: `winget install quarto` oder der Installer. Prüfen mit `quarto --version`.
-2. **Python-Kernel bereitstellen:** `pip install jupyter` in der Kursumgebung aus Modul 02. Quarto führt die `{python}`-Chunks über Jupyter aus (für R-Chunks stattdessen das Paket `rmarkdown`).
+2. **Python-Kernel bereitstellen:** `pip install jupyter` in der Kursumgebung aus Modul 02. Quarto führt die `{python}`-Chunks über Jupyter aus (für `{r}`-Chunks stattdessen das R-Paket `rmarkdown`).
 3. **Nur für PDF:** eine LaTeX-Distribution, am einfachsten `quarto install tinytex`.
 
-**Rendern:** `quarto render code/bericht_beispiel.qmd` erzeugt HTML (das im YAML-Header gesetzte `format`). Mit `--to pdf` oder `--to docx` entstehen die anderen Formate aus **derselben** Quelle. `quarto preview code/bericht_beispiel.qmd` rendert bei jedem Speichern neu und zeigt den Bericht live im Browser — praktisch beim Schreiben.
+### Rendern
+
+`quarto render code/bericht_beispiel.qmd` erzeugt HTML (das im YAML-Header gesetzte `format`). Mit `--to pdf` oder `--to docx` entstehen die anderen Formate aus **derselben** Quelle. `quarto preview code/bericht_beispiel.qmd` rendert bei jedem Speichern neu und zeigt den Bericht live im Browser — praktisch beim Schreiben.
 
 **Stolperstein:** Enthält der YAML-Header `echo: false`, bleibt der Code im gerenderten Bericht unsichtbar, Gutachter können die Analyse nicht nachvollziehen. Für Publikationen immer `echo: true` setzen. `code-fold: true` ist ein guter Kompromiss: Der Code ist vorhanden, aber standardmäßig eingeklappt.
 
 **Darüber hinaus:** Mit `freeze: true` cached Quarto die Chunk-Ausgaben zwischen Renders. Das spart Zeit bei langen Berechnungen, ist aber gefährlich, wenn die Daten sich geändert haben. Im Zweifel: `freeze: false` und den Render sauber von vorne starten.
 
-## 5 In Python
-
-Das Skript [`code/python.py`](code/python.py) zeigt: Seed setzen, Paketversionen festhalten, Analyse mit fester Zufallskomponente durchführen und ein Manifest schreiben.
-
-```python
-SEED = 42
-import pandas as pd
-import numpy as np
-np.random.seed(SEED)          # Pflicht vor jeder numpy-Zufallsoperation
-
-cohort = pd.read_csv("{{DATEN}}kohorte.csv")
-sample = cohort.sample(n=50, random_state=SEED)   # pandas unabhaengig von np
-print("Mittleres Alter:", sample["alter"].mean().round(1))
-
-import importlib.metadata
-for pkg in ["numpy", "pandas", "scikit-learn"]:
-    print(pkg, importlib.metadata.version(pkg))
-```
-
-`random_state` in pandas und scikit-learn ist **unabhängig** von `np.random.seed()`, beide müssen gesetzt werden, wenn beide genutzt werden.
-
-**Stolperstein:** `np.random.seed()` beeinflusst nur den globalen NumPy-Zufallsgenerator. Bei parallelen Ausführungen oder verschachtelten Zufallsgeneratoren kann das zu unerwarteten Interaktionen führen. Robuster ist der neuere Ansatz: `rng = np.random.default_rng(SEED)` erzeugen und explizit weitergeben.
-
-**Darüber hinaus:** `pip freeze > anforderungen.txt` oder `pip-compile` (pip-tools) erzeugt eine vollständige, nachvollziehbare Liste aller installierten Versionen. Zusammen mit einer virtuellen Umgebung ist das die einfachste Form von Environments-as-Code, der erste Schritt zu vollständiger Reproduzierbarkeit.
-
-## 6 In R
-
-Das Skript [`code/r.R`](code/r.R) zeigt dieselben Prinzipien in R: `set.seed()`, reproduzierbare Stichprobe, `sessionInfo()` und gezielte Versionsabfrage einzelner Pakete.
-
-```r
-SEED <- 42
-# Root-Erkennung und Helper laden — siehe code/r.R fuer Details
-library(tidyverse)
-
-set.seed(SEED)                  # vor jeder Zufallsoperation
-
-cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
-sample <- cohort |> slice_sample(n = 50)
-cat("Mittleres Alter:", mean(sample$alter), "\n")
-
-# Paketversionen
-si <- sessionInfo()
-cat("R-Version:", si$R.version$version.string, "\n")
-cat("tidyverse:", as.character(packageVersion("tidyverse")), "\n")
-```
-
-Für R Markdown (`.Rmd`) gilt dasselbe Prinzip wie für Quarto: Text und Code in einer Datei, `rmarkdown::render()` erzeugt das Dokument.
-
-**Stolperstein:** `set.seed()` setzt den Zufallsgenerator global. Ein späterer `set.seed()`-Aufruf innerhalb einer Funktion kann den äußeren State überschreiben, das passiert leicht, wenn Hilfsfunktionen aus Paketen intern Seeds setzen. Robuster: `withr::with_seed(SEED, expr)` für lokal kontrollierte Reproduzierbarkeit.
-
-**Darüber hinaus:** `renv` ist das R-Äquivalent zu Pythons venv mit pip-tools: Es hält alle Paketversionen in einer `renv.lock`-Datei fest, die committet wird. Wer das Projekt klont, ruft `renv::restore()` auf und erhält exakt dieselbe Paketumgebung, ohne manuelle Installation.
-
 ## Fallstricke und Merksätze
 - **Seed vergessen** ist der häufigste Fehler. Setze ihn ganz oben, bevor irgendein Zufallsgenerator aufgerufen wird.
 - **`random_state` in scikit-learn** und **`np.random.seed()`** sind unabhängig, beide müssen gesetzt werden, wenn beide genutzt werden.
-- **Relative Pfade** über `lib.helpers` statt absoluter Pfade sind Grundvoraussetzung, dass Analysen auf anderen Rechnern laufen.
+- **Relative Pfade** über die `lib/`-Helfer statt absoluter Pfade sind Grundvoraussetzung, dass Analysen auf anderen Rechnern laufen.
 - **Paketversionen ändern sich still.** Dokumentiere sie mit `pip freeze` oder `sessionInfo()`; noch besser: virtuelle Umgebungen mit gesperrten Versionen.
 - **Manuelle Schritte sind reproduzierbarer Tod.** Jede Excel-Editierung, die nicht im Code steht, kann nicht nachvollzogen werden.
 - **`echo: true` im Quarto-YAML**, so sieht der Leser den Code. Für Publikationsanhänge ist das Gold wert.
@@ -191,5 +224,5 @@ Für R Markdown (`.Rmd`) gilt dasselbe Prinzip wie für Quarto: Text und Code in
 ## Selbstcheck
 1. **Warum muss der Seed ganz oben im Skript stehen, vor allen Zufallsoperationen?**, Jede Zufallsoperation zieht aus dem laufenden Generator; ein nachträglich gesetzter Seed beeinflusst nur spätere, nicht frühere Aufrufe. Das Ergebnis hängt dann von der Reihenfolge der Aufrufe ab und ist nicht mehr reproduzierbar.
 2. **Was passiert, wenn Patientendaten versehentlich in Git committet wurden?**, Git behält die Datei dauerhaft in der gesamten Historie; vollständiges Entfernen erfordert `git filter-repo` und ein erzwungenes Re-Push auf alle Klone, aufwändig, fehleranfällig und nicht garantiert vollständig bei bereits weitergezogenen Klonen.
-3. **Warum erzeugt ein Quarto-Dokument reproduzierbarere Berichte als Copy-Paste aus dem Skript?**, Code und Text sind in derselben Datei; `quarto render` führt alle Chunks aus und bettet Ergebnisse direkt ein, manuelle Übertragungsfehler zwischen Skript und Bericht entfallen vollständig.
-
+3. **Warum laufen relative Pfade (über die `lib/`-Helfer) reproduzierbarer als absolute wie `C:\Users\…`?**, Absolute Pfade existieren nur auf einem Rechner; auf jedem anderen bricht das Skript. Relative Pfade vom Projektstamm aus funktionieren überall, wo das Repository geklont wird.
+4. **Warum erzeugt ein Quarto-Dokument reproduzierbarere Berichte als Copy-Paste aus dem Skript?**, Code und Text sind in derselben Datei; `quarto render` führt alle Chunks aus und bettet Ergebnisse direkt ein, manuelle Übertragungsfehler zwischen Skript und Bericht entfallen vollständig.
