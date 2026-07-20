@@ -13,6 +13,9 @@
 
 xgboost==2.1.4          # Baum-Ensembles / Boosting (Modul 26)
 lightgbm==4.6.0         # Boosting-Alternative (Modul 26)
-umap-learn==0.5.12      # Dimensionsreduktion (Modul 29); fällt sonst auf t-SNE zurück
+# Dimensionsreduktion (Modul 29); fällt sonst auf t-SNE zurück.
+# Ab 0.5.8 verlangt umap-learn scikit-learn>=1.6, scikit-survival unten aber
+# scikit-learn<1.6 — 0.5.7 ist die letzte Version, die zu beidem passt.
+umap-learn==0.5.7
 shap==0.49.1            # Erklärbarkeit (Modul 27)
 scikit-survival==0.23.1 # Überlebens-ML / Random Survival Forest (Modul 28)
