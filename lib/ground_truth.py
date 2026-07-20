@@ -292,13 +292,23 @@ def write_snapshot() -> Path:
     ORs and HRs. `tools/check_repo.py` diffs those literals against this file.
     """
     hr = true_hazard_ratios()
+
+    # Auf 6 Nachkommastellen runden. Die Modellfits stimmen über Plattformen
+    # hinweg nur bis etwa zur 14. Stelle überein (macOS/Accelerate vs.
+    # Linux/OpenBLAS in der CI). Der Byte-Abgleich in numbers.yml würde an diesem
+    # Gleitkomma-Rauschen scheitern, obwohl jede genutzte Stelle (Prosa und R
+    # nutzen ≤3, check_repo prüft mit Toleranz 0,0005) identisch ist. 6 Stellen
+    # liegen weit über jedem Bedarf und weit über dem Rauschen.
+    def r6(d: dict[str, float]) -> dict:
+        return {k: (round(v, 6) if isinstance(v, float) else v) for k, v in d.items()}
+
     payload = {
         "seed": SEED_TRUTH,
         "n_or": N_TRUTH_OR,
         "n_hr": N_TRUTH_HR,
-        "true_or": true_odds_ratios(),
-        "true_hr_direct": hr["direct"],
-        "true_hr_total": hr["total"],
+        "true_or": r6(true_odds_ratios()),
+        "true_hr_direct": r6(hr["direct"]),
+        "true_hr_total": r6(hr["total"]),
     }
     TRUTH_SNAPSHOT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n",
                               encoding="utf-8")
