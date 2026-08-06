@@ -275,8 +275,13 @@ Zwei Werkzeuge prüfen den Kurs automatisiert; beide laufen lokal und in CI.
   Hinweis gemeldet und lassen den Lauf nicht scheitern.
 
 - **CI:** `pages.yml` baut die Seite und führt `check_repo.py` bei jedem Push
-  aus. `numbers.yml` führt den ~8-minütigen Zahlen-Check bei Pull Requests aus,
-  die `module/**`, `data/**` oder `lib/**` berühren, plus wöchentlich.
+  aus. `check_numbers.py` läuft **nur lokal** (siehe oben) und ist bewusst
+  **kein** CI-Gate: Iterative numerische Verfahren (etwa die Imputation in
+  Modul 14 oder die IPW-Gewichtung in Modul 19) liefern mit den aktuellen
+  Bibliotheken in den letzten Stellen plattformabhängige Ergebnisse
+  (macOS/Accelerate vs. Linux/OpenBLAS); ein strikter Zahlenabgleich über
+  Läufer hinweg meldete das fälschlich als Drift. Vor größeren Zahlenänderungen
+  lohnt der lokale Lauf trotzdem — er fängt grobe Abweichungen zuverlässig.
 
 ## Vertiefungs-Marker (`<!-- vertiefung: … -->`)
 

@@ -26,7 +26,7 @@ Modul und Abschnitt, was falsch ist, und (bei fachlichen Punkten) eine Quelle.
    ./.venv/bin/python tools/check_numbers.py 13   # nur Modul 14 (schnell)
    ```
 
-4. Pull Request öffnen. CI (`pages.yml`, `numbers.yml`) muss grün sein.
+4. Pull Request öffnen. CI (`pages.yml`) muss grün sein.
 
 ## Grundregeln des Kurses
 
