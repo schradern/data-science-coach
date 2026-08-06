@@ -62,6 +62,12 @@ Schon eingerichtet? Springe über die [Modulübersicht](module/README.md) direkt
 - **Prädiktionsmodelle** bauen, leckfrei validieren, kalibrieren, erklären (SHAP) und einsetzen
 - moderne KI einordnen: **Gradient Boosting, Survival-ML, Deep Learning, klinisches NLP/LLMs**
 
+## Reproduzierbarkeit — und ihre Grenzen
+
+Der Kurs ist reproduzierbar angelegt: fester Seed, relative Pfade, gepinnte Paketversionen. Was du **liest**, ist stabil — die Datensätze und Abbildungen sind eingecheckt und ändern sich nicht.
+
+Führst du den Code **selbst** aus, können einzelne Zahlen in den letzten Nachkommastellen je nach Betriebssystem, mathematischer Bibliothek (BLAS) und Paketversion minimal abweichen — vor allem bei iterativen Verfahren wie der multiplen Imputation. An den Schlussfolgerungen ändert das nichts; die Abweichungen liegen weit unter jeder klinisch oder statistisch relevanten Schwelle. Warum bitweise Gleichheit über alle Rechner hinweg nicht garantiert ist, erklärt [Modul 22](module/22-reproduzierbare-berichte/README.md).
+
 ## Rechtliches und Datenschutz
 
 Dieser Kurs dient ausschließlich Lehr- und Fortbildungszwecken und stellt keine klinische oder statistische Beratung dar. Die Website bindet keine Drittanbieter ein: keine Cookies, kein Tracking, keine externen Skripte oder Schriftarten. Deine Einstellungen und dein Lesefortschritt verbleiben ausschließlich lokal in deinem Browser. Wie bei jedem Webseitenaufruf verarbeitet der ausliefernde Server (GitHub Pages) technisch notwendige Zugriffsdaten einschließlich der IP-Adresse.

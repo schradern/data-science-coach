@@ -17,7 +17,9 @@ Dieses Modul baut **ein** reproduzierbares Projekt von Grund auf: erst die Struk
 
 ## 1 Reproduzierbarkeit: was & warum
 
-**Was** bedeutet reproduzierbar? Dieselbe Analyse, von einer anderen Person oder von dir selbst in zwei Jahren, auf demselben Datensatz, liefert **bitgenau dasselbe Ergebnis.**
+**Was** bedeutet reproduzierbar? Dieselbe Analyse, von einer anderen Person oder von dir selbst in zwei Jahren, auf demselben Datensatz, liefert **dasselbe Ergebnis.**
+
+**Darüber hinaus:** Dieses Ideal hat eine Grenze, die man kennen sollte. Iterative numerische Verfahren — etwa multiple Imputation oder eine IPW-Gewichtung — können je nach Betriebssystem und mathematischer Bibliothek (macOS/Accelerate vs. Linux/OpenBLAS) in den letzten Nachkommastellen abweichen. „Reproduzierbar" meint deshalb: **gleiche Methode, gleiche Daten, gleiche Schlussfolgerung** — nicht zwingend dasselbe letzte Bit auf jedem Rechner. Genau darum dokumentierst du Seed, Pfade und Versionen: Sie sichern die Aussage, nicht die 15. Nachkommastelle.
 
 **Warum** scheitert das so häufig?
 
