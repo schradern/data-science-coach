@@ -61,21 +61,36 @@ ist nicht bestellt; eine Bestellpflicht nach Art. 37 DSGVO in Verbindung mit
 
 ### 4.3 Was beim Aufruf der Seite dennoch geschieht
 
-Diese Seite wird über **GitHub Pages** (GitHub, Inc., 88 Colin P. Kelly Jr.
-Street, San Francisco, CA 94107, USA) ausgeliefert. Wie bei jedem Aufruf einer
-Website überträgt dein Browser dabei technisch notwendige Daten an den Server –
-insbesondere deine **IP-Adresse**, Datum und Uhrzeit des Zugriffs, die
-angeforderte Adresse, Referrer und User-Agent. GitHub verarbeitet diese Daten
-serverseitig in Logdateien, um die Auslieferung zu ermöglichen und Missbrauch
-abzuwehren.
+Diese Seite wird unter **datascience.medizin.dev** von einem Server der
+**Hetzner Online GmbH** (Industriestr. 25, 91710 Gunzenhausen) in Deutschland
+ausgeliefert – demselben Server, auf dem auch medizin.dev läuft. Hetzner
+verarbeitet die Daten dabei im Auftrag des Verantwortlichen
+(Auftragsverarbeitung nach Art. 28 DSGVO). Wie bei jedem Aufruf einer Website
+überträgt dein Browser technisch notwendige Daten an den Server – insbesondere
+deine **IP-Adresse**, Datum und Uhrzeit des Zugriffs, die angeforderte Adresse,
+Referrer und User-Agent. Der Webserver speichert diese Daten in einer Logdatei,
+um den sicheren Betrieb zu gewährleisten und Angriffe abzuwehren.
 
 Ganz ohne IP-Adresse geht es also nicht: Wer eine Website aufruft, überträgt
 sie zwangsläufig an den ausliefernden Server. Darüber hinaus überträgt diese
 Seite **nichts**, an niemanden sonst. Das lässt sich in den Entwicklerwerkzeugen
 jedes Browsers (Reiter „Netzwerk“) nachprüfen.
 
-* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der
-  technisch fehlerfreien Bereitstellung der Website).
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am
+  sicheren und technisch fehlerfreien Betrieb der Website).
+* **Speicherdauer:** Die Logdateien werden nach **sieben Tagen** gelöscht.
+* **Drittlandübermittlung:** findet nicht statt; der Server steht in
+  Deutschland.
+
+### 4.4 Ältere Adresse auf GitHub Pages
+
+Damit ältere Links weiter funktionieren, ist der Kurs zusätzlich unter
+`schradern.github.io/data-science-coach` erreichbar. Rufst du ihn über diese
+Adresse auf, liefert ihn **GitHub Pages** (GitHub, Inc., 88 Colin P. Kelly Jr.
+Street, San Francisco, CA 94107, USA) aus und verarbeitet dabei dieselben
+Zugriffsdaten in eigenen Logdateien.
+
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO, wie oben.
 * **Drittlandübermittlung:** Die Verarbeitung findet auch in den USA statt.
   GitHub, Inc. (ein Tochterunternehmen von Microsoft) ist unter dem
   [EU-US Data Privacy Framework](https://www.dataprivacyframework.gov/) zertifiziert,
@@ -86,7 +101,7 @@ jedes Browsers (Reiter „Netzwerk“) nachprüfen.
   und die Hinweise zur
   [Datenerhebung bei GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages).
 
-### 4.4 Lokale Speicherung im Browser (`localStorage`)
+### 4.5 Lokale Speicherung im Browser (`localStorage`)
 
 Dein Lesestatus (als „erledigt“ markierte Module und das zuletzt geöffnete
 Modul), die bevorzugte Programmiersprache (Python/R), die gewählte Lerntiefe,
@@ -100,7 +115,7 @@ Da diese Speicherung für die von dir ausdrücklich gewünschte Funktion
 (Fortschrittsanzeige, Sprachwahl, Ansichtseinstellungen) unbedingt erforderlich ist, ist sie nach § 25
 Abs. 2 Nr. 2 TDDG einwilligungsfrei.
 
-### 4.5 Deine Rechte
+### 4.6 Deine Rechte
 
 Dir stehen gegenüber dem Verantwortlichen die Rechte aus Art. 15–21 DSGVO zu:
 Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung,
@@ -132,5 +147,5 @@ MIT-Lizenz. Siehe `LICENSE` und `LICENSE-CODE`.
 
 ---
 
-*Stand: Juli 2026. Dieses Dokument ist nach bestem Wissen erstellt und ersetzt
+*Stand: Oktober 2026. Dieses Dokument ist nach bestem Wissen erstellt und ersetzt
 keine Rechtsberatung.*

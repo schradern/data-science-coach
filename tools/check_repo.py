@@ -124,8 +124,8 @@ def check_config() -> list[str]:
     except json.JSONDecodeError as exc:
         return [f"config.json does not parse: {exc}"]
 
-    for key in ("owner", "repo", "branch", "data_base_url", "repo_url",
-                "file_base_url", "colab_url"):
+    for key in ("owner", "repo", "branch", "pages_base_url", "data_base_url",
+                "repo_url", "file_base_url", "colab_url"):
         if key not in cfg:
             bad.append(f"config.json misses key '{key}'")
     if not str(cfg.get("data_base_url", "")).endswith("/"):
@@ -140,11 +140,15 @@ def check_config() -> list[str]:
         erwartet = {
             "repo_url": f"https://github.com/{owner}/{repo}",
             "file_base_url": f"https://github.com/{owner}/{repo}/blob/{branch}/",
-            "pages_base_url": f"https://{owner}.github.io/{repo}/",
-            "data_base_url": f"https://{owner}.github.io/{repo}/data/",
             "colab_url": (f"https://colab.research.google.com/github/{owner}/{repo}"
                           f"/blob/{branch}/notebooks/start.ipynb"),
         }
+        # The website has its own domain, so pages_base_url is not derived from
+        # owner/repo. The datasets must still live in that site's data/ folder.
+        pages = str(cfg.get("pages_base_url", ""))
+        if not (pages.startswith("https://") and pages.endswith("/")):
+            bad.append("config.json: pages_base_url must be an https URL ending with '/'")
+        erwartet["data_base_url"] = f"{pages}data/"
         for key, soll in erwartet.items():
             if key in cfg and cfg[key] != soll:
                 bad.append(f"config.json: {key} is {cfg[key]!r}, but owner/repo/branch imply {soll!r}")

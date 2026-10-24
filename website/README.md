@@ -74,15 +74,26 @@ ergänzt man durch eine Diagrammfunktion + Eintrag in `TARGETS`.
 
 ## Ausgabe
 `website/site/` ist vollständig statisch (kein Server nötig), nutzt nur relative
-Pfade (läuft also auch unter einem Unterpfad) und kann direkt auf medizin.dev
-oder per GitHub Pages veröffentlicht werden.
+Pfade (läuft also auch unter einem Unterpfad) und wird unter
+[datascience.medizin.dev](https://datascience.medizin.dev/) veröffentlicht,
+zusätzlich für ältere Links per GitHub Pages.
 
-## Automatisches Deployment (GitHub Pages)
+## Automatisches Deployment
 `.github/workflows/pages.yml` baut die Seite bei jedem Push auf `main` und
-veröffentlicht sie. Der Build braucht nur `markdown` + `pygments`; Abbildungen
+veröffentlicht sie zweimal: per SSH auf den Server von datascience.medizin.dev
+und auf GitHub Pages. Der Build braucht nur `markdown` + `pygments`; Abbildungen
 (`module/*/assets/*.png`) und Datensätze (`data/*.csv`) sind eingecheckt und
-werden unverändert übernommen. Einmalig im Repo aktivieren:
-**Settings → Pages → Source: GitHub Actions**.
+werden unverändert übernommen.
+
+- **Server:** Der Job `deploy-server` schickt die Seite als tar.gz an den
+  Benutzer `dsc-deploy`, mit dem Commit-SHA als einzigem Argument. Der Server
+  entpackt sie in einen neuen Ordner unter `/srv/datascience-coach/releases/`,
+  schaltet `current` um und behält die letzten fünf Releases. Die Zugangsdaten
+  liegen als Secrets `DSC_DEPLOY_HOST`, `DSC_DEPLOY_KEY` und
+  `DSC_DEPLOY_KNOWN_HOSTS` in der Umgebung `datascience-medizin-dev`, die nur
+  `main` nutzen darf.
+- **GitHub Pages:** Einmalig im Repo aktivieren:
+  **Settings → Pages → Source: GitHub Actions**.
 
 Abbildungen/Daten lokal neu erzeugen (optional, vor dem Commit):
 

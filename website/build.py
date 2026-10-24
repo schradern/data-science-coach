@@ -1914,7 +1914,7 @@ def baue_startseite():
 
 
 def baue_404_seite():
-    """A self-contained 404 page. GitHub Pages serves it for ANY missing path,
+    """A self-contained 404 page. The web server serves it for ANY missing path,
     so it cannot rely on relative asset links (those would resolve against the
     missing URL, not the site root). It inlines its styles and links absolutely
     to the course – the graceful landing for a bookmark to a renamed module.

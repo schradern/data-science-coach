@@ -4,7 +4,7 @@ Von der Rohdatei zur belastbaren Auswertung – mit Python, R und SQL, an echten
 klinischen Fragestellungen, reproduzierbar angelegt.
 
 <!-- nur-github -->
-**➜ Kurs lesen: [schradern.github.io/data-science-coach](https://schradern.github.io/data-science-coach/)**
+**➜ Kurs lesen: [datascience.medizin.dev](https://datascience.medizin.dev/)**
 <!-- /nur-github -->
 
 ## Drei Wege, den Kurs zu nutzen
@@ -72,7 +72,7 @@ Führst du den Code **selbst** aus, können einzelne Zahlen in den letzten Nachk
 
 ## Rechtliches und Datenschutz
 
-Dieser Kurs dient ausschließlich Lehr- und Fortbildungszwecken und stellt keine klinische oder statistische Beratung dar. Die Website bindet keine Drittanbieter ein: keine Cookies, kein Tracking, keine externen Skripte oder Schriftarten. Deine Einstellungen und dein Lesefortschritt verbleiben ausschließlich lokal in deinem Browser. Wie bei jedem Webseitenaufruf verarbeitet der ausliefernde Server (GitHub Pages) technisch notwendige Zugriffsdaten einschließlich der IP-Adresse.
+Dieser Kurs dient ausschließlich Lehr- und Fortbildungszwecken und stellt keine klinische oder statistische Beratung dar. Die Website bindet keine Drittanbieter ein: keine Cookies, kein Tracking, keine externen Skripte oder Schriftarten. Deine Einstellungen und dein Lesefortschritt verbleiben ausschließlich lokal in deinem Browser. Wie bei jedem Webseitenaufruf verarbeitet der ausliefernde Server (Hetzner, Deutschland) technisch notwendige Zugriffsdaten einschließlich der IP-Adresse und löscht sie nach sieben Tagen.
 
 Verantwortlich für Inhalt und Konzeption: **Dr. Nikolas B. Schrader** · [nikolasschrader.com](https://nikolasschrader.com) · [medizin.dev](https://medizin.dev).
 

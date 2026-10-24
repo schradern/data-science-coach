@@ -18,8 +18,8 @@
   "owner": "schradern",
   "repo": "data-science-coach",
   "branch": "main",
-  "pages_base_url": "https://schradern.github.io/data-science-coach/",
-  "data_base_url": "https://schradern.github.io/data-science-coach/data/",
+  "pages_base_url": "https://datascience.medizin.dev/",
+  "data_base_url": "https://datascience.medizin.dev/data/",
   "repo_url": "https://github.com/schradern/data-science-coach",
   "file_base_url": "https://github.com/schradern/data-science-coach/blob/main/",
   "colab_url": "https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb"

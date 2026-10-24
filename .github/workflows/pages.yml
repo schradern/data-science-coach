@@ -1,7 +1,8 @@
 name: Build and Deploy Course Website
 
 # Builds the static course site from the Markdown sources and publishes it to
-# GitHub Pages. Figures (PNG) are committed under module/*/assets and rendered
+# datascience.medizin.dev (Hetzner, via SSH) and, for old links, to GitHub
+# Pages. Figures (PNG) are committed under module/*/assets and rendered
 # as-is; the build itself only needs markdown + pygments. The course packages
 # are installed anyway so that tools/check_repo.py can verify every lesson
 # snippet against the real library APIs instead of skipping that check.
@@ -72,3 +73,44 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  # Lädt dieselbe Seite als tar.gz auf den Server. Der Schlüssel darf dort nur
+  # ein Programm starten: Es prüft den Commit-SHA, entpackt in einen neuen
+  # Release-Ordner und schaltet `current` erst um, wenn alles da ist.
+  # Kein Wiederholen bei Fehlern – der Server sperrt eine Adresse nach
+  # fehlgeschlagenen Anmeldungen für einige Minuten.
+  deploy-server:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: datascience-medizin-dev
+      url: https://datascience.medizin.dev/
+    steps:
+      - name: Download site artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: github-pages
+          path: artifact
+
+      - name: Deploy to datascience.medizin.dev
+        env:
+          DSC_DEPLOY_HOST: ${{ secrets.DSC_DEPLOY_HOST }}
+          DSC_DEPLOY_KEY: ${{ secrets.DSC_DEPLOY_KEY }}
+          DSC_DEPLOY_KNOWN_HOSTS: ${{ secrets.DSC_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir site
+          tar -xf artifact/artifact.tar -C site
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DSC_DEPLOY_KEY" > ~/.ssh/dsc_deploy
+          printf '%s\n' "$DSC_DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          tar czf - -C site . | ssh -i ~/.ssh/dsc_deploy \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            -o ConnectTimeout=20 \
+            -o ConnectionAttempts=1 \
+            "dsc-deploy@$DSC_DEPLOY_HOST" "$GITHUB_SHA"

@@ -3,7 +3,7 @@
 Das Gegenstück zu [`requirements.txt`](requirements.txt) für die R-Spur.
 
 > **Reine R-Nutzung braucht kein Python.** Die Kurs-Datensätze liegen fertig
-> unter `https://schradern.github.io/data-science-coach/data/`. Die Codeblöcke
+> unter `https://datascience.medizin.dev/data/`. Die Codeblöcke
 > der Lektionen lesen sie direkt über diese Web-Adresse, und `lib/helpers.R`
 > lädt sie bei Bedarf automatisch nach – du musst nichts erzeugen. Python wird
 > **nur** gebraucht, wenn du das komplette Repository klonst und die Daten
