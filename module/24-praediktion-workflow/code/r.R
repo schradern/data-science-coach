@@ -1,4 +1,4 @@
-# Module 24 — prediction workflow with tidymodels (R, parallel to Python).
+# Module 24 – prediction workflow with tidymodels (R, parallel to Python).
 #   Rscript module/24-praediktion-workflow/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.

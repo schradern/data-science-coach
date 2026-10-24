@@ -1,4 +1,4 @@
-"""Figures for module 29 — unsupervised learning and clinical phenotyping.
+"""Figures for module 29 – unsupervised learning and clinical phenotyping.
 
 Run: python module/29-unueberwacht-phenotyping/code/figures.py
 
@@ -168,7 +168,7 @@ def main() -> None:
     fig_silhouette_k(X)
     fig_pca_cluster(X, df)
     fig_pca_scale_effect()
-    print("Fertig — alle Abbildungen in", ASSETS)
+    print("Fertig – alle Abbildungen in", ASSETS)
 
 
 if __name__ == "__main__":

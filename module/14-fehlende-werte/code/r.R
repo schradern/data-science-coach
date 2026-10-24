@@ -35,7 +35,7 @@ predicted_risk <- function(cf) {
 or_per_01 <- function(cf) exp(-0.1 * cf[["bga_ph"]])
 
 # ---------------------------------------------------------------------------
-cat("\n=== 1) Missingness profile — who is missing, not just how many ===\n")
+cat("\n=== 1) Missingness profile – who is missing, not just how many ===\n")
 for (v in c("bmi", "laktat_mmol_l", "bga_ph")) {
   cat(sprintf("  %-16s %5.1f%% missing\n", v, 100 * mean(is.na(df[[v]]))))
 }

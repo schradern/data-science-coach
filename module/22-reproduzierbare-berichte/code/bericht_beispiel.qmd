@@ -17,7 +17,7 @@ execute:
 
 Dieser Bericht wertet die synthetische Intensivkohorte des Data-Science-Kurses
 aus. Er demonstriert das Quarto-Prinzip: **Analyse und Text in einer Datei**.
-Beim Rendern wird der Code ausgeführt und das Ergebnis direkt eingebettet — kein
+Beim Rendern wird der Code ausgeführt und das Ergebnis direkt eingebettet – kein
 Copy-Paste, keine manuellen Übertragungsfehler.
 
 > **Datenschutz-Hinweis:** Dieser Bericht enthält ausschließlich **fiktive**
@@ -48,7 +48,7 @@ import numpy as np
 import pandas as pd
 from lib.helpers import SEED, load_cohort, load_labs
 
-# Seed setzen — Pflicht fuer Reproduzierbarkeit
+# Seed setzen – Pflicht fuer Reproduzierbarkeit
 np.random.seed(SEED)
 
 cohort = load_cohort()
@@ -76,7 +76,7 @@ print(characteristics.to_frame(name="Wert").round(2).to_string())
 
 Die Kohorte umfasst **`{python} len(df)`** Patient:innen. Die
 30-Tage-Mortalität beträgt
-**`{python} f"{df['verstorben_30d'].mean():.1%}"`**.
+**`{python} f"{df['verstorben_30d'].mean():.1%}".replace(".", ",")`**.
 
 ## Mortalität nach Aufnahmegrund
 
@@ -118,4 +118,4 @@ print(f"Python: {sys.version.split()[0]}")
 
 ---
 
-*Erzeugt mit Quarto · Code und Text in einer Quelle — vollständig reproduzierbar.*
+*Erzeugt mit Quarto · Code und Text in einer Quelle – vollständig reproduzierbar.*

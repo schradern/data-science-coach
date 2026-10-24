@@ -10,7 +10,7 @@
 - Dasselbe Ergebnis in **`pandas`** (Python) und **`readr`/`readxl`/`jsonlite`** (R) erzeugen.
 
 ## Klinischer Aufhänger
-Ihr Klinikum exportiert Labordaten als Semikolon-getrennte CSV-Datei mit
+Dein Klinikum exportiert Labordaten als Semikolon-getrennte CSV-Datei mit
 Dezimalkomma, ein Kollege liefert Einschlusskriterien als Excel-Tabelle, und
 die Radiologie stellt Befunde per REST-API bereit. Vor der Analyse müssen alle
 Quellen **zuverlässig und nachvollziehbar** eingelesen werden.
@@ -20,7 +20,7 @@ Quellen **zuverlässig und nachvollziehbar** eingelesen werden.
 ![Abbildung: Von der Rohdatei zum DataFrame, Trennzeichen, Encoding, Dezimalzeichen und Header entscheiden, ob die Tabelle korrekt ankommt.](assets/einlesen_pipeline.svg)
 
 CSV ist das häufigste Exportformat in klinischen IT-Systemen, aber keineswegs
-einheitlich. Drei Fußangeln begegnen fast täglich:
+einheitlich. Drei Fußangeln begegnen dir fast täglich:
 
 | Problem | Ursache | Lösung |
 |---------|---------|--------|
@@ -55,13 +55,13 @@ subset = pd.read_csv("{{DATEN}}kohorte.csv",
 ```
 
 <div class="code-verbalization" markdown="1">
-🗣 **Code-Verbalisierung:**
+**Zeile für Zeile:**
 
 * `cohort_de = pd.read_csv(...)`: Lese eine CSV-Datei ein und speichere sie in der Variablen `cohort_de`.
 * `"{{DATEN}}kohorte_de.csv"`: Die Web-Adresse der Datei.
 * `sep=";"`: Verwende das Semikolon `;` als Trennzeichen zwischen den Spalten.
 * `encoding="latin-1"`: Verwende die Latin-1-Zeichenkodierung (oft bei alten Windows-KIS-Systemen nötig für Umlaute).
-* `decimal=","`: Erkenne das Komma `,` als Dezimaltrennzeichen für Fließkommazahlen (damit z.B. `1,4` korrekt als Zahl `1.4` eingelesen wird).
+* `decimal=","`: Erkenne das Komma `,` als Dezimaltrennzeichen für Fließkommazahlen (damit z. B. `1,4` korrekt als Zahl `1.4` eingelesen wird).
 </div>
 
 `readr` liest ebenfalls direkt von einer Web-Adresse:
@@ -85,6 +85,12 @@ cohort_de2 <- read_csv2("{{DATEN}}kohorte_de.csv",
                          locale = locale(encoding = "latin1"),
                          show_col_types = FALSE)
 ```
+
+**Stolperstein:** Lässt du `encoding="latin-1"` weg, bricht pandas mit einem
+`UnicodeDecodeError` ab: Das `ä` in `männlich` ist in Latin-1 ein einzelnes Byte,
+das in UTF-8 so nicht vorkommen darf. `readr` bricht nicht ab, sondern liest
+still weiter und zeigt das rohe Byte an: `m<e4>nnlich`. Der umgekehrte Fall,
+eine UTF-8-Datei als Latin-1 gelesen, erzeugt die bekannten `Ã¤` statt `ä`.
 
 **Stolperstein:** Wenn Zahlen nach dem Einlesen als `object` (Python) oder
 `character` (R) erscheinen, ist meist das falsche Dezimalzeichen schuld.
@@ -117,7 +123,7 @@ lab_data = pd.read_excel(
 )
 ```
 
-`readxl` kann keine Web-Adresse direkt öffnen, lade die Datei zuerst in eine
+`readxl` kann keine Web-Adresse direkt öffnen; lade die Datei zuerst in eine
 temporäre Datei herunter:
 
 ```r
@@ -134,9 +140,10 @@ lab_data <- read_excel(tmp, sheet = "Labor")
 ```
 
 **Stolperstein:** `sheet_name=0` (Python) greift per Index auf das erste Blatt
-zu, das funktioniert, ist aber spröde: Benennt ein Kollege das Blatt um,
-bricht der Code still. Gib den Namen immer explizit an:
-`sheet_name="Kohorte"`.
+zu. Das funktioniert, ist aber spröde: Fügt ein Kollege vorne ein Blatt ein
+oder ändert die Reihenfolge, liest der Code still das falsche Blatt. Gib den
+Namen explizit an (`sheet_name="Kohorte"`); fehlt das Blatt, bricht der Code
+wenigstens mit einer klaren Fehlermeldung ab.
 
 **Darüber hinaus:** Excel-Dateien enthalten oft versteckte Formatierungen,
 Farben oder verbundene Zellen. Mit `pd.ExcelFile("datei.xlsx").sheet_names`
@@ -171,7 +178,7 @@ df_fhir = pd.json_normalize(bundle["entry"], sep="_")
 library(jsonlite)
 library(tibble)
 
-# Flat JSON — fromJSON() reads URLs directly.
+# Flat JSON – fromJSON() reads URLs directly.
 df <- fromJSON("{{DATEN}}beispiel.json")
 
 # Nested JSON -> tibble.
@@ -179,19 +186,20 @@ bundle  <- fromJSON("{{DATEN}}fhir_bundle.json", flatten = TRUE)
 df_fhir <- as_tibble(bundle$entry)
 ```
 
-**Stolperstein:** Ohne `sep="_"` (Python) oder `flatten=TRUE` (R) landen
-ganze Unterstrukturen als Liste in einer einzigen Zelle, ein häufiges
-Rätsel beim ersten FHIR-Export. `pd.json_normalize` mit `sep="_"` klappt
-die Hierarchie auf und benennt Spalten wie `resource_code_text` oder
-`resource_valueQuantity_value` (die vollständige Spaltenliste dieses Bundles:
+**Stolperstein:** Ohne `pd.json_normalize` (Python; ein bloßes
+`pd.DataFrame(bundle["entry"])` reicht nicht) oder `flatten=TRUE` (R) landen
+ganze Unterstrukturen in einer einzigen Zelle, ein häufiges Rätsel beim ersten
+FHIR-Export. `pd.json_normalize` klappt die Hierarchie auf; `sep="_"` sorgt nur
+dafür, dass die Spalten `resource_code_text` oder
+`resource_valueQuantity_value` heißen statt `resource.code.text` (die vollständige Spaltenliste dieses Bundles:
 `resource_resourceType`, `resource_id`, `resource_gender`, `resource_birthDate`,
 `resource_status`, `resource_code_text`, `resource_subject_reference`,
 `resource_valueQuantity_value`, `resource_valueQuantity_unit`).
 
 **Darüber hinaus:** Für komplexe FHIR-Daten gibt es spezialisierte Pakete:
-`fhirpy` (Python) und `fhircrackr` (R) können ganze FHIR-Bundles typsicher
-lesen und in flache Tabellen überführen, deutlich robuster als manuelle
-JSON-Normalisierung.
+`fhirpy` (Python) fragt FHIR-Server komfortabel ab, `fhircrackr` (R) lädt
+ganze Bundles und überführt sie in flache Tabellen, deutlich robuster als
+manuelle JSON-Normalisierung.
 
 ## 4 Web-API: Daten aus dem Internet abrufen
 
@@ -201,11 +209,11 @@ damit Skripte auch ohne Netzwerkzugang (z. B. im Klinik-Netz, offline auf
 Reisen) reproduzierbar laufen.
 
 Dieses Beispiel nutzt bewusst `urllib` aus der Python-Standardbibliothek
-(keine Zusatzinstallation nötig) statt des beliebten Pakets `requests`,
-für einfache GET-Anfragen mit Timeout reicht das völlig.
+(keine Zusatzinstallation nötig) statt des beliebten Pakets `requests`: Für
+einfache GET-Anfragen mit Timeout reicht das völlig.
 
 Ein echter Offline-Fallback darf nicht auf eine *zweite* Web-Adresse
-ausweichen — im Klinik-Netz ohne externe Verbindung wäre auch die nicht
+ausweichen – im Klinik-Netz ohne externe Verbindung wäre auch die nicht
 erreichbar. Das Muster ist daher **Cache-on-Success**: bei Erfolg wird die
 Antwort in eine *lokale* Datei geschrieben, und der Fallback liest genau diese
 lokale Datei. So läuft jeder Wiederholungslauf ohne Netzwerk.
@@ -217,19 +225,22 @@ from pathlib import Path
 import pandas as pd
 
 URL = "https://disease.sh/v3/covid-19/countries?allowNull=false"
-CACHE = Path("api_cache.csv")   # wirklich lokale Datei neben dem Skript
+CACHE = Path("api_cache.csv")   # truly local file in the current working directory
+
+# Some APIs reject urllib's default User-Agent ("Python-urllib/...") with HTTP 403.
+request = urllib.request.Request(URL, headers={"User-Agent": "data-science-course"})
 
 try:
-    with urllib.request.urlopen(URL, timeout=5) as response:
+    with urllib.request.urlopen(request, timeout=5) as response:
         df_api = pd.DataFrame(json.load(response))
-    df_api.to_csv(CACHE, index=False)         # für Offline-Wiederholungen sichern
+    df_api.to_csv(CACHE, index=False)         # keep a copy for offline re-runs
     print(f"API call succeeded: {len(df_api)} countries")
 except Exception as exc:
     if CACHE.exists():
-        df_api = pd.read_csv(CACHE)            # echter lokaler Fallback (kein Netz)
+        df_api = pd.read_csv(CACHE)            # genuine local fallback (no network)
         print(f"API unreachable ({exc}). Using local cache {CACHE}.")
     else:
-        raise SystemExit(f"API nicht erreichbar und kein lokaler Cache {CACHE}: {exc}")
+        raise SystemExit(f"API unreachable and no local cache {CACHE}: {exc}")
 ```
 
 ```r
@@ -237,19 +248,20 @@ library(httr2)
 library(jsonlite)
 
 url   <- "https://disease.sh/v3/covid-19/countries?allowNull=false"
-cache <- "api_cache.csv"   # wirklich lokale Datei neben dem Skript
+cache <- "api_cache.csv"   # truly local file in the current working directory
 
 df_api <- tryCatch({
   response <- request(url) |> req_timeout(5) |> req_perform()
-  df <- fromJSON(resp_body_string(response)) |> as_tibble()
-  readr::write_csv(df, cache)                 # für Offline-Wiederholungen sichern
+  # flatten = TRUE unpacks the nested countryInfo field, so write_csv() can save it.
+  df <- fromJSON(resp_body_string(response), flatten = TRUE) |> tibble::as_tibble()
+  readr::write_csv(df, cache)                 # keep a copy for offline re-runs
   df
 }, error = function(e) {
   if (file.exists(cache)) {
     message("API unreachable: ", e$message, ". Using local cache ", cache, ".")
-    readr::read_csv(cache, show_col_types = FALSE)   # echter lokaler Fallback
+    readr::read_csv(cache, show_col_types = FALSE)   # genuine local fallback
   } else {
-    stop("API nicht erreichbar und kein lokaler Cache ", cache, ": ", e$message)
+    stop("API unreachable and no local cache ", cache, ": ", e$message)
   }
 })
 ```
@@ -278,22 +290,22 @@ GET [Server]/Patient?birthdate=ge1950-01-01&_count=100
 ```
 
 ### REDCap (Research Electronic Data Capture)
-REDCap ist das weltweit verbreitetste System für klinische Forschungsdatenbanken.
+REDCap ist eines der weltweit am weitesten verbreiteten Systeme für klinische
+Forschungsdatenbanken.
 Seine REST-API exportiert Daten direkt nach Python/R:
 
 ```python
 import pandas as pd
-import requests   # in requirements.txt enthalten (Modul 04); Offline-Fallback siehe unten
-                   # uv pip install requests
+import requests   # pinned in requirements.txt (otherwise: uv pip install requests)
 
-# REDCap API (conceptual — substitute your own token and URL).
+# REDCap API (conceptual – substitute your own token and URL).
 payload = {
-    "token": "MY_API_TOKEN",     # never store in code — use environment variable
+    "token": "MY_API_TOKEN",     # never store in code – use environment variable
     "content": "record",
     "format": "json",
     "type": "flat",
 }
-r = requests.post("https://redcap.klinik.de/api/", data=payload)
+r = requests.post("https://redcap.example.org/api/", data=payload, timeout=30)
 df_redcap = pd.DataFrame(r.json())
 ```
 
@@ -304,9 +316,11 @@ Der vollständige, lauffähige Code steht in [`code/python.py`](code/python.py) 
 - **Erst die Rohdatei öffnen.** Ein Blick in den Texteditor spart Stunden Debugging:
  Welches Trennzeichen? Gibt es eine Kopfzeile? Sind Umlaute korrekt?
 
-- **Encoding explizit angeben.** `latin-1` (auch `ISO-8859-1` genannt) ist in
- deutschen klinischen Systemen häufiger als `utf-8`. Falsches Encoding zeigt
- sich in Kauderwelsch bei Umlauten (ä → Ã¤).
+- **Encoding explizit angeben.** `latin-1` (auch `ISO-8859-1` genannt, oft
+ eigentlich das verwandte Windows-`cp1252`) ist in älteren deutschen klinischen
+ Systemen noch verbreitet. Falsches Encoding zeigt sich als Kauderwelsch bei
+ Umlauten (UTF-8-Datei als `latin-1` gelesen: ä → Ã¤) oder als
+ `UnicodeDecodeError` (`latin-1`-Datei als UTF-8 gelesen).
 
 - **Dezimalkomma** ist in Deutschland der Standard, `pandas` liest `.` als
  Dezimaltrenner. `decimal=","` (Python) bzw. `locale(decimal_mark=",")` (R)
@@ -320,10 +334,11 @@ Der vollständige, lauffähige Code steht in [`code/python.py`](code/python.py) 
  landen ganze Unterstrukturen in einer Zelle.
 
 - **Excel-Blattname prüfen.** `sheet_name=0` (erstes Blatt) funktioniert immer,
- aber ein Kollege könnte Blätter umbenannt haben, besser explizit benennen.
+ liest aber still das falsche Blatt, sobald jemand die Reihenfolge ändert;
+ besser explizit benennen.
 
 ## Selbstcheck
-1. **Warum zeigen Umlaute in einer CSV-Datei manchmal „Ã¤" statt „ä"?**, Die Datei ist `latin-1`-codiert, wird aber als `utf-8` gelesen; `encoding="latin-1"` behebt das.
-2. **Was passiert, wenn man eine Semikolon-CSV ohne `sep=";"` einliest?**, Alle Spalten landen in einer einzigen Spalte, weil pandas `,` als Trennzeichen erwartet.
-3. **Warum braucht API-Code immer einen Offline-Fallback?**, Klinik-Netzwerke sperren oft externe Verbindungen; ohne Fallback ist das Skript nicht reproduzierbar.
+1. **Warum zeigen Umlaute in einer CSV-Datei manchmal „Ã¤“ statt „ä“?** – Die Datei ist UTF-8-codiert, wird aber als `latin-1` (bzw. `cp1252`) gelesen: Das „ä“ besteht in UTF-8 aus zwei Bytes, die dann als zwei Zeichen erscheinen; `encoding="utf-8"` behebt das. Der umgekehrte Fall (`latin-1`-Datei als UTF-8 gelesen) endet in pandas meist mit einem `UnicodeDecodeError`.
+2. **Was passiert, wenn man eine Semikolon-CSV ohne `sep=";"` einliest?** – Alle Spalten landen in einer einzigen Spalte, weil pandas `,` als Trennzeichen erwartet.
+3. **Warum braucht API-Code immer einen Offline-Fallback?** – Klinik-Netzwerke sperren oft externe Verbindungen; ohne Fallback ist das Skript nicht reproduzierbar.
 

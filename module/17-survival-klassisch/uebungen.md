@@ -23,7 +23,7 @@ Führe einen Log-rank-Test für Sepsis vs. Nicht-Sepsis durch und interpretiere 
 
 ## Aufgabe 4 – Cox-Modell
 
-Fitten ein Cox-Modell:
+Fitte ein Cox-Modell:
 
 ```text
 Surv(fu_zeit_tage, status) ~ sepsis + alter + sofa_score

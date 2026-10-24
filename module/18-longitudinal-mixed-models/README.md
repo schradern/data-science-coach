@@ -21,7 +21,7 @@ entlassen (kürzere Verweildauer, aber überlebt), nur 6 sind innerhalb von 30 T
 beiden Ursachen sind statistisch nicht dasselbe, mehr dazu im Stolperstein am Ende dieses Moduls. Eine
 gewöhnliche lineare Regression (OLS) ignoriert außerdem, dass mehrere Messungen derselben Person nicht
 unabhängig voneinander sind. Ein Mixed Model erlaubt es, die individuelle Baseline jeder Person als
-„Random Effect" zu modellieren.
+„Random Effect“ zu modellieren.
 
 **Stolperstein:** Ein verbreiteter Irrglaube ist, dass man den Unterschied zwischen OLS und Mixed Model
 immer an unterschiedlichen Koeffizienten erkennt. Das stimmt nicht zuverlässig – oft sind die *Punktschätzer*
@@ -64,20 +64,20 @@ Simulieren nötig:
 import pandas as pd
 import statsmodels.formula.api as smf
 
-# 1. Wiederholte MAP-Messungen mit Basisdaten verknüpfen
+# 1. Join repeated MAP measurements with baseline data
 vitalwerte = pd.read_csv("{{DATEN}}vitalwerte.csv")   # patient_id, tag, map_mmhg, ...
 kohorte = pd.read_csv("{{DATEN}}kohorte.csv")[["patient_id", "diabetes"]]
 df_long = vitalwerte.merge(kohorte, on="patient_id", how="left")
 
-# 2. Random-Intercept-Modell fitten
-# Random Intercept pro Patient:in via groups="patient_id"
+# 2. Fit a random-intercept model
+# Random intercept per patient via groups="patient_id"
 model = smf.mixedlm("map_mmhg ~ tag + diabetes", df_long, groups=df_long["patient_id"])
 result = model.fit(reml=True)
 
 print(result.summary())
 ```
 
-🗣 **Code-Verbalisierung:**
+**Zeile für Zeile:**
 
 * `smf.mixedlm("map_mmhg ~ tag + diabetes", ...)` spezifiziert das Modell: MAP wird durch Tag und
   Diabetes-Status vorhergesagt (Fixed Effects).
@@ -100,7 +100,7 @@ vitalwerte <- read_csv("{{DATEN}}vitalwerte.csv")
 kohorte <- read_csv("{{DATEN}}kohorte.csv")[, c("patient_id", "diabetes")]
 df_long <- merge(vitalwerte, kohorte, by = "patient_id")
 
-# (1 | patient_id) steht für einen Random Intercept pro ID
+# (1 | patient_id) means one random intercept per ID
 model <- lmer(map_mmhg ~ tag + diabetes + (1 | patient_id), data = df_long)
 summary(model)
 ```
@@ -133,11 +133,11 @@ MAP-Wert liegt zwischen Patient:innen statt innerhalb einer Person über die Zei
 realer Effekt, deutlich kleiner als in stark korrelierten Verlaufsdaten (z. B. wiederholte Messungen
 innerhalb einer OP), aber genug, um die Standardfehler sichtbar zu verschieben.
 
-**Darüber hinaus:** Für den zeitvarianten Prädiktor `tag` ist die naive OLS-Standardabweichung *nicht*
-automatisch zu klein – hier war sie in unseren Daten sogar geringfügig größer als beim Mixed Model
+**Darüber hinaus:** Für den zeitvarianten Prädiktor `tag` ist der naive OLS-Standardfehler *nicht*
+automatisch zu klein – hier war er in unseren Daten sogar geringfügig größer als beim Mixed Model
 (Verhältnis 0,94×). Ob OLS über- oder unterschätzt, hängt bei zeitvarianten Prädiktoren von der
 Korrelationsstruktur der Kovariate selbst ab. Die generelle Faustregel „OLS-SE ist bei Clusterdaten immer
-zu klein" gilt zuverlässig nur für **gruppenkonstante** Prädiktoren – bei zeitvarianten Prädiktoren lohnt
+zu klein“ gilt zuverlässig nur für **gruppenkonstante** Prädiktoren – bei zeitvarianten Prädiktoren lohnt
 sich der explizite Vergleich.
 
 ![Verteilung der geschätzten Random Intercepts (individuelle Abweichung vom Populationsmittel) aus dem Mixed Model.](assets/random_intercepts.png)
@@ -149,26 +149,31 @@ Populationsmittel einfängt: eine SD von rund 3 mmHg um den gemeinsamen Achsenab
 
 ## 5 Generalized Estimating Equations (GEE)
 
-Mixed Models schätzen **subjektspezifische Effekte** (z. B. "Wie verändert sich der Blutdruck *eines
-bestimmten* Patienten über die Zeit?").
+Mixed Models schätzen **subjektspezifische Effekte** (z. B. „Wie verändert sich der Blutdruck *einer
+bestimmten* Person über die Zeit?“).
 
-Wenn dich stattdessen der **durchschnittliche Populationseffekt** interessiert (z. B. "Wie unterscheidet
-sich der mittlere Blutdruck aller Diabetiker:innen im Vergleich zu Nicht-Diabetiker:innen über die Zeit?"),
+Wenn dich stattdessen der **durchschnittliche Populationseffekt** interessiert (z. B. „Wie unterscheidet
+sich der mittlere Blutdruck aller Diabetiker:innen im Vergleich zu Nicht-Diabetiker:innen über die Zeit?“),
 sind **Generalized Estimating Equations (GEE)** oft die bessere Wahl.
 
-**Praxis:** GEE schätzt robuste Standardfehler, indem eine Arbeitskorrelationsmatrix (z. B. *austauschbar*
-oder *autoregressiv*) spezifiziert wird – in Python über `statsmodels.genmod.generalized_estimating_equations.GEE`,
-in R über das Paket `geepack`. Für Fragestellungen zur Ätiologie/Mechanismus ("Wie reagiert eine einzelne
-Person?") bleibt das Mixed Model die richtige Wahl.
+**Stolperstein:** Bei einem linearen Modell mit stetigem Outcome wie dem MAP fallen beide Lesarten
+zusammen: Der feste Koeffizient des Mixed Models ist zugleich der Populationseffekt. Auseinander laufen
+sie erst bei binären oder Zähl-Outcomes (logistisches Mixed Model gegen GEE); dort ist das subjektspezifische
+Odds Ratio betragsmäßig größer als das populationsgemittelte.
+
+**Praxis:** GEE braucht eine Arbeitskorrelationsmatrix (z. B. *austauschbar*
+oder *autoregressiv*); die robusten Standardfehler bleiben gültig, auch wenn diese Wahl nicht genau stimmt – in Python über `statsmodels.genmod.generalized_estimating_equations.GEE`,
+in R über das Paket `geepack`. Für Fragestellungen zur Ätiologie/Mechanismus („Wie reagiert eine einzelne
+Person?“) bleibt das Mixed Model die richtige Wahl.
 
 ---
 
-> **Wann du Hilfe holst.** Sobald der Dropout nicht ignorierbar ist (z. B. Truncation by Death), die Random-Effects-Struktur unklar bleibt, oder du zwischen LMM und GEE entscheiden musst, hol methodische Beratung — die falsche Korrelationsstruktur verzerrt genau die Standardfehler, wegen derer du das Mixed Model überhaupt rechnest.
+> **Wann du Hilfe holst.** Sobald der Dropout nicht ignorierbar ist (z. B. Truncation by Death), die Random-Effects-Struktur unklar bleibt, oder du zwischen LMM und GEE entscheiden musst, hol methodische Beratung – die falsche Korrelationsstruktur verzerrt genau die Standardfehler, wegen derer du das Mixed Model überhaupt rechnest.
 
 ## Fallstricke und Merksätze
 
 **Stolperstein:** Wenn die Varianz des Random Effects extrem nahe an Null liegt, wirft `lme4`
-(bzw. `statsmodels`) eine „Singular Fit"-Warnung aus. Genau das passiert, wenn du im Beispiel oben
+(bzw. `statsmodels`) eine „Singular Fit“-Warnung aus. Genau das passiert, wenn du im Beispiel oben
 zusätzlich einen Random Slope für `tag` schätzt: Mit maximal vier Messungen pro Patient:in reicht die
 Information nicht aus, um pro Person eine eigene Zeit-Steigung von der Baseline zu trennen – das Modell
 ist überparametrisiert, und das einfachere Random-Intercept-Modell ist die richtige Wahl.
@@ -196,23 +201,24 @@ frühzeitig aus der Messreihe fallen.
 **Standard-Abhilfen:** Joint Models für longitudinale und Survival-Daten (gemeinsame Modellierung von
 MAP-Verlauf und Sterbezeit), Principal Stratification / Survivor-Average Causal Effects (Schätzung
 innerhalb der Teilpopulation, die unter beiden Bedingungen überlebt hätte), oder das Estimand explizit
-einschränken und das auch so benennen („mittlerer Verlauf unter den Überlebenden" statt „mittlerer
-Verlauf in der Population").
+einschränken und das auch so benennen („mittlerer Verlauf unter den Überlebenden“ statt „mittlerer
+Verlauf in der Population“).
 
 **Darüber hinaus:** Auch bei Mixed Models gilt: Ohne Randomisierung bleiben beobachtete Effekte anfällig
 für zeitvariante Störfaktoren. Ein Mixed Model löst das Problem der korrelierten Standardfehler, nicht
 das Problem des Confoundings (siehe Modul 15 und Modul 19 zur kausalen Inferenz).
 
 ## Selbstcheck
-1. **Wann nutzt man ein Random-Slope-Modell?**, Wenn man davon ausgeht, dass sich der Effekt eines
+1. **Wann nutzt man ein Random-Slope-Modell?** – Wenn man davon ausgeht, dass sich der Effekt eines
    Prädiktors (z. B. der Krankheitsverlauf über die Zeit) zwischen den Clustern/Patient:innen systematisch
    unterscheidet (unterschiedliche Steigungen der individuellen Regressionsgeraden) – und genügend
    Messungen pro Person vorliegen, um das zu schätzen.
-2. **Was bedeutet die Angabe Group Var (Varianz der Random Effects) in der Zusammenfassung?**, Sie
-   quantifiziert die Variabilität zwischen den Gruppen (z. B. wie stark die individuellen MAP-Werte der
-   einzelnen Patient:innen um den Populationsmittelwert schwanken).
+2. **Was bedeutet die Angabe Group Var (Varianz der Random Effects) in der Zusammenfassung?** – Sie
+   quantifiziert die Variabilität zwischen den Gruppen (z. B. wie stark die individuellen MAP-Baselines der
+   einzelnen Patient:innen um den Populationsmittelwert streuen; die Schwankung von Tag zu Tag steckt in
+   der Residualvarianz).
 3. **Warum können OLS und Mixed Model fast identische Koeffizienten, aber unterschiedliche Standardfehler
-   liefern?**, Weil beide Modelle bei balancierten oder annähernd balancierten Designs oft dieselben
+   liefern?** – Weil beide Modelle bei balancierten oder annähernd balancierten Designs oft dieselben
    gewichteten Mittelwerte als Punktschätzer liefern – der Unterschied liegt in der Varianzschätzung: OLS
    ignoriert die Korrelation wiederholter Messungen derselben Person, das Mixed Model berücksichtigt sie.
 4. **Warum ist eine unvollständige Messreihe bei einer verstorbenen Patientin kein MCAR/MAR-Problem?**,

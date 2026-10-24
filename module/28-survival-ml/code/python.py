@@ -1,4 +1,4 @@
-"""Module 28 — Survival ML: Random Survival Forests and time-dependent risk.
+"""Module 28 – Survival ML: Random Survival Forests and time-dependent risk.
 
 Runs standalone from the project root:
     python module/28-survival-ml/code/python.py
@@ -86,7 +86,7 @@ def bootstrap_td_auc(cumulative_dynamic_auc, surv_train, surv_test,
 
     Resamples the (small) test set with replacement and recomputes the
     time-dependent AUC of both models on each resample, so we can report a
-    95%-CI per model at each horizon — and, crucially, a CI on the
+    95%-CI per model at each horizon – and, crucially, a CI on the
     Cox-minus-RSF difference. With only ~19 test events (and a handful of
     deaths by day 7) the per-time point estimates are extremely noisy; the
     difference CI shows whether any apparent RSF/Cox gap is real or sampling
@@ -98,7 +98,7 @@ def bootstrap_td_auc(cumulative_dynamic_auc, surv_train, surv_test,
     cox_b = {t: [] for t in times}
     diff_b = {t: [] for t in times}
     # A resample with no events before an early horizon (e.g. day 7) makes the
-    # true-positive rate 0/0; sksurv returns nan there — we drop those below.
+    # true-positive rate 0/0; sksurv returns nan there – we drop those below.
     with np.errstate(invalid="ignore", divide="ignore"):
         for _ in range(n_boot):
             idx = rng.integers(0, n, n)
@@ -129,7 +129,7 @@ def run_with_sksurv(X, events, times) -> bool:
     except ImportError:
         return False
 
-    print("\n=== scikit-survival AVAILABLE — using Random Survival Forest ===")
+    print("\n=== scikit-survival AVAILABLE – using Random Survival Forest ===")
     (X_train, X_test, events_train, events_test,
      times_train, times_test) = train_test_split(
         X, events, times, test_size=0.25, stratify=events, random_state=SEED)
@@ -145,7 +145,7 @@ def run_with_sksurv(X, events, times) -> bool:
     )
     rsf.fit(X_tr_np, surv_train)
 
-    # Risk score = expected time of event (inverted: high score = high risk).
+    # Risk score = cumulative hazard at day 28 (high score = high risk).
     # predict_cumulative_hazard_function returns a list of step functions.
     chf_funcs = rsf.predict_cumulative_hazard_function(X_te_np, return_array=False)
     # Summarise as cumulative hazard at last evaluation time (28d).
@@ -195,7 +195,7 @@ def run_with_sksurv(X, events, times) -> bool:
 
     n_indistinct = sum(zero_in_ci.values())
     print(f"\n  Fazit: Bei {n_indistinct} von {len(valid_times)} Zeitpunkten schließt das"
-          " 95%-KI der Differenz\n  die Null ein — dort ist die Cox-vs-RSF-Lücke von"
+          " 95%-KI der Differenz\n  die Null ein – dort ist die Cox-vs-RSF-Lücke von"
           " Rauschen nicht zu unterscheiden.")
     print("  Nur am frühesten Horizont (Tag 7) liegt das KI knapp über 0 zugunsten von")
     print("  Cox, aber genau dort gibt es die wenigsten Ereignisse, und dieser Bootstrap")
@@ -213,8 +213,8 @@ def run_fallback(X, events, times) -> None:
     Fits Cox (lifelines) and HistGradientBoosting at a fixed 30-day horizon.
     Computes standard AUC for comparison. Prints a clear note about censoring.
     """
-    print("\n=== scikit-survival NOT installed — fallback: Cox vs. classifier ===")
-    print("  Install scikit-survival: pip install scikit-survival --break-system-packages")
+    print("\n=== scikit-survival NOT installed – fallback: Cox vs. classifier ===")
+    print("  Install scikit-survival: uv pip install scikit-survival")
     print("  Note: HistGradientBoosting ignores censoring; Cox handles it correctly.\n")
 
     (X_train, X_test, events_train, events_test,
@@ -230,7 +230,7 @@ def run_fallback(X, events, times) -> None:
     cox_auc = roc_auc_score(events_test, cox_scores)
     print(f"  Cox 30-day AUC (Metrik ignoriert Zensierung): {cox_auc:.3f}")
 
-    # HistGradientBoosting — ignores censoring (educational anti-pattern).
+    # HistGradientBoosting – ignores censoring (educational anti-pattern).
     hgb = HistGradientBoostingClassifier(
         random_state=SEED, max_iter=200, class_weight="balanced")
     hgb.fit(X_tr_np, events_train.astype(int))
@@ -242,10 +242,10 @@ def run_fallback(X, events, times) -> None:
     print("  und widerspricht damit dem Kern dieses Moduls. Nur die time-dependent AUC")
     print("  (sksurv, oben) bzw. der C-Index berücksichtigen Zensierung korrekt.")
     print("  Der hier gezeigte Cox-Wert nutzt einen zensierungsbewussten MODELL-Score,")
-    print("  wird aber mit einer zensierungsblinden METRIK bewertet — deshalb nur")
+    print("  wird aber mit einer zensierungsblinden METRIK bewertet – deshalb nur")
     print("  als Kontrast zum Klassifikator, nicht als Gütemaß zu lesen.")
 
-    print("\n  Concept — time-dependent AUC (not computed without sksurv):")
+    print("\n  Concept – time-dependent AUC (not computed without sksurv):")
     for t in TIMES:
         print(f"    Day {t:2d}: would compare RSF vs. Cox discrimination up to that point.")
 
@@ -258,13 +258,13 @@ def main() -> None:
     print(f"  Events (deaths):  {events.sum()} ({100*events.mean():.1f}%)")
     print(f"  Min/Max time:     {times.min():.0f} / {times.max():.0f} days")
     print("  Censored patients contributed follow-up time without dying;")
-    print("  a classifier would label them as 'no event' — systematically wrong.")
+    print("  a classifier would label them as 'no event' – systematically wrong.")
 
     sksurv_ran = run_with_sksurv(X, events, times)
     if not sksurv_ran:
         run_fallback(X, events, times)
 
-    print("\n=== 3) Competing risks — concept ===")
+    print("\n=== 3) Competing risks – concept ===")
     print("  If a patient is transferred or dies from an unrelated cause,")
     print("  Kaplan-Meier overestimates the cumulative incidence.")
     print("  The Aalen-Johansen estimator (cmprsk/tidycmprsk in R) is correct.")
@@ -274,7 +274,7 @@ def main() -> None:
     print("  1. Use survival models when follow-up times vary or censoring occurs.")
     print("  2. Time-dependent AUC reveals whether discrimination holds across time.")
     print("  3. Group patients by model score (not outcome) to get honest KM curves.")
-    print("  4. Competing risks require dedicated estimators — KM is biased.")
+    print("  4. Competing risks require dedicated estimators – KM is biased.")
 
 
 if __name__ == "__main__":

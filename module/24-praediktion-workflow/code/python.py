@@ -1,4 +1,4 @@
-"""Module 24 — Prediction workflow, data leakage, tuning and thresholds.
+"""Module 24 – Prediction workflow, data leakage, tuning and thresholds.
 
 Runs standalone from the project root:
     python module/24-praediktion-workflow/code/python.py
@@ -20,7 +20,8 @@ from sklearn.compose import ColumnTransformer  # noqa: E402
 from sklearn.feature_selection import SelectKBest, f_classif  # noqa: E402
 from sklearn.impute import SimpleImputer  # noqa: E402
 from sklearn.linear_model import LogisticRegression  # noqa: E402
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score, train_test_split  # noqa: E402
+from sklearn.model_selection import (  # noqa: E402
+    GridSearchCV, StratifiedKFold, cross_val_predict, cross_val_score, train_test_split)
 from sklearn.pipeline import Pipeline  # noqa: E402
 from sklearn.preprocessing import OneHotEncoder, StandardScaler  # noqa: E402
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve  # noqa: E402
@@ -42,7 +43,7 @@ def build_data():
 
 def build_pipeline(C: float = 1.0) -> Pipeline:
     """Imputation, scaling and encoding live INSIDE the pipeline, so they are
-    re-fitted on each training fold only — this is what prevents leakage."""
+    re-fitted on each training fold only – this is what prevents leakage."""
     numeric = Pipeline([("impute", SimpleImputer(strategy="median")),
                         ("scale", StandardScaler())])
     categorical = OneHotEncoder(handle_unknown="ignore")
@@ -81,14 +82,14 @@ def main() -> None:
     leaky_auc = cross_val_score(LogisticRegression(max_iter=1000), selected, y,
                                 cv=cv, scoring="roc_auc").mean()
     # CORRECT: imputation, scaling AND selection all sit in the pipeline, so
-    # they are re-fit on each training fold only — nothing sees the fold's
+    # they are re-fit on each training fold only – nothing sees the fold's
     # validation rows in advance.
     honest_pipe = Pipeline([("impute", SimpleImputer(strategy="median")),
                             ("scale", StandardScaler()),
                             ("select", SelectKBest(f_classif, k=12)),
                             ("model", LogisticRegression(max_iter=1000))])
     honest_auc = cross_val_score(honest_pipe, X_aug, y, cv=cv, scoring="roc_auc").mean()
-    print(f"  leaked  CV-AUC: {leaky_auc:.3f}   (too optimistic — selection saw the test rows)")
+    print(f"  leaked  CV-AUC: {leaky_auc:.3f}   (too optimistic – selection saw the test rows)")
     print(f"  honest  CV-AUC: {honest_auc:.3f}   (trustworthy)")
 
     print("\n=== 2) Train/test split + hyperparameter tuning ===")
@@ -104,18 +105,24 @@ def main() -> None:
     print(f"  held-out test AUC: {test_auc:.3f}")
 
     print("\n=== 3) Choosing a decision threshold (not just 0.5) ===")
+    # Choose the threshold on the TRAINING data (out-of-fold predictions) and
+    # apply it once to the test set. Picking it on the test set would be one
+    # more way of optimising on the final yardstick.
+    oof = cross_val_predict(grid.best_estimator_, X_train, y_train, cv=cv,
+                            method="predict_proba")[:, 1]
+    fpr, tpr, thr = roc_curve(y_train, oof)
+    youden_thr = float(thr[int(np.argmax(tpr - fpr))])
     proba = grid.predict_proba(X_test)[:, 1]
-    fpr, tpr, thr = roc_curve(y_test, proba)
-    youden = int(np.argmax(tpr - fpr))
 
     def sens_spec(threshold: float) -> tuple[float, float]:
         tn, fp, fn, tp = confusion_matrix(y_test, (proba >= threshold).astype(int)).ravel()
         return tp / (tp + fn), tn / (tn + fp)
 
     s05, sp05 = sens_spec(0.5)
-    sY, spY = sens_spec(thr[youden])
+    sY, spY = sens_spec(youden_thr)
     print(f"  threshold 0.50          -> sensitivity {s05:.2f}, specificity {sp05:.2f}")
-    print(f"  threshold {thr[youden]:.2f} (Youden) -> sensitivity {sY:.2f}, specificity {spY:.2f}")
+    print(f"  threshold {youden_thr:.2f} (Youden) -> sensitivity {sY:.2f}, specificity {spY:.2f}"
+          "   (threshold chosen on training folds, evaluated on test)")
     print("\nThe threshold is a clinical decision, not a statistical default.")
 
 

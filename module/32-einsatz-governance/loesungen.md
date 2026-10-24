@@ -4,8 +4,10 @@
 ```python
 import joblib, sklearn, tempfile
 from pathlib import Path
+from sklearn.metrics import roc_auc_score
 
-# Train
+# pipe, X_train, X_test, y_train, y_test as in code/python.py
+# (build_text_pipeline() and prepare_data())
 pipe.fit(X_train, y_train)
 
 # Save
@@ -35,6 +37,7 @@ Trainingsgröße, Test-AUC, SHA-256-Prüfsumme der Trainingsdaten.
 ## Aufgabe 2 – Prävalenz-Shift: ROC-AUC vs. PR-AUC
 ```python
 import numpy as np
+import pandas as pd
 from sklearn.metrics import roc_auc_score, average_precision_score
 
 rng = np.random.default_rng(42)
@@ -64,8 +67,10 @@ Precision (`TP / (TP + FP)`) direkt von der Prävalenz abhängt: bei mehr Positi
 im Nenner-relevanten Bereich sinkt der Anteil falsch-positiver Fälle relativ zu
 den (jetzt häufigeren) richtig-positiven, die Precision-Recall-Kurve verbessert
 sich rein durch die veränderte Klassenbalance. Das ist die Kernlektion: **ROC-AUC
-ist prävalenzunabhängig, PR-AUC nicht**, bei starkem Klassenungleichgewicht oder
-erwartetem Prävalenz-Shift ist PR-AUC deshalb oft die aussagekräftigere Metrik.
+ist prävalenzunabhängig, PR-AUC nicht.** PR-AUC beschreibt, wie gut die Alarme
+bei *genau dieser* Prävalenz zutreffen; sie ist bei seltenen Ereignissen
+informativ, lässt sich aber nur zusammen mit der Prävalenz lesen und muss bei
+einem Prävalenz-Shift in der Zielpopulation neu bestimmt werden.
 
 ## Aufgabe 3 – Subgruppenanalyse mit Konfidenzintervall
 ```python
@@ -114,7 +119,7 @@ Felder ohne prospektive Studie nicht befüllbar:
 
 - Leistungsmetriken auf externen Kohorten (anderer Klinik, anderer Zeitraum)
 - Subgruppenleistung auf Populationen, die im Testsplit gar nicht oder zu
-  klein vertreten sind (z. B. Ethnizität, seltene Altersgruppen) — Geschlecht
+  klein vertreten sind (z. B. Ethnizität, seltene Altersgruppen) – Geschlecht
   und ein Altersgruppen-Split (Schwelle 65 Jahre) lassen sich mit dem
   vorhandenen Testsplit inkl. Bootstrap-CI berechnen (siehe README Abschnitt 4).
 - Kalibrierung in der Zielklinik
@@ -151,10 +156,14 @@ ax.set_title("Kalibrierungskurve: Shift-Effekt")
 ax.legend(); plt.tight_layout(); plt.show()
 ```
 Tatsächlicher Lauf: ECE steigt von 0,127 (kein Shift, n=125, Positivrate 34,4 %)
-auf 0,173 (100 % Shift, n=168, Positivrate 51,2 %). Der ECE steigt mit
-zunehmendem Shift, obwohl (wie in Aufgabe 2 gezeigt) die **ROC-AUC nahezu
-unverändert bleibt**, das Modell gibt für die veränderte, höhere Ereignisrate
-weiterhin die alten (zu niedrigen) Wahrscheinlichkeiten aus. Das ist die
-komplementäre Lektion zu Aufgabe 2: Ranking (AUC) kann intakt bleiben, während
-die Kalibrierung unter Prävalenz-Shift trotzdem kaputtgeht, Rekalibrierung
-(Platt Scaling) auf der neuen Grundrate wäre dann nötig.
+auf 0,173 (100 % Shift, n=168, Positivrate 51,2 %). Schon ohne Shift ist das
+Modell nicht gut kalibriert: `class_weight="balanced"` schiebt die
+Wahrscheinlichkeiten nach oben (mittlere Vorhersage ≈ 0,46 bei 34 % beobachteter
+Rate). Mit dem Shift steigt der ECE weiter, obwohl (wie in Aufgabe 2 gezeigt) die
+**ROC-AUC nahezu unverändert bleibt**: In den oberen Risikobereichen liegen die
+Vorhersagen jetzt deutlich unter der beobachteten Häufigkeit, weil das Modell die
+höhere Ereignisrate nicht kennt. Das ist die komplementäre Lektion zu Aufgabe 2:
+Ranking (AUC) kann intakt bleiben, während die Kalibrierung unter Prävalenz-Shift
+leidet; eine Rekalibrierung (z. B. Platt Scaling) auf der neuen Grundrate wäre
+dann nötig. Der ECE hier ist der ungewichtete Mittelwert über die Bins; die
+übliche Definition gewichtet jeden Bin mit seinem Anteil an den Fällen.

@@ -59,7 +59,7 @@ dass das Testset kaum Ereignisse enthält. Deshalb **stratifizieren** wir: Der
 Split erhält die Ereignisrate in beiden Mengen.
 
 <!-- excerpt-note -->
-> **Hinweis — die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/23-machine-learning/code/python.py` — siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+> **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/23-machine-learning/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
 X_train, X_test, y_train, y_test = train_test_split(
@@ -103,13 +103,14 @@ auc = roc_auc_score(y_test, pipeline.predict_proba(X_test)[:, 1])
 `class_weight="balanced"` gewichtet die Minderheitsklasse (Verstorbene) höher,
 damit das Modell sie nicht systematisch ignoriert, wichtig bei ~16 % Basisrate.
 
-**Stolperstein:** `class_weight="balanced"` verbessert Rangordnung und
-Schwellenverhalten, aber es verzerrt `predict_proba()` als absolute
-Wahrscheinlichkeit: Das Modell rechnet effektiv so, als wären Tod und Überleben
+**Stolperstein:** `class_weight="balanced"` verschiebt vor allem die
+Schwelle: Bei 0,5 erkennt das Modell mehr Verstorbene. An der Rangordnung ändert
+es kaum etwas (Test-AUC 0,880 mit, 0,878 ohne Gewichtung). Dafür verzerrt es
+`predict_proba()` als absolute Wahrscheinlichkeit: Das Modell rechnet effektiv so, als wären Tod und Überleben
 gleich häufig. Auf unseren Daten sagt das Modell im Testset im Mittel **46 %**
 Mortalität vorher, obwohl nur **16 %** tatsächlich sterben (Abschnitt 5). Für
-Rangordnung/AUC ist das unerheblich (eine monotone Transformation ändert die
-Reihenfolge nicht), für Kalibrierung, Brier Score und Decision-Curve-Analyse
+Rangordnung/AUC ist das fast unerheblich (die Gewichtung verschiebt vor allem den
+Achsenabschnitt, und eine solche Verschiebung ändert die Reihenfolge nicht), für Kalibrierung, Brier Score und Decision-Curve-Analyse
 (Modul 25) ist es entscheidend, dort wird zuerst rekalibriert.
 
 **Stolperstein:** Den `StandardScaler` *vor* dem Split auf allen Daten fitten.
@@ -137,10 +138,13 @@ print(f"CV-AUC: {auc_scores.mean():.3f} ± {auc_scores.std():.3f}")
 ```
 
 Kreuzvalidierung berührt das Testset *nicht*, es bleibt der unabhängige,
-abschließende Prüfstein.
+abschließende Prüfstein. Auf unseren Daten liefert die CV einen AUC von
+0,728 ± 0,060, deutlich weniger als die 0,880 des einzelnen Testsets. Das Testset
+mit seinen 16 Ereignissen ist hier offenbar günstig ausgefallen; die CV-Zahl ist
+die realistischere Erwartung.
 
 **Stolperstein:** Das Testset in die Kreuzvalidierung einbeziehen (z. B. `cv` auf
-`X` statt `X_train` aufrufen). Dann ist das „Testset" kein echtes Testset mehr, die CV-Güte wird zu optimistisch berichtet.
+`X` statt `X_train` aufrufen). Dann ist das „Testset“ kein echtes Testset mehr, die CV-Güte wird zu optimistisch berichtet.
 
 **Darüber hinaus:** `RepeatedStratifiedKFold` mit mehreren Wiederholungen liefert
 stabilere Schätzer, weil die zufällige Faltungsvarianz gemittelt wird. Bei sehr
@@ -191,7 +195,7 @@ the-large, Slope, Decision-Curve-Analyse).
 
 ## 6 Klassenungleichgewicht und Gütekriterien
 
-Unsere Kohorte hat ~16 % Mortalität. Ein Modell, das immer „lebt" vorhersagt,
+Unsere Kohorte hat ~16 % Mortalität. Ein Modell, das immer „lebt“ vorhersagt,
 erreicht **84 % Accuracy**, und ist klinisch wertlos. Das ist das
 **Genauigkeitsparadox**: Accuracy täuscht, wenn die Klassen stark unbalanciert sind.
 
@@ -203,9 +207,9 @@ Sterbende höher einstuft als Überlebende, schwellenunabhängig.
 | Sensitivität | TP / (TP + FN) | Werden alle Sterbenden erkannt? |
 | Spezifität | TN / (TN + FP) | Werden Überlebende korrekt klassifiziert? |
 | ROC-AUC | Fläche unter der ROC-Kurve (0,5–1,0) | Gesamte Trennschärfe, schwellenunabhängig |
-| PPV | TP / (TP + FP) | Wie viele „Alarm"-Patient:innen sterben wirklich? |
+| PPV | TP / (TP + FP) | Wie viele „Alarm“-Patient:innen sterben wirklich? |
 
-`class_weight="balanced"` legt automatisch mehr Gewicht auf die Minderheitsklasse, eine einfache und effektive Gegenmaßnahme.
+`class_weight="balanced"` legt mehr Gewicht auf die Minderheitsklasse und verschiebt damit die Standardschwelle 0,5 zugunsten der Sensitivität. Gegen das Genauigkeitsparadox helfen aber vor allem das passende Gütemaß und eine bewusst gewählte Schwelle; die Gewichtung selbst kostet Kalibrierung (Abschnitt 5).
 
 **Stolperstein:** AUC > 0,9 unkritisch als Erfolg werten. Bei kleinen Testsets
 mit seltenen Ereignissen deutet eine sehr hohe AUC eher auf Overfitting oder
@@ -262,7 +266,7 @@ cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE) |>
     is_smoker = as.integer(raucherstatus == "aktiv")
   )
 
-# Stratifizierter Split
+# Stratified split
 idx_pos   <- which(cohort$verstorben_30d == 1)
 idx_neg   <- which(cohort$verstorben_30d == 0)
 train_idx <- c(sample(idx_pos, floor(0.8 * length(idx_pos))),
@@ -272,7 +276,7 @@ test_df   <- cohort[-train_idx, ]
 
 # Case weights == scikit-learn's class_weight="balanced" (base R glm() has no
 # built-in class_weight argument). Without this, glm() silently reproduces
-# the accuracy paradox — see code/r.R for the unweighted-vs-weighted comparison.
+# the accuracy paradox – see code/r.R for the unweighted-vs-weighted comparison.
 n_tr  <- nrow(train_df)
 w_pos <- n_tr / (2 * sum(train_df$verstorben_30d == 1))
 w_neg <- n_tr / (2 * sum(train_df$verstorben_30d == 0))
@@ -284,7 +288,7 @@ fit <- glm(
 )
 probs <- predict(fit, newdata = test_df, type = "response")
 
-# AUC via Wilcoxon-Statistik (kein pROC erforderlich)
+# AUC via the Wilcoxon statistic (no pROC required)
 u_stat <- wilcox.test(probs[test_df$verstorben_30d == 1],
                        probs[test_df$verstorben_30d == 0])$statistic
 n1 <- sum(test_df$verstorben_30d == 1)
@@ -293,19 +297,24 @@ auc <- as.numeric(u_stat) / (n1 * n0)
 cat("ROC-AUC (Test):", round(auc, 3), "\n")
 ```
 
-> **Wann du Hilfe holst.** Sobald aus dem Übungsmodell ein Modell für echte Patient:innen werden soll, brauchst du externe Validierung, genügend Ereignisse und eine ehrliche Kalibrierungs- und Fairnessprüfung — spätestens dann gehören ein:e Methodiker:in und, bei Einsatz am Bett, die Regulatorik mit an den Tisch.
+`sample()` in R zieht einen anderen Split (399/101) als `train_test_split()` in
+Python. `code/r.R` kommt deshalb auf einen Test-AUC von 0,793 statt 0,880 und
+einen CV-AUC von 0,775: dieselbe Split-Abhängigkeit wie in Abschnitt 4, diesmal
+zwischen zwei Sprachen.
+
+> **Wann du Hilfe holst.** Sobald aus dem Übungsmodell ein Modell für echte Patient:innen werden soll, brauchst du externe Validierung, genügend Ereignisse und eine ehrliche Kalibrierungs- und Fairnessprüfung – spätestens dann gehören ein:e Methodiker:in und, bei Einsatz am Bett, die Regulatorik mit an den Tisch.
 
 ## Fallstricke und Merksätze
 - **Erst splitten, dann alles andere.** Kein Preprocessing auf den Gesamtdaten vor dem Split.
 - **Stratifizieren** bei seltenen Outcomes, ohne Stratifizierung kann ein Fold keine Ereignisse enthalten.
-- **AUC statt Accuracy** bei unbalancierten Klassen: 84 % Accuracy für ein Modell, das immer „lebt" sagt, ist kein Erfolg.
+- **AUC statt Accuracy** bei unbalancierten Klassen: 84 % Accuracy für ein Modell, das immer „lebt“ sagt, ist kein Erfolg.
 - **Pipeline = Schutz vor Leakage.** Der Scaler kennt nur die Trainingsdaten, nie die Testdaten.
-- **`class_weight="balanced"` rettet die Rangordnung, nicht die Wahrscheinlichkeiten.** Für Kalibrierung immer vorher rekalibrieren (`CalibratedClassifierCV`, Modul 25).
+- **`class_weight="balanced"` verschiebt die Schwelle, nicht die Rangordnung, und verzerrt die Wahrscheinlichkeiten.** Für Kalibrierung immer vorher rekalibrieren (`CalibratedClassifierCV`, Modul 25).
 - **AUC > 0,9 ist ein Warnsignal,** kein Erfolgsbeweis. Externe Validierung ist Pflicht vor jedem klinischen Einsatz.
 - **Assoziation ≠ Kausalität.** Das gilt auch für ML-Modelle, drei Mal, weil es das Wichtigste ist.
 
 ## Selbstcheck
-1. **Warum stratifizieren wir beim Train/Test-Split?**, Bei ~16 % Mortalität kann ein zufälliger Split dazu führen, dass das Testset kaum oder gar keine Ereignisse enthält; Stratifizierung erhält die Ereignisrate in beiden Mengen und macht den AUC berechenbar.
-2. **Was verhindert die Pipeline bei der Skalierung?**, Dass der StandardScaler auf den Gesamtdaten (inkl. Testset) gefittet wird; in der Pipeline geschieht das erst nach dem Split auf den Trainingsdaten, kein Leakage.
-3. **Warum ist ein AUC von 0,88 bei einem Mortalitätsmodell mit kleinem Testset ein Ergebnis, das man nicht unkritisch feiern sollte?**, Bei nur ~16 Ereignissen im Testset (N = 100) ist das 95-%-KI des AUC breit; eine sehr hohe AUC kann auch auf Overfitting oder Leakage hindeuten und erfordert externe Validierung, bevor man ihr traut.
-4. **Warum sagt unser Modell im Mittel 46 % Mortalität vorher, obwohl nur 16 % der Testpatient:innen sterben?**, Weil `class_weight="balanced"` die Verlustfunktion so umgewichtet, als wären beide Klassen gleich häufig; das verbessert Rangordnung (AUC) und Schwellenverhalten, verzerrt aber `predict_proba()` als absolute Wahrscheinlichkeit. Vor jeder Kalibrierungsaussage muss zuerst mit `CalibratedClassifierCV` rekalibriert werden.
+1. **Warum stratifizieren wir beim Train/Test-Split?** – Bei ~16 % Mortalität kann ein zufälliger Split dazu führen, dass das Testset kaum oder gar keine Ereignisse enthält; Stratifizierung erhält die Ereignisrate in beiden Mengen und macht den AUC berechenbar.
+2. **Was verhindert die Pipeline bei der Skalierung?** – Dass der StandardScaler auf den Gesamtdaten (inkl. Testset) gefittet wird; in der Pipeline geschieht das erst nach dem Split auf den Trainingsdaten, kein Leakage.
+3. **Warum ist ein AUC von 0,88 bei einem Mortalitätsmodell mit kleinem Testset ein Ergebnis, das man nicht unkritisch feiern sollte?** – Bei nur ~16 Ereignissen im Testset (N = 100) ist das 95-%-KI des AUC breit; eine sehr hohe AUC kann auch auf Overfitting oder Leakage hindeuten und erfordert externe Validierung, bevor man ihr traut.
+4. **Warum sagt unser Modell im Mittel 46 % Mortalität vorher, obwohl nur 16 % der Testpatient:innen sterben?** – Weil `class_weight="balanced"` die Verlustfunktion so umgewichtet, als wären beide Klassen gleich häufig; das verschiebt die Standardschwelle zugunsten der Sensitivität und lässt die Rangordnung (AUC) praktisch unverändert, verzerrt aber `predict_proba()` als absolute Wahrscheinlichkeit. Vor jeder Kalibrierungsaussage muss zuerst mit `CalibratedClassifierCV` rekalibriert werden.

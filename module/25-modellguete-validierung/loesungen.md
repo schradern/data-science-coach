@@ -10,17 +10,18 @@ print(f"ROC-AUC: {auc_roc:.3f}  PR-AUC: {auc_pr:.3f}  Baseline PR: {y_test.mean(
 # ROC-AUC: 0.844  PR-AUC: 0.624  Baseline PR: 0.152
 ```
 Die PR-AUC-Baseline ist der Ereignisanteil (~0,15). Ein Zufallsmodell erreicht bei
-ROC-AUC dagegen immer 0,50. Bei 15 % Ereignissen kann die ROC-AUC hoch wirken
-(viele wahre Negative machen es leicht), während die PR-AUC zeigt, ob das Modell
-tatsächlich Hochrisikopatienten findet, hier bestätigt PR-AUC 0,624 (deutlich über
+ROC-AUC dagegen immer 0,50. Die ROC-AUC hängt nicht von der Ereignisrate ab und
+kann bei 15 % Ereignissen hoch wirken, obwohl viele Alarme Fehlalarme sind; die
+PR-AUC zeigt, ob das Modell Hochrisikopatient:innen mit brauchbarer Präzision
+findet. Hier bestätigt PR-AUC 0,624 (deutlich über
 der Baseline 0,152), dass das Modell tatsächlich informativ ist.
 
 Beide Werte gehören mit Konfidenzintervall berichtet. Auf n = 125 mit 19
 Ereignissen liefert der Bootstrap ROC-AUC 0,844 (95 %-KI 0,707–0,946) und
-PR-AUC 0,624 (95 %-KI 0,398–0,847) — die Intervalle sind so breit, dass eine
+PR-AUC 0,624 (95 %-KI 0,398–0,847) – die Intervalle sind so breit, dass eine
 Punktschätzung allein Präzision vortäuscht.
 
-## Aufgabe 2 – Erst rekalibrieren, dann kalibrieren
+## Aufgabe 2 – Erst rekalibrieren, dann Kalibrierung prüfen
 ```python
 from sklearn.calibration import CalibratedClassifierCV
 
@@ -50,7 +51,7 @@ print(f"Brier Score: {brier:.4f}")
 Punkte oberhalb der Diagonalen: Modell unterschätzt das Risiko (beobachtet mehr
 Ereignisse als vorhergesagt). Punkte unterhalb: Überschätzung. Das Null-Modell
 (immer mittlere Ereignisrate ≈ 0,152) hat Brier Score ≈ p*(1-p) ≈ 0,129. Der
-rekalibrierte Wert (0,0955) liegt klar darunter, besser als Zufall. Bei nur
+rekalibrierte Wert (0,0955) liegt klar darunter, besser als das Nullmodell. Bei nur
 ~19 Testevents in 10 Bins schwankt die Kurve zwischen den Bins deutlich, das ist
 Stichprobenrauschen, kein Modellfehler.
 
@@ -76,8 +77,8 @@ for t in [0.05, 0.10, 0.20, 0.30]:
 # t=0.30: Modell=0.0594 Alle=-0.2114
 ```
 Das Modell ist nützlich, solange sein Net Benefit *über* beiden Referenzlinien
-liegt. Hier gilt das für alle vier gezeigten Schwellen, „alle behandeln" fällt
-bereits ab Schwelle ≈0,15 unter „niemanden behandeln" (negativer Net Benefit),
+liegt. Hier gilt das für alle vier gezeigten Schwellen, „alle behandeln“ fällt
+bereits ab Schwelle ≈0,15 unter „niemanden behandeln“ (negativer Net Benefit),
 während das Modell durchgehend positiv bleibt.
 
 ## Aufgabe 5 – Bootstrap-Optimismus

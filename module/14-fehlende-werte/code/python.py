@@ -58,7 +58,7 @@ def load() -> pd.DataFrame:
 
 def section_1_profile(df: pd.DataFrame) -> None:
     print("=" * 74)
-    print("1) Missingness profile — who is missing, not just how many")
+    print("1) Missingness profile – who is missing, not just how many")
     print("=" * 74)
     for col in ["bmi", "laktat_mmol_l", "bga_ph"]:
         print(f"  {col:16s} {df[col].isna().mean():6.1%} missing")
@@ -166,7 +166,7 @@ def section_5_imputation(df: pd.DataFrame) -> None:
     n_imputed = int(df["bga_ph"].isna().sum())
     print(f"\n  Median imputation invents {n_imputed} patients with an average pH and shrinks")
     print("  the effect toward zero (regression dilution). It also claims a certainty")
-    print("  it does not have — note its standard error. Rubin's rules add the")
+    print("  it does not have – note its standard error. Rubin's rules add the")
     print("  between-imputation variance back in.")
 
 
@@ -200,7 +200,7 @@ def section_5b_sabotaged_imputation(df: pd.DataFrame) -> None:
                     ("MI, outcome IN imputation model", with_outcome),
                     ("MI, outcome OMITTED", without_outcome)]:
         print(f"  {name:34s}{or_per_01_ph_drop(p):>14.2f}{predicted_risk(p):>13.3f}")
-    print("\n  Omitting the outcome breaks the ODDS RATIO, not the absolute risk —")
+    print("\n  Omitting the outcome breaks the ODDS RATIO, not the absolute risk –")
     print("  the mirror image of what complete-case analysis does (section 3).")
 
 
@@ -213,7 +213,7 @@ def section_6_report(df: pd.DataFrame) -> None:
     print(f'  "Der arterielle pH fehlte bei {n_miss} von {len(df)} Patient:innen ({pct:.1%}).')
     print("   Das Fehlen hing mit der 30-Tage-Mortalität zusammen, nicht mit Alter")
     print("   oder SOFA-Score. Die Hauptanalyse verwendet multiple Imputation")
-    print("   (m = 20, Rubin's rules; das Imputationsmodell enthält das Outcome).")
+    print("   (m = 20, Rubins Regeln; das Imputationsmodell enthält das Outcome).")
     print("   Eine Complete-Case-Analyse als Sensitivitätsanalyse lieferte")
     print('   vergleichbare Odds Ratios, aber zu niedrige absolute Risiken."')
 

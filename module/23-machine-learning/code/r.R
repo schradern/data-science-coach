@@ -1,4 +1,4 @@
-# Module 23 — Introduction to machine learning: first classifier (R / glm).
+# Module 23 – Introduction to machine learning: first classifier (R / glm).
 #
 # Runs standalone from the project root:
 #   Rscript module/23-machine-learning/code/r.R
@@ -48,7 +48,7 @@ cat("30-day mortality:", round(mean(cohort$verstorben_30d) * 100, 1), "%\n")
 cat(
   "Accuracy paradox: always predicting 'lebt' gives",
   round((1 - mean(cohort$verstorben_30d)) * 100, 1),
-  "% accuracy — and misses every death.\n\n"
+  "% accuracy – and misses every death.\n\n"
 )
 
 # ---------------------------------------------------------------------------
@@ -138,7 +138,7 @@ specificity <- tn / (tn + fp)
 cat(sprintf("\nSensitivity: %.2f   Specificity: %.2f  (threshold = 0.5, weighted glm)\n",
             sensitivity, specificity))
 
-# AUC via Wilcoxon statistic — equivalent to the area under the ROC curve.
+# AUC via Wilcoxon statistic – equivalent to the area under the ROC curve.
 # No external package required: AUC = U / (n1 * n0).
 u_stat <- wilcox.test(
   probs[test_df$verstorben_30d == 1],
@@ -203,10 +203,10 @@ cat("Mean CV-AUC :", round(mean(cv_auc, na.rm = TRUE), 3),
     "±", round(sd(cv_auc, na.rm = TRUE), 3), "\n")
 
 # ---------------------------------------------------------------------------
-# 5) tidymodels workflow sketch (commented — requires tidymodels package)
+# 5) tidymodels workflow sketch (commented – requires tidymodels package)
 # ---------------------------------------------------------------------------
 cat("\n=================================================================\n")
-cat("5) TIDYMODELS SKETCH  (not executed — install.packages('tidymodels'))\n")
+cat("5) TIDYMODELS SKETCH  (not executed – install.packages('tidymodels'))\n")
 cat("=================================================================\n")
 cat(
   "tidymodels mirrors scikit-learn's Pipeline + StratifiedKFold pattern.\n",

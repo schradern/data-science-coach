@@ -15,7 +15,7 @@ y  = df["verstorben_30d"]
 
 # Naive baseline: always predict the majority class (lebt = 0)
 y_pred_baseline = np.zeros(len(y), dtype=int)
-print("Accuracy (Baseline):", round(accuracy_score(y, y_pred_baseline), 3))  # ~0.92
+print("Accuracy (Baseline):", round(accuracy_score(y, y_pred_baseline), 3))  # 0.844
 print("AUC (Baseline):     ", roc_auc_score(y, y_pred_baseline))              # 0.5
 ```
 
@@ -26,7 +26,7 @@ df <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 y  <- df$verstorben_30d
 
 # Accuracy: always predict 0
-cat("Accuracy (Baseline):", round(mean(y == 0), 3), "\n")   # ~0.92
+cat("Accuracy (Baseline):", round(mean(y == 0), 3), "\n")   # 0.844
 
 # AUC for a constant zero predictor = 0.5
 u  <- wilcox.test(rep(0, sum(y == 1)), rep(0, sum(y == 0)))$statistic
@@ -230,8 +230,8 @@ Spezifität allein.
 von **46,0 %**, während im Testset nur **16,0 %** tatsächlich sterben, das
 Modell **überschätzt das Risiko erheblich**. Ursache ist `class_weight=
 "balanced"` (Abschnitt 3/6): Es gewichtet die Verlustfunktion so um, als wären
-Tod und Überleben gleich häufig, das hilft der Rangordnung (AUC = 0,880 bleibt
-unverändert gut), verzerrt aber jede absolute Wahrscheinlichkeit.
+Tod und Überleben gleich häufig. Die Rangordnung bleibt dabei praktisch gleich
+(AUC 0,880 mit, 0,878 ohne Gewichtung), aber jede absolute Wahrscheinlichkeit ist verzerrt.
 
 **Klinische Konsequenz:** In der Praxis würde eine solche Überschätzung zu
 unnötiger Therapieeskalation führen, z. B. ICU-Aufnahme statt Normalstation,
@@ -242,18 +242,19 @@ und schlechte Kalibrierung (falsche absolute Werte) können gleichzeitig
 auftreten, genau das sehen wir hier.
 
 **Der Effekt heißt:** class-weight-induzierte Verzerrung der Vorhersage-
-wahrscheinlichkeiten (nicht "Overfitting", die Rangordnung ist ja intakt).
+wahrscheinlichkeiten (nicht „Overfitting“, die Rangordnung ist ja intakt).
 
 **Post-hoc-Korrektur:**
 
 ```python
+# continues the code from task 4 (pipeline, X_train, X_test, probs)
 from sklearn.calibration import CalibratedClassifierCV
 
 calibrated = CalibratedClassifierCV(pipeline, method="sigmoid", cv=5)
 calibrated.fit(X_train, y_train)
 probs_cal = calibrated.predict_proba(X_test)[:, 1]
 print(f"Mittlere Vorhersage vorher: {probs.mean():.1%}  nachher: {probs_cal.mean():.1%}")
-# vorher: 46.0%  nachher: ~18% (nahe an den beobachteten 16%)
+# vorher: 46.0%  nachher: 17.9% (close to the observed 16%)
 ```
 
 `method="isotonic"` ist flexibler, braucht aber mehr Daten. Bei kleinem

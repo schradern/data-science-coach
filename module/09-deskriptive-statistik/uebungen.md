@@ -12,7 +12,7 @@ a) Wo weichen sie stark voneinander ab? Was sagt das über die Verteilung?
 b) Welches Lagemaß würdest du in einer Publikation berichten, und warum?
 
 ## Aufgabe 2 – Häufigkeiten und Anteile
-a) Wie viele Patient:innen haben als Aufnahmegrund „Herzinsuffizienz"?
+a) Wie viele Patient:innen haben als Aufnahmegrund „Herzinsuffizienz“?
  Wie viel Prozent der Kohorte ist das (1 Dezimalstelle)? 
 b) Wie groß ist der Anteil der Patient:innen mit Hypertonie? 
 c) Erstelle eine Kreuztabelle: Raucherstatus × Diabetes (absolut und relativ).

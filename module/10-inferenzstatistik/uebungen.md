@@ -10,7 +10,7 @@ Für jede Aufgabe gilt: **p + Effektgröße + Konfidenzintervall** berichten, ni
 ## Aufgabe 1 – p-Wert interpretieren
 
 Führe einen Welch-t-Test durch: Unterscheidet sich der **SOFA-Score** zwischen
-Patient:innen mit und ohne Diabetes? Berechne auch Cohen's d und das 95-%-KI
+Patient:innen mit und ohne Diabetes? Berechne auch Cohens d und das 95-%-KI
 der Mittelwertdifferenz.
 
 Formuliere anschließend **in einem Satz** in eigenen Worten:
@@ -18,7 +18,7 @@ Formuliere anschließend **in einem Satz** in eigenen Worten:
 1. Was der p-Wert in diesem konkreten Fall bedeutet.
 2. Benenne eine häufige Fehldeutung, die du aus der Literatur kennst.
 
-*Tipp:* Cohen's d = (M₁ − M₂) / gepoolte SD. Welcher Effektstärken-Bereich wäre klinisch auffällig?
+*Tipp:* Cohens d = (M₁ − M₂) / gepoolte SD. Welcher Effektstärken-Bereich wäre klinisch auffällig?
 
 ---
 
@@ -29,7 +29,7 @@ die Schiefe und erstelle ein Histogramm.
 
 Beantworte:
 
-- Ab welcher Stichprobengröße verliert der Shapiro-Wilk-Test an Trennschärfe, und warum?
+- Warum taugt der Shapiro-Wilk-Test bei großen (und bei sehr kleinen) Stichproben wenig als Entscheidungshilfe?
 - Welcher Hypothesentest ist bei nicht-normalverteilten Daten die robustere Wahl?
 
 *Tipp:* Achte auf den Unterschied zwischen statistischer Signifikanz des Shapiro-Tests
@@ -40,16 +40,16 @@ und praktischer Relevanz der Abweichung.
 ## Aufgabe 3 – Chi-Quadrat-Test
 
 Gibt es einen Zusammenhang zwischen **Raucherstatus** (aktiv vs. nicht-aktiv) und
-30-Tage-Mortalität? Berechne χ², p und Cramér's V.
+30-Tage-Mortalität? Berechne χ², p und Cramérs V.
 
 Schritte:
 
 1. Binarisiere `raucherstatus` zu zwei Gruppen: `"aktiv"` vs. `"ehemalig"/"nie"`.
 2. Erstelle eine Kontingenztabelle.
-3. Berechne χ² und Cramér's V.
+3. Berechne χ² und Cramérs V.
 4. Interpretiere den Befund klinisch, auch dann, wenn p > 0,05.
 
-*Tipp:* Cramér's V nahe 0 heißt nicht, dass kein Effekt existiert, es könnte auch an
+*Tipp:* Cramérs V nahe 0 heißt nicht, dass kein Effekt existiert, es könnte auch an
 mangelnder Power liegen. Was bräuchtest du, um das zu klären?
 
 ---
@@ -92,7 +92,7 @@ Beantworte:
 
 Berechne die **Power** des Welch-t-Tests (α = 0,05, zweiseitig) für den
 Laktat-Unterschied Sepsis vs. Nicht-Sepsis bei den beobachteten Stichprobengrößen und
-dem beobachteten Cohen's d.
+dem beobachteten Cohens d.
 
 Frage außerdem: Wie viele Patient:innen je Gruppe wären für Power = 0,8 nötig?
 
@@ -102,7 +102,7 @@ Frage außerdem: Wie viele Patient:innen je Gruppe wären für Power = 0,8 nöti
 Was bedeutet Power = 0,8 konkret, und was folgt daraus, wenn die Power deutlich darunter liegt?
 
 **Kritische Zusatzfrage** (Vorgriff auf Modul 13 (Studiendesign und Power)):
-Ist die hier berechnete „beobachtete Power" (aus dem tatsächlich gemessenen
+Ist die hier berechnete „beobachtete Power“ (aus dem tatsächlich gemessenen
 Effekt, im *selben* Test, den du gerade nicht-signifikant gefunden hast) eine
 sinnvolle nachträgliche Rechtfertigung für das nicht-signifikante Ergebnis?
 Was wäre der korrekte, *prospektive* Verwendungszweck einer Power-Berechnung?

@@ -12,7 +12,7 @@
 # does NOT state an exact antibiotic dose, so the third question below has no
 # correct answer in the corpus -- this is what the confidence threshold must catch.
 GUIDELINE <- paste(
-  "Bei Sepsis-induzierter Hypotension oder einem Laktatwert von mindestens 2 mmol/L sollen innerhalb der ersten 3 Stunden mindestens 30 ml/kg Koerpergewicht einer balancierten kristalloiden Infusionsloesung verabreicht werden. Der Effekt der Volumengabe soll ueber dynamische Parameter wie die Pulsdruckvariation oder ein passives Beinheben ueberprueft werden, um eine Fluessigkeitsueberladung zu vermeiden.",
+  "Bei Sepsis-induzierter Hypotension oder einem Laktatwert von mindestens 4 mmol/L sollen innerhalb der ersten 3 Stunden mindestens 30 ml/kg Koerpergewicht einer balancierten kristalloiden Infusionsloesung verabreicht werden. Der Effekt der Volumengabe soll ueber dynamische Parameter wie die Pulsdruckvariation oder ein passives Beinheben ueberprueft werden, um eine Fluessigkeitsueberladung zu vermeiden.",
   "Als Vasopressor der ersten Wahl bei septischem Schock soll Noradrenalin eingesetzt werden, mit dem Ziel, einen mittleren arteriellen Druck (MAP) von mindestens 65 mmHg zu erreichen. Reicht Noradrenalin allein nicht aus, kann Vasopressin als zweiter Vasopressor ergaenzt werden, um die Noradrenalin-Dosis zu senken. Adrenalin gilt als Reservemedikament bei therapierefraktaerem Schock.",
   "Eine kalkulierte intravenoese Antibiotikatherapie soll so frueh wie moeglich, spaetestens jedoch innerhalb einer Stunde nach Diagnosestellung einer Sepsis begonnen werden. Vor Gabe der Antibiotika sollen, sofern ohne relevante Verzoegerung moeglich, mindestens zwei Blutkulturpaare abgenommen werden. Die Auswahl des Antibiotikums richtet sich nach dem vermuteten Infektionsfokus und der lokalen Resistenzlage.",
   "Der Infektionsfokus soll innerhalb der ersten 6 bis 12 Stunden identifiziert und, wo moeglich, chirurgisch oder interventionell saniert werden (Fokuskontrolle), zum Beispiel durch Drainage eines Abszesses oder Entfernung eines infizierten Katheters. Eine verzoegerte Fokuskontrolle ist mit einer hoeheren Sterblichkeit assoziiert.",
@@ -212,9 +212,9 @@ f1 <- if (pr + rc > 0) 2 * pr * rc / (pr + rc) else 0
 cat(sprintf("\n  Gepoolte Out-of-Sample-Kennzahlen ueber alle %d Fragen (tp=%d, fp=%d, fn=%d):\n", n_eval, tp, fp, fn))
 cat(sprintf("  Precision=%.3f  Recall=%.3f  F1=%.3f\n", pr, rc, f1))
 if (f1 < 1.0) {
-  cat("  Nicht perfekt -- das ist das ehrliche Ergebnis. Die vorherige In-Sample-Zahl\n")
-  cat("  (Precision=Recall=F1=1.00, auf denselben Daten berichtet, die die Schwelle\n")
-  cat("  festgelegt haben) war zirkulaer und sagte nichts ueber neue Fragen aus.\n")
+  cat("  Nicht perfekt -- das ist das ehrliche Ergebnis. Die In-Sample-Zahl\n")
+  cat("  (hier Precision=Recall=F1=1.00, auf denselben Daten berechnet, die die Schwelle\n")
+  cat("  festgelegt haben) waere zirkulaer und sagt nichts ueber neue Fragen aus.\n")
 } else {
   cat("  Auch out-of-sample perfekt auf diesem winzigen Set -- bei n=8 Fragen ist das\n")
   cat("  ein einzelner guenstiger Datenpunkt, kein Beleg fuer Generalisierung.\n")

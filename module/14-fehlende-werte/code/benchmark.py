@@ -362,7 +362,7 @@ def main() -> None:
 
     projected_full = per_rep_without_mice * R + mice_only * R
     # MICE always runs all R replicates. A timing-based cap would make the
-    # reported coverage depend on machine speed — a fast machine runs full R and
+    # reported coverage depend on machine speed – a fast machine runs full R and
     # prints one set of numbers, a loaded or slow machine runs fewer and prints
     # different ones. The module asserts specific coverage values and
     # tools/check_numbers.py verifies them, so determinism must win over the

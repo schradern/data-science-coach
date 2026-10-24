@@ -3,7 +3,7 @@
 --
 -- python.py/r.R load the course datasets with the shared pandas/readr
 -- loaders (local-first, URL-fallback) and hand them to DuckDB as in-memory
--- tables via con.register()/duckdb_register() — no file path needed here.
+-- tables via con.register()/duckdb_register() – no file path needed here.
 --
 -- DuckDB can also query a CSV file (local or remote) directly:
 --   read_csv_auto('/path/to/kohorte.csv')          -- local path
@@ -83,7 +83,7 @@ ORDER BY laktat_median DESC;
 
 -- Portable: repeat COUNT(*) instead of referencing the alias `gesamt` within
 -- the same SELECT list. DuckDB allows reusing a SELECT alias in the same list,
--- but PostgreSQL/SQLite do not — and this query is meant to move to a real
+-- but PostgreSQL/SQLite do not – and this query is meant to move to a real
 -- clinic server. COUNT(*) - COUNT(col) counts the NULLs in `col`.
 SELECT
     COUNT(*)                                      AS gesamt,
@@ -113,7 +113,7 @@ WHERE l.laktat_mmol_l IS NOT NULL;
 
 
 ------------------------------------------------------------------------
--- 7) Vitals: trend — mean heart rate per patient and day
+-- 7) Vitals: trend – mean heart rate per patient and day
 ------------------------------------------------------------------------
 
 SELECT

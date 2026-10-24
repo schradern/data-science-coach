@@ -32,6 +32,7 @@ print(missing[missing > 0])
 ## Aufgabe 2 – Nur bestimmte Spalten laden
 
 ```python
+import pandas as pd
 labs = pd.read_csv("{{DATEN}}labor.csv",
                    usecols=["patient_id", "kreatinin_mg_dl", "laktat_mmol_l"])
 print(labs.shape)  # (500, 3)
@@ -69,7 +70,7 @@ dim(df)  # 10 3
 import json, pandas as pd
 raw = '[{"id":1,"vitals":{"hr":82,"map":75},"dx":"Sepsis"},{"id":2,"vitals":{"hr":91,"map":68},"dx":"Pneumonie"},{"id":3,"vitals":{"hr":74,"map":82},"dx":"COPD-Exazerbation"}]'
 df = pd.json_normalize(json.loads(raw), sep="_")
-# Columns: id, vitals_hr, vitals_map, dx
+# Columns: id, dx, vitals_hr, vitals_map
 print(df)
 ```
 ```r
@@ -89,8 +90,10 @@ import pandas as pd
 
 def load_api_or_local(url: str, local_file: str) -> pd.DataFrame:
     """Fetch from URL; fall back to local file on any error."""
+    # A custom User-Agent: some APIs answer urllib's default one with HTTP 403.
+    request = urllib.request.Request(url, headers={"User-Agent": "data-science-course"})
     try:
-        with urllib.request.urlopen(url, timeout=5) as response:
+        with urllib.request.urlopen(request, timeout=5) as response:
             return pd.DataFrame(json.load(response))
     except Exception as exc:
         print(f"API unreachable ({exc}). Using: {local_file}")
@@ -139,6 +142,9 @@ vitals <- read_csv("{{DATEN}}vitalwerte.csv", show_col_types=FALSE)
 missing_vitals <- anti_join(cohort, vitals, by="patient_id")
 cat("Patients without vitals:", nrow(missing_vitals), "\n")
 ```
-**Beobachtung:** `vitalwerte.csv` enthält 1873 statt 2000 Messungen (4 × 500),
-d. h. bei einigen Patient:innen fehlen Tage, klinisch realistisch (z. B.
-Patient:in vor Tag 3 entlassen oder verstorben).
+**Beobachtung:** Alle 500 IDs kommen in `vitalwerte.csv` vor (die Differenzmenge
+ist leer, `anti_join` liefert 0 Zeilen). Auffällig ist etwas anderes: Die Datei
+enthält nur 1873 statt 2000 Messungen (4 × 500). Bei Patient:innen mit einer
+Verweildauer unter vier Tagen fehlen die späteren Tage, sie waren dann schon
+entlassen. Die ID-Prüfung allein hätte das nicht gezeigt; zähle auch die Zeilen
+je Patient:in (`vitals.groupby("patient_id").size()` bzw. `count(vitals, patient_id)`).

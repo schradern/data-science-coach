@@ -1,4 +1,4 @@
-"""Module 05 — SQL for data extraction using DuckDB.
+"""Module 05 – SQL for data extraction using DuckDB.
 
 Runs standalone from the project root:
     python module/05-sql/code/python.py
@@ -7,7 +7,7 @@ Data: read from data/ (committed with the repo); if that folder is
 missing, the same files are fetched from the published URL.
 Package required: pip install duckdb
 
-DuckDB lets us run SQL directly on CSV files — no database server needed.
+DuckDB lets us run SQL directly on CSV files – no database server needed.
 The queries mirror the examples in sql.sql.
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ def connect() -> duckdb.DuckDBPyConnection:
 
     Uses the shared, local-first/URL-fallback loaders from lib.helpers (not a
     hardcoded local path), then hands the resulting DataFrames to DuckDB via
-    con.register() — no `read_csv_auto()` on a file path needed.
+    con.register() – no `read_csv_auto()` on a file path needed.
     """
     con = duckdb.connect(":memory:")
     con.register("kohorte", load_cohort())
@@ -52,7 +52,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     # 1) SELECT / WHERE / ORDER BY / LIMIT
     # ------------------------------------------------------------------
-    print("\n=== 1) SELECT / WHERE / ORDER BY — Sepsis, SOFA >= 6 ===")
+    print("\n=== 1) SELECT / WHERE / ORDER BY – Sepsis, SOFA >= 6 ===")
     df1 = con.execute("""
         SELECT patient_id, alter, aufnahmegrund, sofa_score
         FROM kohorte
@@ -64,9 +64,9 @@ def main() -> None:
     print(df1.to_string(index=False))
 
     # ------------------------------------------------------------------
-    # 2) GROUP BY — count, mean SOFA, mortality rate per admission type
+    # 2) GROUP BY – count, mean SOFA, mortality rate per admission type
     # ------------------------------------------------------------------
-    print("\n=== 2) GROUP BY — aggregation per Aufnahmegrund ===")
+    print("\n=== 2) GROUP BY – aggregation per Aufnahmegrund ===")
     df2 = con.execute("""
         SELECT
             aufnahmegrund,
@@ -81,9 +81,9 @@ def main() -> None:
     print(df2.to_string(index=False))
 
     # ------------------------------------------------------------------
-    # 3) LEFT JOIN — cohort + labs; row count must stay the same
+    # 3) LEFT JOIN – cohort + labs; row count must stay the same
     # ------------------------------------------------------------------
-    print("\n=== 3) LEFT JOIN — kohorte + labor (first 5 rows) ===")
+    print("\n=== 3) LEFT JOIN – kohorte + labor (first 5 rows) ===")
     df3 = con.execute("""
         SELECT
             k.patient_id,
@@ -107,9 +107,9 @@ def main() -> None:
     print(f"  Row-count check OK: {n_join} == {n_cohort}")
 
     # ------------------------------------------------------------------
-    # 4) JOIN + GROUP BY — median lactate per admission type
+    # 4) JOIN + GROUP BY – median lactate per admission type
     # ------------------------------------------------------------------
-    print("\n=== 4) JOIN + GROUP BY — median lactate per Aufnahmegrund ===")
+    print("\n=== 4) JOIN + GROUP BY – median lactate per Aufnahmegrund ===")
     df4 = con.execute("""
         SELECT
             k.aufnahmegrund,
@@ -125,7 +125,7 @@ def main() -> None:
     print(df4.to_string(index=False))
 
     # ------------------------------------------------------------------
-    # 5) NULL analysis — how many lactate values are missing?
+    # 5) NULL analysis – how many lactate values are missing?
     # ------------------------------------------------------------------
     print("\n=== 5) NULL shares in labor ===")
     df5 = con.execute("""
@@ -139,9 +139,9 @@ def main() -> None:
     print(df5.to_string(index=False))
 
     # ------------------------------------------------------------------
-    # 6) CTE — high-risk Sepsis patients (SOFA >= 8)
+    # 6) CTE – high-risk Sepsis patients (SOFA >= 8)
     # ------------------------------------------------------------------
-    print("\n=== 6) CTE — lactate in high-risk Sepsis (SOFA >= 8) ===")
+    print("\n=== 6) CTE – lactate in high-risk Sepsis (SOFA >= 8) ===")
     df6 = con.execute("""
         WITH high_risk AS (
             SELECT patient_id
@@ -160,9 +160,9 @@ def main() -> None:
     print(df6.to_string(index=False))
 
     # ------------------------------------------------------------------
-    # 7) Three-way JOIN — cohort + labs + vitals at admission day
+    # 7) Three-way JOIN – cohort + labs + vitals at admission day
     # ------------------------------------------------------------------
-    print("\n=== 7) Three-way JOIN — kohorte + labor + vitalwerte day 0 (Sepsis) ===")
+    print("\n=== 7) Three-way JOIN – kohorte + labor + vitalwerte day 0 (Sepsis) ===")
     df7 = con.execute("""
         SELECT
             k.patient_id,

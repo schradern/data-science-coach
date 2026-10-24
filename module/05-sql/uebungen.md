@@ -3,7 +3,7 @@
 Nutze DuckDB in Python oder R, um die folgenden Abfragen auf den Datensätzen
 `kohorte`, `labor` und `vitalwerte` auszuführen. Lade sie zuerst mit
 `pandas`/`readr` von `{{DATEN}}` und registriere sie bei DuckDB (siehe
-README §2 „In Python (DuckDB)" / „In R (DBI + duckdb)"). Lösungen:
+README §2 „In Python (DuckDB)“ / „In R (DBI + duckdb)“). Lösungen:
 [`loesungen.md`](loesungen.md).
 
 ## Aufgabe 1 – SELECT und WHERE
@@ -25,11 +25,12 @@ Berechne dann den mittleren Laktatwert je `aufnahmegrund`. Zeige nur
 Gruppen mit mindestens 30 Messwerten (`HAVING COUNT(*) >= 30`).
 
 ## Aufgabe 5 – Dreifach-JOIN
-Verknüpfe alle drei Tabellen: Kohorte + Labor + Vitalwerte (nur Tag 1).
+Verknüpfe alle drei Tabellen: Kohorte + Labor + Vitalwerte (nur `tag = 1`, also
+der erste Tag nach dem Aufnahmetag `tag = 0`).
 Gib für Patient:innen mit `diabetes = 1` aus: `patient_id`, `aufnahmegrund`,
 `laktat_mmol_l`, `herzfrequenz` (Tag 1). Wie viele haben vollständige Daten?
 
 ## Bonus – CTE
-Definiere mit `WITH` zunächst eine Gruppe „schwer krank": `sofa_score >= 7`
+Definiere mit `WITH` zunächst eine Gruppe „schwer krank“: `sofa_score >= 7`
 und beliebiger Aufnahmegrund. Berechne dann für diese Gruppe das mediane
 Kreatinin und Laktat im Vergleich zum Rest.

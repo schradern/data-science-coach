@@ -1,4 +1,4 @@
-# Module 26 — tree ensembles and gradient boosting (R, parallel to Python).
+# Module 26 – tree ensembles and gradient boosting (R, parallel to Python).
 #   Rscript module/26-ensembles-boosting/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.

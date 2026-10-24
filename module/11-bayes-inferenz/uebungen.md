@@ -28,5 +28,5 @@ Zwei Behandlungsarme werden bayesianisch verglichen. Die Posterior-Verteilung de
 **±0,05** (Unterschiede unter 5 Prozentpunkten gelten als praktisch gleich).
 
 1. Schließt das Credible-Interval die Null ein? Was bedeutet das?
-2. Liegt das gesamte Credible-Interval innerhalb der ROPE? Was folgt daraus für die Aussage „praktisch äquivalent"?
-3. Formuliere den Befund in einem Satz für eine klinische Leserin — ohne das Wort „signifikant".
+2. Liegt das gesamte Credible-Interval innerhalb der ROPE? Was folgt daraus für die Aussage „praktisch äquivalent“?
+3. Formuliere den Befund in einem Satz für eine klinische Leserin – ohne das Wort „signifikant“.

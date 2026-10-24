@@ -31,7 +31,7 @@ def main() -> None:
     #    Uniform prior Beta(1, 1): every rate equally plausible a priori.
     #    Posterior = Beta(1 + k, 1 + n - k).
     # -----------------------------------------------------------------
-    print("\n1) Overall 30-day mortality — posterior Beta(1+k, 1+n-k)")
+    print("\n1) Overall 30-day mortality – posterior Beta(1+k, 1+n-k)")
     a_post, b_post = 1 + k, 1 + n - k
     mean, lo, hi = beta_summary(a_post, b_post)
     print(f"data: k={k} deaths / n={n} patients (observed {k / n:.4f})")
@@ -48,7 +48,7 @@ def main() -> None:
     #    weak prior  = Beta(1, 1)    (uniform, ~0 pseudo-patients)
     #    strong prior= Beta(20, 80)  (mean 0.20, worth 100 pseudo-patients)
     # -----------------------------------------------------------------
-    print("\n2) Prior sensitivity — weak Beta(1,1) vs strong Beta(20,80)")
+    print("\n2) Prior sensitivity – weak Beta(1,1) vs strong Beta(20,80)")
     priors = {"weak Beta(1,1)": (1, 1), "strong Beta(20,80)": (20, 80)}
 
     interim = df.head(30)
@@ -66,7 +66,7 @@ def main() -> None:
     #    Draw from each Beta posterior (uniform prior) and look at the
     #    posterior of the DIFFERENCE in mortality.
     # -----------------------------------------------------------------
-    print("\n3) Two groups — Sepsis vs non-Sepsis, posterior of the difference")
+    print("\n3) Two groups – Sepsis vs non-Sepsis, posterior of the difference")
     sep = df["aufnahmegrund"] == "Sepsis"
     k1, n1 = int(df.loc[sep, "verstorben_30d"].sum()), int(sep.sum())
     k0, n0 = int(df.loc[~sep, "verstorben_30d"].sum()), int((~sep).sum())
@@ -86,7 +86,7 @@ def main() -> None:
     print(f"P(Sepsis mortality > non-Sepsis mortality) = {p_gt0:.4f}")
 
     # -----------------------------------------------------------------
-    # 4) ROPE — region of practical equivalence.
+    # 4) ROPE – region of practical equivalence.
     #    A difference of at most +/- 0.05 (5 percentage points) is treated
     #    as clinically negligible. Report the posterior mass inside it.
     # -----------------------------------------------------------------

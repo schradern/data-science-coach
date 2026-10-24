@@ -15,8 +15,8 @@
 
 Im geteilten Kohortendatensatz interessiert uns die Frage: Wie stark erhöht **Diabetes** das 30-Tage-Mortalitätsrisiko
 insgesamt? Ärzt:innen können diese Frage nicht direkt aus einem rohen Gruppenvergleich beantworten, weil
-Diabetiker:innen in unserer Kohorte im Schnitt älter sind und häufiger männlich, hypertensiv oder aktive
-Raucher:innen – alles Faktoren, die das Sterberisiko unabhängig beeinflussen (Confounding). Mittels
+Diabetiker:innen in unserer Kohorte im Schnitt älter sind, häufiger hypertensiv und seltener männlich –
+Merkmale, die klinisch plausibel auch das Sterberisiko beeinflussen (Confounding). Mittels
 Propensity Score Matching erstellen wir eine synthetische Kontrollgruppe, in der Diabetiker:innen und
 Nicht-Diabetiker:innen bezüglich dieser Confounder nahezu identisch sind.
 
@@ -40,16 +40,16 @@ Zur Einordnung: In einer hypothetischen randomisierten Studie, in der die Exposi
 zugeteilt würde, wäre der PS für alle Patient:innen 0,5. In Beobachtungsstudien schätzen wir den PS über
 eine **logistische Regression**, bei der die Exposition der binäre Outcome ist.
 
-**Stolperstein – ist Diabetes überhaupt eine „Behandlung"?** Propensity-Score-Methoden imitieren ein
+**Stolperstein – ist Diabetes überhaupt eine „Behandlung“?** Propensity-Score-Methoden imitieren ein
 randomisiertes Experiment. Das setzt eine **wohldefinierte Intervention** voraus: einen Eingriff, den man
 einer Person zuweisen *könnte* (Consistency-Annahme). Diabetes ist **nicht manipulierbar** – man kann
-niemandem „Diabetes" zuteilen. „Der kausale Effekt von Diabetes" ist ohne spezifizierte Intervention
+niemandem „Diabetes“ zuteilen. „Der kausale Effekt von Diabetes“ ist ohne spezifizierte Intervention
 mehrdeutig: gemeint sein könnte eine Blutzuckersenkung, eine Diagnose, eine Krankheitsdauer – lauter
-verschiedene Kontraste (Hernáns Frage *„does water kill?"* – ertrinken oder verdursten?). Wir behalten das
+verschiedene Kontraste (Hernáns Frage *„does water kill?“* – ertrinken oder verdursten?). Wir behalten das
 Beispiel hier als **Illustration der Mechanik** (PS, Matching, IPW, Balance) auf vertrauten Daten – die
 geschätzte Zahl ist aber kein sauber definierter Kausaleffekt. Ein verteidigbares **Target Trial** würde
 stattdessen eine konkrete Intervention emulieren, z. B. „intensive vs. Standard-Blutzuckerkontrolle ab
-Aufnahme", mit klaren Ein-/Ausschlusskriterien und einem definierten Zeitnullpunkt.
+Aufnahme“, mit klaren Ein-/Ausschlusskriterien und einem definierten Zeitnullpunkt.
 
 **Stolperstein – Positivity.** Kausale Kontraste brauchen zusätzlich, dass in jeder Confounder-Kombination
 sowohl exponierte als auch nicht-exponierte Personen vorkommen können (`0 < PS < 1`). Fehlt in einer
@@ -69,26 +69,26 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from scipy.spatial.distance import cdist
 
-# 1. Kohorte laden; Exposition = Diabetes, Confounder = Alter/Geschlecht/Hypertonie/Raucherstatus
+# 1. Load the cohort; exposure = diabetes, confounders = age/sex/hypertension/smoking status
 df = pd.read_csv("{{DATEN}}kohorte.csv")
 df["geschlecht_m"] = (df["geschlecht"] == "maennlich").astype(int)
 df["raucher_aktiv"] = (df["raucherstatus"] == "aktiv").astype(int)
-covariates = ["alter", "geschlecht_m", "hypertonie", "raucher_aktiv"]  # NICHT sofa_score (Mediator!)
+covariates = ["alter", "geschlecht_m", "hypertonie", "raucher_aktiv"]  # NOT sofa_score (mediator!)
 
-# 2. Propensity Score schätzen (unregularisierte logistische Regression)
-lr = LogisticRegression(max_iter=2000, penalty=None)
+# 2. Estimate the propensity score (unregularised logistic regression)
+lr = LogisticRegression(max_iter=2000, C=np.inf)
 lr.fit(df[covariates], df["diabetes"])
 df["ps"] = lr.predict_proba(df[covariates])[:, 1]
 df["logit_ps"] = np.log(df["ps"] / (1 - df["ps"]))
 
-# 3. 1:1 Matching mit Caliper (0,2 x SD des Logit-PS - Faustregel nach Austin 2011)
+# 3. 1:1 matching with a caliper (0.2 x SD of the logit PS - rule of thumb after Austin 2011)
 caliper = 0.2 * df["logit_ps"].std()
 treated = df[df["diabetes"] == 1]
 control = df[df["diabetes"] == 0]
 dists = cdist(treated[["logit_ps"]], control[["logit_ps"]])
 
 matched_pairs, available = [], np.ones(len(control), dtype=bool)
-for i in np.argsort(dists.min(axis=1)):  # beste Matches zuerst vergeben
+for i in np.argsort(dists.min(axis=1)):  # assign the best matches first
     d = dists[i].copy(); d[~available] = np.inf
     j = int(np.argmin(d))
     if d[j] <= caliper:
@@ -100,10 +100,10 @@ df_matched = pd.concat([df.loc[[t for t, _ in matched_pairs]],
 print(f"Gematchte Paare: {len(matched_pairs)} von {len(treated)} Diabetiker:innen")
 ```
 
-🗣 **Code-Verbalisierung:**
+**Zeile für Zeile:**
 
-* `LogisticRegression(penalty=None)` trainiert eine *unregularisierte* logistische Regression (wie R's
-  `glm()`) für die Behandlungszuweisung (`diabetes`) basierend auf den vier Confoundern.
+* `LogisticRegression(C=np.inf)` trainiert eine *unregularisierte* logistische Regression (wie
+  `glm()` in R) für die Behandlungszuweisung (`diabetes`) basierend auf den vier Confoundern.
 * `cdist` berechnet die absoluten Differenzen der Logit-Propensity-Scores zwischen allen Diabetiker:innen
   und allen Nicht-Diabetiker:innen.
 * Der **Caliper** (hier `0,2 × SD(logit PS)`, eine gängige Faustregel) verwirft Matches, die zu weit
@@ -126,9 +126,11 @@ df <- read_csv("{{DATEN}}kohorte.csv")
 df$geschlecht_m <- as.integer(df$geschlecht == "maennlich")
 df$raucher_aktiv <- as.integer(df$raucherstatus == "aktiv")
 
-# Matching mit Caliper (0.2 x SD des Logit-PS), NICHT nach sofa_score (Mediator)
+# Matching with a caliper (0.2 x SD of the logit PS), NOT on sofa_score (mediator)
+# link = "linear.logit": caliper on the logit scale (the default would be the PS scale)
 m_out <- matchit(diabetes ~ alter + geschlecht_m + hypertonie + raucher_aktiv,
-                  data = df, method = "nearest", caliper = 0.2)
+                  data = df, method = "nearest", distance = "glm",
+                  link = "linear.logit", caliper = 0.2)
 summary(m_out)
 df_matched <- match.data(m_out)
 ```
@@ -169,11 +171,13 @@ zusätzlich mit **IPW** als drittem Ansatz:
 | Raucher:in (aktiv) | 0,08 | **0,03** ✓ | 0,03 ✓ |
 
 Mit Caliper (93 von 94 Diabetiker:innen matchbar – eine Person hat keinen ausreichend ähnlichen Partner
-und fällt heraus) erreichen **alle vier Confounder** die 0,10-Schwelle. Ohne Caliper verfehlt „Geschlecht"
-die Schwelle knapp (SMD ≈ 0,11–0,15 je nach Zufallsreihenfolge) – genau der Fall, den die Fallstricke unten
-beschreiben. IPW balanciert Geschlecht, Hypertonie und Raucherstatus gut, lässt aber **Alter** bei SMD ≈ 0,13
-– ein Hinweis, dass die Gewichte hier (Bereich 1,0–13,1) allein nicht ausreichen und Trimming oder ein
-stabilisiertes Gewicht sinnvoll wäre.
+und fällt heraus) erreichen **alle vier Confounder** die 0,10-Schwelle. Ohne Caliper (alle 94 gematcht)
+bleibt „Geschlecht“ mit SMD ≈ −0,09 nur knapp darunter; der Caliper drückt sie auf −0,06. IPW balanciert
+Geschlecht, Hypertonie und Raucherstatus gut, lässt aber **Alter** bei SMD ≈ 0,13 – ein Hinweis, dass das
+PS-Modell den Alterseinfluss nicht gut genug abbildet (linearer Term im Logit). Abhilfe: das PS-Modell
+nachbessern (z. B. Spline für Alter) oder Alter zusätzlich ins Outcome-Modell nehmen. Stabilisieren hilft
+hier nicht: Es multipliziert die Gewichte innerhalb jeder Gruppe nur mit einer Konstanten, die gewichtete
+SMD bleibt identisch.
 
 ![Kovariaten-Balance vor und nach Propensity-Score-Matching (Caliper) sowie IPW-gewichtet. Alle vier adjustierten Confounder liegen nach dem Caliper-Matching unter der 0,10-Schwelle; der SOFA-Score (Mediator, unten) bleibt bewusst unbalanciert.](assets/love_plot_smd.png)
 
@@ -194,6 +198,10 @@ stabilisiertes Gewicht sinnvoll wäre.
 | Gematcht (Caliper), 93 Paare | **ATT** (Effekt bei den Behandelten) | 1,39 | [0,71; 2,70] |
 | IPW-gewichtet | **ATE** (Effekt in der Gesamtkohorte) | 1,86 | [1,03; 3,36] |
 
+Die Zahlen stammen aus `code/python.py`. `code/r.R` vergibt beim gierigen Matching wegen numerisch
+knapper Gleichstände der Logit-PS einige Partner anders, findet so für alle 94 Diabetiker:innen einen
+Partner innerhalb des Calipers und kommt auf OR 1,37 [0,69; 2,72] – dieselbe Aussage, andere Nachkommastelle.
+
 **Stolperstein – zwei verschiedene Zielgrößen, nicht nur zwei Genauigkeiten.** Matching 1:1 auf die
 Behandelten schätzt den **ATT** (*Average Treatment effect on the Treated*) – den Diabetes-Effekt in der
 Population der 93 gematchten Diabetiker:innen. IPW mit `1/PS` bzw. `1/(1−PS)` gewichtet die *gesamte*
@@ -201,7 +209,7 @@ Kohorte auf und schätzt den **ATE** (*Average Treatment Effect*) – den Effekt
 Kohorte exponiert bzw. nicht exponiert. ATT und ATE stimmen nur überein, wenn der Effekt in allen
 Subgruppen gleich groß ist; unterscheiden sich Behandelte und Gesamtkohorte in effektmodifizierenden
 Merkmalen, dürfen die Zahlen **echt** auseinanderlaufen – die Lücke zwischen 1,39 und 1,86 ist also nicht
-allein „Zufall/Präzision".
+allein „Zufall/Präzision“.
 
 Beide lassen den Mediator SOFA-Score bewusst aus und schätzen daher jeweils einen **Gesamteffekt** – nur
 auf unterschiedlichen Zielpopulationen. Der rohe Vergleich überschätzt das Risiko am stärksten; nach
@@ -231,14 +239,15 @@ PS-Modellen sollte man den Bootstrap bevorzugen.
 
 **Extreme Gewichte, Stabilisierung, Trimming.** Die unstabilisierten Gewichte reichen von 1,04 bis 13,08 –
 ein paar wenige Patient:innen dominieren die Schätzung. **Stabilisierte Gewichte** (`P(A=a)/P(A=a|X)`)
-schätzen denselben ATE, schrumpfen den Bereich aber auf 0,41–2,46; Punktschätzung und CI bleiben hier
-unverändert (`1,86 [1,03; 3,36]`). Auch **Trimming** beim 99. Perzentil (Kappung bei 9,78) ändert kaum etwas
+schätzen denselben ATE, schrumpfen den Bereich aber auf 0,41–2,46; Punktschätzung und CI bleiben
+unverändert (`1,86 [1,03; 3,36]`) – bei einem Outcome-Modell, das nur die Exposition enthält, ist das
+zwangsläufig so. Auch **Trimming** beim 99. Perzentil (Kappung bei 9,78) ändert kaum etwas
 (`1,83 [1,02; 3,29]`) – ein beruhigendes Zeichen, dass das Ergebnis nicht von einzelnen Extremgewichten
 getragen wird.
 
 ---
 
-> **Wann du Hilfe holst.** Sobald die Überlappung (Positivität) fraglich ist, unklar bleibt, ob du ATT oder ATE schätzen willst, oder plausibel ungemessene Confounder bestehen, hol methodische Beratung — kein Propensity-Score repariert ein schwaches Design allein.
+> **Wann du Hilfe holst.** Sobald die Überlappung (Positivität) fraglich ist, unklar bleibt, ob du ATT oder ATE schätzen willst, oder plausibel ungemessene Confounder bestehen, hol methodische Beratung – kein Propensity-Score repariert ein schwaches Design allein.
 
 ## Fallstricke und Merksätze
 
@@ -249,7 +258,7 @@ bleibt die Assoziation verzerrt. Nur ein RCT schützt zuverlässig vor ungemesse
 **Stolperstein:** Support-Verlust (Overlap). Wenn exponierte und Kontroll-Patient:innen völlig
 unterschiedliche Scores haben (kein Overlap), können viele Patient:innen nicht gematcht werden – in
 unserem Beispiel verliert der Caliper eine von 94 Diabetiker:innen. Das reduziert die Stichprobengröße und
-schränkt die Generalisierbarkeit auf den Bereich mit „Common Support" ein.
+schränkt die Generalisierbarkeit auf den Bereich mit „Common Support“ ein.
 
 **Darüber hinaus:** Selbst mit Caliper balanciert 1:1-PS-Matching nicht automatisch *jede* einzelne
 Kovariate – es matcht auf den (skalaren) Score, nicht auf jede Variable einzeln. Prüfe deshalb immer die
@@ -261,15 +270,15 @@ Mahalanobis-Distanz-Matching als Ergänzung.
 Tabelle (Love Plot, wie oben) – das ist mittlerweile Standard in Zeitschriften mit Beobachtungsstudien.
 
 ## Selbstcheck
-1. **Warum vergleichen wir Gruppen nach dem Matching mit SMD und nicht mit p-Werten?**, Weil p-Werte durch
-   die künstliche Reduktion der Fallzahl nach dem Matching kleiner/nicht-signifikant werden können, obwohl
+1. **Warum vergleichen wir Gruppen nach dem Matching mit SMD und nicht mit p-Werten?** – Weil p-Werte durch
+   die künstliche Reduktion der Fallzahl nach dem Matching größer (nicht signifikant) werden können, obwohl
    die absolute Asymmetrie unverändert ist. Die SMD ist unabhängig von der Fallzahl und misst die reine
    Effektgröße des Ungleichgewichts.
-2. **Was versteht man unter dem Caliper-Wert beim Matching?**, Eine Toleranzgrenze (maximal erlaubte
+2. **Was versteht man unter dem Caliper-Wert beim Matching?** – Eine Toleranzgrenze (maximal erlaubte
    Differenz der Propensity Scores/Logit-PS), innerhalb derer ein Match stattfinden darf. Matches außerhalb
    des Calipers werden verworfen, was die Qualität der Balance verbessert, aber Patient:innen kosten kann.
 3. **Warum wird `sofa_score` in diesem Modul nicht in das Propensity-Score-Modell aufgenommen, obwohl er
-   stark mit der Mortalität assoziiert ist?**, Weil er ein Mediator auf dem Pfad Diabetes → Mortalität ist
+   stark mit der Mortalität assoziiert ist?** – Weil er ein Mediator auf dem Pfad Diabetes → Mortalität ist
    (Diabetes erhöht den SOFA-Score kausal). Würde man danach adjustieren, würde man einen Teil des
    Gesamteffekts von Diabetes wegrechnen und stattdessen nur den direkten, nicht-SOFA-vermittelten Effekt
    schätzen.

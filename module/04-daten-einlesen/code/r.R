@@ -1,7 +1,8 @@
-# Module 04 — Reading & extracting data (R / readr, readxl, jsonlite).
+# Module 04 – Reading & extracting data (R / readr, readxl, jsonlite).
 #   Rscript module/04-daten-einlesen/code/r.R
-# Data: read from data/ (committed with the repo); if that folder is
-# missing, the same files are fetched from the published URL.
+# Data: the same companion files the lesson reads (kohorte_de.csv,
+# einschluss.xlsx, beispiel.json, fhir_bundle.json), taken from data/ when the
+# repo is cloned and otherwise fetched from the published URL.
 # Packages: tidyverse (readr), readxl, jsonlite, httr2 (optional for API)
 # Code is English; the dataset schema (column names) stays German.
 
@@ -16,10 +17,16 @@ source(file.path(root, "lib", "helpers.R"))
 
 data_dir <- file.path(root, "data")
 
+# Local copy in data/ if present, else the published URL of the same file.
+source_of <- function(name) {
+  local <- file.path(data_dir, name)
+  if (file.exists(local)) local else paste0(DATA_BASE_URL, name)
+}
+
 # ---------------------------------------------------------------------------
-# 1) CSV — standard case: explicit options
+# 1) CSV – standard case: explicit options
 # ---------------------------------------------------------------------------
-cat("=== 1) CSV — standard case (UTF-8, comma) ===\n")
+cat("=== 1) CSV – standard case (UTF-8, comma) ===\n")
 
 cohort <- read_csv(
   file.path(data_dir, "kohorte.csv"),
@@ -37,90 +44,59 @@ cat("Shape:", nrow(cohort), "x", ncol(cohort), "\n")
 print(head(cohort, 3))
 
 # ---------------------------------------------------------------------------
-# 2) CSV — German format: semicolon, latin-1, decimal comma
+# 2) CSV – German format: semicolon, latin-1, decimal comma
 # ---------------------------------------------------------------------------
-cat("\n=== 2) CSV — German format (semicolon, latin-1, decimal comma) ===\n")
-
-# Build a small demo CSV in German hospital format.
-demo_de_path <- file.path(tempdir(), "kohorte_de_demo.csv")
-subset_for_demo <- cohort |> select(patient_id, alter, bmi, crp_mg_l) |> head(10)
-write.table(subset_for_demo, file = demo_de_path, sep = ";", dec = ",",
-            row.names = FALSE, fileEncoding = "latin1")
+cat("\n=== 2) CSV – German format (semicolon, latin-1, decimal comma) ===\n")
 
 cohort_de <- read_delim(
-  demo_de_path,
+  source_of("kohorte_de.csv"),
   delim = ";",
   locale = locale(encoding = "latin1", decimal_mark = ","),
   show_col_types = FALSE
 )
 cat("Shape:", nrow(cohort_de), "x", ncol(cohort_de), "\n")
-print(head(cohort_de, 3))
-file.remove(demo_de_path)
+print(head(select(cohort_de, patient_id, geschlecht, gewicht_kg, bmi), 3))
 
 # ---------------------------------------------------------------------------
-# 3) Excel — create a synthetic file, then read it back
+# 3) Excel – one workbook, three sheets
 # ---------------------------------------------------------------------------
-cat("\n=== 3) Excel — create and read ===\n")
+cat("\n=== 3) Excel – einschluss.xlsx ===\n")
 
-xl_path <- file.path(tempdir(), "einschluss_demo.xlsx")
-
-if (requireNamespace("writexl", quietly = TRUE)) {
-  writexl::write_xlsx(
-    list(
-      Kohorte = cohort |> select(patient_id, alter, aufnahmegrund, sofa_score) |> head(20),
-      Klinik  = cohort |> select(patient_id, crp_mg_l, verweildauer_tage) |> head(20)
-    ),
-    path = xl_path
-  )
-
-  if (requireNamespace("readxl", quietly = TRUE)) {
-    sheet_cohort <- readxl::read_excel(xl_path, sheet = "Kohorte")
-    cat("Sheet 'Kohorte':", nrow(sheet_cohort), "x", ncol(sheet_cohort), "\n")
-    print(head(sheet_cohort, 3))
-
-    sheet_clinic <- readxl::read_excel(xl_path, sheet = "Klinik")
-    cat("Sheet 'Klinik':", nrow(sheet_clinic), "x", ncol(sheet_clinic), "\n")
-  } else {
-    cat("readxl not installed — Excel demo skipped.\n")
+if (requireNamespace("readxl", quietly = TRUE)) {
+  xl_path <- source_of("einschluss.xlsx")
+  if (startsWith(xl_path, "http")) {          # readxl cannot read a URL
+    tmp <- tempfile(fileext = ".xlsx")
+    download.file(xl_path, tmp, mode = "wb", quiet = TRUE)
+    xl_path <- tmp
   }
-  file.remove(xl_path)
+  cat("Sheets:", paste(readxl::excel_sheets(xl_path), collapse = ", "), "\n")
+  sheet_labs <- readxl::read_excel(xl_path, sheet = "Labor", range = readxl::cell_cols("A:F"))
+  cat("Sheet 'Labor':", nrow(sheet_labs), "x", ncol(sheet_labs), "\n")
+  print(head(sheet_labs, 3))
 } else {
-  cat("writexl not installed — Excel demo skipped.\n")
-  cat("  Tip: install.packages('writexl') to enable.\n")
+  cat("readxl not installed – Excel demo skipped.\n")
 }
 
 # ---------------------------------------------------------------------------
-# 4) JSON — flat and nested structures
+# 4) JSON – flat and nested structures
 # ---------------------------------------------------------------------------
-cat("\n=== 4) JSON — flat and nested ===\n")
+cat("\n=== 4) JSON – flat and nested ===\n")
 
 if (requireNamespace("jsonlite", quietly = TRUE)) {
   library(jsonlite)
 
   # Flat JSON (REDCap-like export).
-  small <- cohort |> select(patient_id, alter, aufnahmegrund) |> head(5)
-  json_text <- toJSON(small, pretty = TRUE)
-  df_flat   <- fromJSON(json_text) |> as_tibble()
-  cat("Flat JSON read:", nrow(df_flat), "x", ncol(df_flat), "\n")
-  print(df_flat)
+  df_flat <- fromJSON(source_of("beispiel.json")) |> as_tibble()
+  cat("Flat JSON (beispiel.json):", nrow(df_flat), "x", ncol(df_flat), "\n")
+  print(head(df_flat, 3))
 
-  # Nested JSON (FHIR-like structure).
-  fhir_bundle <- list(
-    resourceType = "Bundle",
-    entry = lapply(seq_len(3), function(i) {
-      list(resource = list(
-        id        = as.character(small$patient_id[i]),
-        birthYear = 2024L - small$alter[i],
-        diagnosis = list(code = small$aufnahmegrund[i])
-      ))
-    })
-  )
-  df_fhir <- fromJSON(toJSON(fhir_bundle, auto_unbox = TRUE), flatten = TRUE)$entry |>
-    as_tibble()
-  cat("\nNested JSON (FHIR-like) normalised:\n")
-  print(df_fhir)
+  # Nested JSON (FHIR bundle).
+  bundle  <- fromJSON(source_of("fhir_bundle.json"), flatten = TRUE)
+  df_fhir <- as_tibble(bundle$entry)
+  cat("\nNested JSON (fhir_bundle.json) normalised:", nrow(df_fhir), "x", ncol(df_fhir), "\n")
+  cat("Columns:", paste(head(names(df_fhir), 6), collapse = ", "), "...\n")
 } else {
-  cat("jsonlite not installed — JSON demo skipped.\n")
+  cat("jsonlite not installed – JSON demo skipped.\n")
 }
 
 # ---------------------------------------------------------------------------
@@ -133,7 +109,8 @@ api_url <- "https://disease.sh/v3/covid-19/countries?allowNull=false&limit=10"
 df_api <- tryCatch({
   if (!requireNamespace("httr2", quietly = TRUE)) stop("httr2 not available")
   library(httr2)
-  response <- request(api_url) |> req_timeout(5) |> req_perform()
+  response <- request(api_url) |> req_user_agent("data-science-coach/1.0") |>
+    req_timeout(5) |> req_perform()
   df       <- fromJSON(resp_body_string(response)) |> as_tibble()
   cat("API call succeeded:", nrow(df), "countries\n")
   print(df |> select(country, cases, deaths) |> head(5))
@@ -149,7 +126,7 @@ df_api <- tryCatch({
 # ---------------------------------------------------------------------------
 # 6) Summary: explicit, safe CSV import with missing-value check
 # ---------------------------------------------------------------------------
-cat("\n=== 6) kohorte.csv — explicit and safe ===\n")
+cat("\n=== 6) kohorte.csv – explicit and safe ===\n")
 
 cohort_final <- read_csv(
   file.path(data_dir, "kohorte.csv"),

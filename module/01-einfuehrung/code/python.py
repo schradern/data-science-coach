@@ -1,4 +1,4 @@
-"""Module 01 — Introduction & learning path.
+"""Module 01 – Introduction & learning path.
 
 Runs standalone from the project root:
     python module/01-einfuehrung/code/python.py
@@ -30,16 +30,16 @@ def summarise_cohort(df) -> None:
 
 
 def main() -> None:
-    print("=== Module 01 — First look at the cohort ===\n")
+    print("=== Module 01 – First look at the cohort ===\n")
 
     cohort = load_cohort()
     summarise_cohort(cohort)
 
-    # Admission reasons — the first grouping a clinician would ask for.
+    # Admission reasons – the first grouping a clinician would ask for.
     print("\nAdmission reasons (by frequency):")
     print(cohort["aufnahmegrund"].value_counts().to_string())
 
-    # Mortality by admission reason — the clinical question in miniature.
+    # Mortality by admission reason – the clinical question in miniature.
     print("\n30-day mortality by admission reason:")
     mortality_by_reason = (
         cohort.groupby("aufnahmegrund")["verstorben_30d"]
@@ -49,8 +49,8 @@ def main() -> None:
     )
     print(mortality_by_reason.to_string())
 
-    print(f"\nSeed: {SEED}  — results are fully reproducible.")
-    print("\nDone. Next: Module 02 — Tools & reproducible environment.")
+    print(f"\nSeed: {SEED}  – results are fully reproducible.")
+    print("\nDone. Next: Module 02 – Tools & reproducible environment.")
 
 
 if __name__ == "__main__":

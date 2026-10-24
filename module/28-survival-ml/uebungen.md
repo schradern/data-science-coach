@@ -21,8 +21,8 @@ Trennen sich die Kurven deutlich? Führe den Log-Rank-Test durch.
 
 ## Aufgabe 4 – RSF (falls sksurv installiert)
 Trainiere einen `RandomSurvivalForest` und berechne die zeitabhängige AUC bei
-Tag 7 und Tag 21. Vergleiche mit der Cox-AUC. Wo ist der Vorteil des RSF am
-größten, zu frühen oder späten Zeitpunkten?
+Tag 7 und Tag 21. Vergleiche mit der Cox-AUC. Liegt eines der beiden Modelle zu
+einem Zeitpunkt klar vorn, und reicht die Testmenge, um das zu belegen?
 
 ## Bonus – Konkurrierende Risiken konzeptuell
 Angenommen, 10 % der Patient:innen werden in eine andere Klinik verlegt und

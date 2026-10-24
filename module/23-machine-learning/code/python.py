@@ -1,4 +1,4 @@
-"""Module 23 — Introduction to machine learning: first classifier.
+"""Module 23 – Introduction to machine learning: first classifier.
 
 Runs standalone from the project root:
     python module/23-machine-learning/code/python.py
@@ -142,10 +142,10 @@ def check_calibration(pipeline: Pipeline,
     print(
         "\nSTOLPERSTEIN: this gap is not (only) small-sample noise. This pipeline"
         "\nwas fitted with class_weight='balanced', which reweights the loss as if"
-        "\ndeaths were as common as survivals. That helps ranking (AUC/threshold"
-        "\nchoice) but means predict_proba() systematically overstates absolute"
-        "\nrisk. AUC/ranking is a monotonic function of the score and is unaffected"
-        "\n(a monotonic rescaling never changes who ranks above whom) — but any"
+        "\ndeaths were as common as survivals. That shifts the default 0.5"
+        "\nthreshold towards sensitivity but means predict_proba() systematically"
+        "\noverstates absolute risk. AUC/ranking is almost unaffected (the weights"
+        "\nmainly shift the intercept, a near-monotonic rescaling) – but any"
         "\nabsolute probability (Brier score, calibration curve, decision-curve"
         "\nnet benefit) IS affected. Module 25 recalibrates with"
         "\nCalibratedClassifierCV before computing any of those; see this module's"
@@ -177,7 +177,7 @@ def check_calibration(pipeline: Pipeline,
 
 def main() -> None:
     """End-to-end ML pipeline: split, train, cross-validate, calibrate."""
-    print("Module 23 — Machine Learning: 30-day mortality classifier")
+    print("Module 23 – Machine Learning: 30-day mortality classifier")
     print("=" * 60)
 
     df = load_cohort()
@@ -188,7 +188,7 @@ def main() -> None:
     print(f"Target: verstorben_30d  (base rate: {y.mean():.1%})")
     print(
         f"\nAccuracy paradox: a model that always predicts 'lebt' achieves"
-        f" {1 - y.mean():.1%} accuracy — and misses every death."
+        f" {1 - y.mean():.1%} accuracy – and misses every death."
         f"\n→ Use AUC, not accuracy, as the primary metric for imbalanced outcomes."
     )
 
@@ -217,12 +217,12 @@ def main() -> None:
     pipeline.fit(X_train, y_train)
     print("Pipeline fitted successfully.")
     print(
-        "Logistic regression: transparent, interpretable, and — WITHOUT class"
-        "\nweighting — calibrated by default. class_weight='balanced' prevents the"
-        "\nmodel from ignoring deaths (good for ranking/AUC), but it reweights the"
+        "Logistic regression: transparent, interpretable, and – WITHOUT class"
+        "\nweighting – calibrated by default. class_weight='balanced' prevents the"
+        "\nmodel from ignoring deaths at the 0.5 threshold, but it reweights the"
         "\nloss function, so predict_proba() no longer reflects the true event rate"
         "\n(see the calibration check below). The scaler is fitted on training data"
-        "\nonly — no leakage into the test set."
+        "\nonly – no leakage into the test set."
     )
 
     # --- Evaluation on test set ---
@@ -234,7 +234,7 @@ def main() -> None:
     print("=" * 60)
     print(
         "CV uses all training data alternately for fitting and validation."
-        "\nThe test set is never touched during CV — it remains a clean holdout."
+        "\nThe test set is never touched during CV – it remains a clean holdout."
     )
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
     auc_scores = cross_val_score(pipeline, X_train, y_train, cv=cv, scoring="roc_auc")
@@ -257,7 +257,7 @@ def main() -> None:
         "\n   above), and the ~16 test events are too few for stable bins even"
         "\n   after recalibration.\n"
         "4. Fairness not checked: subgroup AUC can vary widely from global AUC.\n"
-        "5. Association ≠ causation: the model finds statistical patterns —"
+        "5. Association ≠ causation: the model finds statistical patterns –"
         "\n   some may reflect confounders, not causal pathways.\n"
         "\nThis script is a teaching example, not a clinical decision tool."
     )

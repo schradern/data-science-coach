@@ -16,31 +16,31 @@ Das Modell läuft, die AUC im Validierungsset war gut. Jetzt beginnt der schwier
 Ein trainiertes scikit-learn-Objekt wird mit `joblib.dump` als komprimierte Binärdatei gespeichert. Beim Laden muss die **exakt gleiche scikit-learn-Version** vorhanden sein, sonst drohen stille Deserialisierungsfehler.
 
 <!-- excerpt-note -->
-> **Hinweis — die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/32-einsatz-governance/code/python.py` — siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+> **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/32-einsatz-governance/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
 import joblib
 
-# Speichern
+# Save
 joblib.dump({"pipeline": pipe, "sklearn_version": sklearn.__version__}, "modell.joblib")
 
-# Laden und Version prüfen
+# Load and check the version
 artefakt = joblib.load("modell.joblib")
 assert artefakt["sklearn_version"] == sklearn.__version__, "Versionsmismatch!"
 pipe_loaded = artefakt["pipeline"]
 ```
 
-Für den Produktiveinsatz gilt: das Modell zusammen mit einer `requirements.txt` (inkl. Versions-Pin) einfrieren und in einem Modell-Registry (MLflow, DVC, Vertex AI) versionieren.
+Für den Produktiveinsatz gilt: das Modell zusammen mit einer `requirements.txt` (inkl. Versions-Pin) einfrieren und in einer Modell-Registry (z. B. MLflow oder DVC) versionieren.
 
-**Stolperstein:** `pickle` (das `joblib` intern nutzt) ist **nicht sicher** für fremde Binärdaten, ein schädlicher `.joblib`-File kann Code ausführen. Lade nur Modelle aus vertrauenswürdigen Quellen, idealerweise mit kryptographischer Prüfsumme.
+**Stolperstein:** `pickle` (das `joblib` intern nutzt) ist **nicht sicher** für fremde Binärdaten, eine schädliche `.joblib`-Datei kann Code ausführen. Lade nur Modelle aus vertrauenswürdigen Quellen, idealerweise mit kryptographischer Prüfsumme.
 
 **Darüber hinaus:** ONNX ermöglicht Framework-übergreifende Modell-Serialisierung (scikit-learn → ONNX → Java-Backend). Für regulierte Umgebungen bietet das zusätzliche Reproduzierbarkeit und Entkopplung vom Python-Ökosystem.
 
 ## 2 Model Card, der Steckbrief des Modells
-Eine **Model Card** dokumentiert, was das Modell tut, für wen es gebaut wurde, wie es bewertet wurde und wo es versagt. Sie ist Pflicht für verantwortungsvolle KI und Grundlage für die regulatorische Dokumentation.
+Eine **Model Card** dokumentiert, was das Modell tut, für wen es gebaut wurde, wie es bewertet wurde und wo es versagt. Gesetzlich vorgeschrieben ist sie nicht, aber sie gehört zu verantwortungsvoller KI und liefert die Grundlage für die regulatorische Dokumentation.
 
 ```markdown
-## Model Card — Klinisches Verschlechterungs-Prädiktionsmodell
+## Model Card – Klinisches Verschlechterungs-Prädiktionsmodell
 
 **Modellname:** Klinische-Verschlechterung-v1  
 **Version:** 1.0.0  
@@ -70,12 +70,11 @@ class_weight=balanced). Pipeline, kein Pre-Leakage.
 ### Subgruppenleistung
 AUC nach Geschlecht (jeweils mit 95%-Bootstrap-CI): weiblich [Wert, CI],
 männlich [Wert, CI]. AUC nach Altersgruppe (Schwelle 65 Jahre): [Wert, CI].
-Eine Lücke gilt erst als auffällig, wenn sich die Konfidenzintervalle
-zwischen den Gruppen nicht mehr überlappen, nicht schon bei einem reinen
-Punktschätzer-Unterschied.
+Ein reiner Punktschätzer-Unterschied belegt keine Lücke; maßgeblich ist das
+Konfidenzintervall der AUC-Differenz zwischen den Gruppen.
 
 ### Einschränkungen und Risiken
-- Bag-of-Words ignoriert Negation (z. B. „kein Fieber").
+- Bag-of-Words ignoriert Negation (z. B. „kein Fieber“).
 - Kalibrierung nicht validiert auf externen Kohorten.
 - Sprache: Deutsch. Andere Dokumentationssprachen nicht unterstützt.
 - Keine prospektive Validierung durchgeführt.
@@ -86,8 +85,9 @@ NICHT für autonome klinische Entscheidungen ohne Human-in-the-Loop.
 
 ### Regulatorik
 Klinische Entscheidungsunterstützung → MDR 2017/745: typischerweise Klasse IIa,
-unter Regel 11 aber Klasse IIb/III, wenn die unterstützte Entscheidung Tod oder
-irreversible Verschlechterung verursachen kann. Ein 30-Tage-Mortalitäts-CDSS ist
+unter Regel 11 aber Klasse IIb bei möglicher schwerwiegender Verschlechterung
+und Klasse III, wenn die unterstützte Entscheidung Tod oder irreversible
+Verschlechterung verursachen kann. Ein 30-Tage-Mortalitäts-CDSS ist
 ein IIb/III-Kandidat. EU AI Act: Hochrisiko. (Keine Rechtsberatung; vgl. §5.)
 Vor Produktiveinsatz: CE-Kennzeichnung, klinische Evaluierungsstudie, PMS-Plan.
 ```
@@ -132,7 +132,7 @@ for flip_rate in [0.00, 0.05, 0.10, 0.15, 0.20]:
 **Darüber hinaus:** Population Stability Index (PSI) ist ein verbreitetes Maß für Covariate Shift. Für unlabeled Production-Data eignen sich Maximum-Mean-Discrepancy (MMD) oder domänenadaptive Verfahren.
 
 ## 4 Fairness: Subgruppenleistung
-Ein gutes mittleres AUC kann starke Leistungsunterschiede zwischen Subgruppen verdecken. Im klinischen Kontext ist Gleichheit nach `geschlecht`, Altersgruppe oder Ethnizität (soweit dokumentiert) eine ethische und zunehmend regulatorische Anforderung. Bei kleinen Subgruppen ist die AUC-Schätzung aber hochvariabel — **ein Bootstrap-Konfidenzintervall ist deshalb Pflicht**, nicht optional, bevor eine Lücke als real gilt.
+Ein gutes mittleres AUC kann starke Leistungsunterschiede zwischen Subgruppen verdecken. Im klinischen Kontext ist Gleichheit nach `geschlecht`, Altersgruppe oder Ethnizität (soweit dokumentiert) eine ethische und zunehmend regulatorische Anforderung. Bei kleinen Subgruppen ist die AUC-Schätzung aber hochvariabel – **ein Bootstrap-Konfidenzintervall ist deshalb Pflicht**, nicht optional, bevor eine Lücke als real gilt.
 
 ```python
 import numpy as np
@@ -160,20 +160,20 @@ for group in ["weiblich", "maennlich"]:
     print(f"  AUC {group}: {auc_g:.3f}  [95%-CI {lo:.3f}-{hi:.3f}]  (n={mask.sum()})")
 ```
 
-![Abbildung: AUC nach Geschlechtsgruppe für den Textklassifikator mit 95%-Bootstrap-Fehlerbalken. Die Referenzlinie zeigt die Gesamt-AUC. Ein Balken wird nur dann rot markiert, wenn sein Konfidenzintervall die Gesamt-AUC nicht mehr einschließt — bei den hier gemessenen Werten (Weiblich 0,88 [0,79–0,95]; Männlich 0,81 [0,69–0,91]) überlappen sich die Intervalle deutlich, die Farbe bleibt daher neutral.](assets/subgruppen_auc.png)
+![Abbildung: AUC nach Geschlechtsgruppe für den Textklassifikator mit 95%-Bootstrap-Fehlerbalken. Die Referenzlinie zeigt die Gesamt-AUC. Ein Balken wird nur dann rot markiert, wenn sein Konfidenzintervall die Gesamt-AUC nicht mehr einschließt – bei den hier gemessenen Werten (Weiblich 0,88 [0,79–0,95]; Männlich 0,81 [0,69–0,91]) schließen beide Intervalle die Gesamt-AUC von 0,85 ein, die Farbe bleibt daher neutral.](assets/subgruppen_auc.png)
 
-Konkret gemessen auf dem Testsplit (n=125, Gesamt-AUC 0,849): **Weiblich** AUC 0,880, 95%-CI [0,787–0,952] (n=61); **Männlich** AUC 0,807, 95%-CI [0,689–0,909] (n=64). Der Punktschätzer-Unterschied (Δ≈0,07) sieht auf den ersten Blick nach einer Lücke aus, die Konfidenzintervalle überlappen jedoch stark. **Diese Lücke ist bei n≈60 pro Gruppe statistisch nicht von Zufall zu unterscheiden** — eine ehrliche Model Card würde hier "keine belastbare Evidenz für eine Geschlechter-Disparität" schreiben, nicht "Modell diskriminiert nach Geschlecht".
+Konkret gemessen auf dem Testsplit (n=125, Gesamt-AUC 0,849): **Weiblich** AUC 0,880, 95%-CI [0,787–0,952] (n=61); **Männlich** AUC 0,807, 95%-CI [0,689–0,909] (n=64). Der Punktschätzer-Unterschied (Δ≈0,07) sieht auf den ersten Blick nach einer Lücke aus, die Konfidenzintervalle überlappen jedoch stark. **Diese Lücke ist bei n≈60 pro Gruppe statistisch nicht von Zufall zu unterscheiden** – eine ehrliche Model Card würde hier „keine belastbare Evidenz für eine Geschlechter-Disparität“ schreiben, nicht „Modell diskriminiert nach Geschlecht“.
 
-**Praxis — Worked Example Altersgruppe:** Dieselbe Analyse lässt sich auf jede andere klinisch relevante Subgruppe anwenden. Mit der Schwelle 65 Jahre (gängiger geriatrischer Cutoff) ergibt sich auf demselben Testsplit: **<65 Jahre** AUC 0,843, 95%-CI [0,733–0,940] (n=57); **≥65 Jahre** AUC 0,842, 95%-CI [0,734–0,930] (n=68). Hier liegen die Punktschätzer praktisch identisch — noch deutlicher als bei Geschlecht kein Hinweis auf eine Alters-Disparität in diesem Modell.
+**Praxis – Worked Example Altersgruppe:** Dieselbe Analyse lässt sich auf jede andere klinisch relevante Subgruppe anwenden. Mit der Schwelle 65 Jahre (gängiger geriatrischer Cutoff) ergibt sich auf demselben Testsplit: **<65 Jahre** AUC 0,843, 95%-CI [0,733–0,940] (n=57); **≥65 Jahre** AUC 0,842, 95%-CI [0,734–0,930] (n=68). Hier liegen die Punktschätzer praktisch identisch – noch deutlicher als bei Geschlecht kein Hinweis auf eine Alters-Disparität in diesem Modell.
 
-**Stolperstein:** Zwei sich überlappende Konfidenzintervalle sind **kein** Beweis für Gleichheit — zwei Gruppen können sich signifikant unterscheiden, obwohl ihre einzelnen Intervalle überlappen (siehe Modul 10 §3). Sauber gilt nur die eine Richtung: überlappen die Intervalle **nicht**, ist die Lücke fast sicher real. Für eine belastbare Aussage über die *Differenz* gehört das Konfidenzintervall der Differenz berechnet oder ein formaler Test — und selbst ein deutlicher Unterschied bräuchte eine größere, unabhängige Kohorte zur Bestätigung.
+**Stolperstein:** Zwei sich überlappende Konfidenzintervalle sind **kein** Beweis für Gleichheit – zwei Gruppen können sich signifikant unterscheiden, obwohl ihre einzelnen Intervalle überlappen (siehe Modul 10 §3). Sauber gilt nur die eine Richtung: überlappen die Intervalle **nicht**, ist die Lücke fast sicher real. Für eine belastbare Aussage über die *Differenz* gehört das Konfidenzintervall der Differenz berechnet oder ein formaler Test – und selbst ein deutlicher Unterschied bräuchte eine größere, unabhängige Kohorte zur Bestätigung.
 
 **Darüber hinaus:** Über AUC-Gleichheit hinaus gibt es Fairness-Kriterien wie Equal Opportunity (gleiche Sensitivität) oder Calibration across groups. Diese können in Konflikt stehen, die Wahl des Fairness-Kriteriums ist eine normative Entscheidung.
 
 ## 5 Governance: MDR und EU AI Act
 Klinische Prädiktionsmodelle sind in Europa reguliert. Zwei Rahmen sind relevant:
 
-**MDR 2017/745 (Medical Device Regulation):** Ein Software-Produkt ist ein Medizinprodukt, wenn es zur Diagnose, Überwachung, Prognose oder Behandlung von Krankheiten eingesetzt wird. Klinische Entscheidungsunterstützung fällt typischerweise unter **Klasse IIa** (mittleres Risiko) oder **Klasse IIb/III** (hohes Risiko). Anforderungen: Qualitätsmanagementsystem (ISO 13485), klinische Bewertung, Post-Market Surveillance Plan, CE-Kennzeichnung, Unique Device Identifier.
+**MDR 2017/745 (Medical Device Regulation):** Ein Software-Produkt ist ein Medizinprodukt, wenn der Hersteller es zur Diagnose, Verhütung, Überwachung, Vorhersage, Prognose oder Behandlung von Krankheiten bestimmt (Zweckbestimmung, Art. 2 Nr. 1 MDR). Klinische Entscheidungsunterstützung fällt typischerweise unter **Klasse IIa** (mittleres Risiko) oder **Klasse IIb/III** (hohes Risiko). Anforderungen: Qualitätsmanagementsystem (ISO 13485), klinische Bewertung, Post-Market Surveillance Plan, CE-Kennzeichnung, Unique Device Identifier. Für Eigenentwicklungen, die nur innerhalb derselben Gesundheitseinrichtung eingesetzt werden, gibt es eine eng begrenzte Ausnahme von der CE-Kennzeichnung (Art. 5 Abs. 5 MDR); sie verlangt unter anderem ein Qualitätsmanagement, eine Dokumentation und die Begründung, warum kein gleichwertiges Produkt auf dem Markt den Bedarf deckt.
 
 **EU AI Act (Regulation (EU) 2024/1689):** Die Verordnung ist seit
 1. August 2024 in Kraft und wird stufenweise anwendbar. Klinische KI kann
@@ -182,22 +182,22 @@ als Sicherheitskomponente eines Medizinprodukts dient oder in einem gelisteten
 Hochrisiko-Kontext eingesetzt wird. Die konkrete Einordnung hängt vom
 Verwendungszweck, vom Produktkontext und von aktueller EU-/MDCG-Leitlinie ab.
 Für Lernzwecke genügt hier: patient:innenrelevante Entscheidungsunterstützung
-niemals als „nur Software" behandeln. Typische Pflichten sind:
+niemals als „nur Software“ behandeln. Typische Pflichten sind:
 
-- Transparenz: Nutzer müssen wissen, dass sie mit einem KI-System interagieren.
-- Menschliche Aufsicht: Entscheidungen müssen von qualifiziertem Personal überschaubar und übersteuerbar sein.
-- Robustheit und Genauigkeit: Nachgewiesene Leistung über den gesamten Lebenszyklus.
+- Transparenz: Der Anbieter liefert eine Gebrauchsanweisung mit Leistung und Grenzen des Systems (Art. 13); wer direkt mit einem KI-System interagiert, muss das erkennen können (Art. 50).
+- Menschliche Aufsicht: Entscheidungen müssen von qualifiziertem Personal überschaubar und übersteuerbar sein (Art. 14).
+- Robustheit und Genauigkeit: Nachgewiesene Leistung über den gesamten Lebenszyklus (Art. 15).
 - Konformitätsbewertung und technische Dokumentation vor Inbetriebnahme, wenn
   das System in den Hochrisiko-/Medizinproduktbereich fällt.
 
-**Praktische Konsequenzen für Datenwissenschafter:innen:**
+**Praktische Konsequenzen für Datenwissenschaftler:innen:**
 
 - Kein Deployment ohne vollständige Dokumentation (Model Card + technische Akte).
 - Prospektive klinische Studie vor Produktiveinsatz.
 - Monitoring-Plan mit definierten Schwellenwerten für Intervention.
 - Changelog und Audit-Trail für alle Modellversionen.
 
-**Stolperstein:** „Research Use Only" schützt nicht, wenn das Tool tatsächlich klinische Entscheidungen beeinflusst. Die Klassifikation richtet sich nach dem **Verwendungszweck**, nicht nach dem Entwicklungskontext.
+**Stolperstein:** „Research Use Only“ schützt nicht, wenn das Tool tatsächlich klinische Entscheidungen beeinflusst. Die Klassifikation richtet sich nach dem **Verwendungszweck**, nicht nach dem Entwicklungskontext.
 
 **Darüber hinaus:** Prüfe vor realem Einsatz den aktuellen Stand von MDR, MDCG
 2019-11, EU-AI-Act-Leitlinien und harmonisierten Normen. Die Fristen und
@@ -207,18 +207,18 @@ Datenschutz und Ethikkommission früh ein.
 ## 6 Weitere Praxisfragen: Automation Bias, Haftung, Aufklärung
 Regulatorik allein macht ein KI-System nicht sicher. Drei weitere Fragen betreffen unmittelbar den klinischen Alltag:
 
-**Automation Bias und Alert Fatigue:** Klinisches Personal neigt dazu, Modellvorhersagen unkritisch zu übernehmen (Automation Bias), besonders unter Zeitdruck. Umgekehrt führt eine hohe Rate falsch-positiver Alarme dazu, dass Warnungen zunehmend ignoriert werden (Alert Fatigue), ein Modell mit vielen Fehlalarmen "verbrennt" das Vertrauen, das es eigentlich unterstützen soll. Beides untergräbt den Zweck der Entscheidungsunterstützung, in entgegengesetzte Richtungen.
+**Automation Bias und Alert Fatigue:** Klinisches Personal neigt dazu, Modellvorhersagen unkritisch zu übernehmen (Automation Bias), besonders unter Zeitdruck. Umgekehrt führt eine hohe Rate falsch-positiver Alarme dazu, dass Warnungen zunehmend ignoriert werden (Alert Fatigue), ein Modell mit vielen Fehlalarmen „verbrennt“ das Vertrauen, das es eigentlich unterstützen soll. Beides untergräbt den Zweck der Entscheidungsunterstützung, in entgegengesetzte Richtungen.
 
 **Praxis:** Gegenmaßnahmen: Schwellenwerte an die tatsächliche Fehlalarmtoleranz der Station anpassen (nicht nur an Youden-Index optimieren), regelmäßiges Feedback an das Team, wie oft ein Alarm zutraf, und Schulung, dass ein Modell-Score ein Hinweis ist, keine Diagnose.
 
 **Haftung:** Wer haftet, wenn eine KI-gestützte Entscheidung einem Patienten schadet, die behandelnde Person, die Modellentwicklerin oder die Klinik als Betreiberin? Die Antwort ist **je nach Rechtsraum unterschiedlich und rechtlich nicht abschließend geklärt**; dieses Modul kann und will hier keine Rechtsberatung ersetzen. In der Praxis bleibt die behandelnde Person in aller Regel verantwortlich für die letztendliche Entscheidung (Human-in-the-Loop ist auch deshalb keine Formalität), während Hersteller- und Betreiberhaftung zusätzlich über Produkthaftungs- und Medizinprodukterecht greifen können. Vor Produktiveinsatz gehört diese Frage explizit zur Rechtsabteilung und Klinikleitung, nicht zur Data-Science-Entscheidung.
 
-**Informierte Einwilligung:** Sollten Patient:innen erfahren, dass ein KI-System an ihrer Behandlungsentscheidung beteiligt war? Der EU AI Act fordert für Hochrisiko-KI grundsätzlich Transparenz gegenüber betroffenen Personen. Praktisch heißt das: Aufklärungsbögen und Behandlungsgespräche sollten benennen, dass ein unterstützendes Vorhersagemodell eingesetzt wird, in verständlicher Sprache, ohne technische Details vorauszusetzen. Wie genau (mündlich, schriftlich, im Rahmen der allgemeinen Aufnahmeaufklärung) ist institutionell und je nach Risikoklasse zu klären.
+**Informierte Einwilligung:** Sollten Patient:innen erfahren, dass ein KI-System an ihrer Behandlungsentscheidung beteiligt war? Der EU AI Act verlangt eine Information der Betroffenen ausdrücklich nur für bestimmte Hochrisiko-Anwendungen aus Anhang III (Art. 26 Abs. 11); bei KI in Medizinprodukten stellt sich die Frage vor allem über die ärztliche Aufklärungspflicht (§ 630e BGB), deren Reichweite für KI-Unterstützung noch nicht abschließend geklärt ist. Praktisch heißt das: Aufklärungsbögen und Behandlungsgespräche sollten benennen, dass ein unterstützendes Vorhersagemodell eingesetzt wird, in verständlicher Sprache, ohne technische Details vorauszusetzen. Wie genau (mündlich, schriftlich, im Rahmen der allgemeinen Aufnahmeaufklärung) ist institutionell und je nach Risikoklasse zu klären.
 
-> **Wann du Hilfe holst.** Sobald ein Modell reale Behandlungsentscheidungen beeinflusst, sind Rechtsabteilung, Datenschutz, Ethikkommission und gegebenenfalls Benannte Stelle keine Formalie, sondern Voraussetzung — spätestens bei nachgewiesenem Drift oder ungleicher Subgruppenleistung gehört die Weiternutzung gemeinsam mit diesen Stellen entschieden, nicht allein technisch.
+> **Wann du Hilfe holst.** Sobald ein Modell reale Behandlungsentscheidungen beeinflusst, sind Rechtsabteilung, Datenschutz, Ethikkommission und gegebenenfalls Benannte Stelle keine Formalie, sondern Voraussetzung – spätestens bei nachgewiesenem Drift oder ungleicher Subgruppenleistung gehört die Weiternutzung gemeinsam mit diesen Stellen entschieden, nicht allein technisch.
 
 ## Fallstricke und Merksätze
-- **Versionspinning ist Pflicht.** Ein joblib-File ohne Versionsinfo ist eine Zeitbombe.
+- **Versionspinning ist Pflicht.** Eine joblib-Datei ohne Versionsinfo ist eine Zeitbombe.
 - **Model Card = Ehrlichkeits-Dokument.** Grenzen und Versagen klar benennen.
 - **AUC-Monitoring braucht Labels.** Ohne Outcomes sieht man nur Covariate Shift.
 - **Subgruppen-AUC ist nicht optional.** Mittlere Güte verdeckt systematische Ungleichheit,
@@ -237,8 +237,8 @@ Regulatorik allein macht ein KI-System nicht sicher. Drei weitere Fragen betreff
 > und erfordert ein eigenes, mehrjähriges Projekt mit entsprechender Governance.
 
 ## Selbstcheck
-1. **Was muss beim Laden eines joblib-Modells immer geprüft werden?**, Die scikit-learn-Version; ein Versionsmismatch kann stille Fehler oder falsche Vorhersagen produzieren.
-2. **Warum reicht Covariate-Shift-Monitoring allein nicht?**, Weil Concept Drift (veränderte Outcome-Beziehung) nur mit echten Labels erkennbar ist. Merkmalsverteilung kann stabil sein, während das Modell trotzdem versagt.
-3. **Was bedeutet gleiche AUC, aber unterschiedliche Sensitivität für zwei Subgruppen — und wann ist eine Subgruppen-Differenz überhaupt belegt?**, Gleiche AUC heißt gleiche Rangliste, aber bei gleicher Schwelle liegt das Modell in einer Gruppe systematisch früher falsch: ungleiche Identifikationsraten. Ein Punktschätzer-Unterschied allein belegt keine Fairness-Lücke — die AUC ist in kleinen Subgruppen hochvariabel; erst nicht überlappende Bootstrap-Konfidenzintervalle sprechen für mehr als Stichprobenrauschen.
-4. **Ab welcher EU-AI-Act-Risikoklasse gelten die strengsten Pflichten?**, Bei Hochrisiko-KI; ob ein klinisches Prädiktionsmodell darunter fällt, hängt vom Verwendungszweck und Produktkontext ab.
-5. **Was ist Alert Fatigue, und warum widerspricht sie Automation Bias?**, Alert Fatigue ist das Ignorieren von Warnungen nach zu vielen Fehlalarmen; Automation Bias ist das unkritische Übernehmen von Modellvorhersagen. Beide untergraben sinnvolle Entscheidungsunterstützung, aber in entgegengesetzte Richtungen, zu viel bzw. zu wenig Vertrauen ins Modell.
+1. **Was muss beim Laden eines joblib-Modells immer geprüft werden?** – Die scikit-learn-Version; ein Versionsmismatch kann stille Fehler oder falsche Vorhersagen produzieren.
+2. **Warum reicht Covariate-Shift-Monitoring allein nicht?** – Weil Concept Drift (veränderte Outcome-Beziehung) nur mit echten Labels erkennbar ist. Merkmalsverteilung kann stabil sein, während das Modell trotzdem versagt.
+3. **Was bedeutet gleiche AUC, aber unterschiedliche Sensitivität für zwei Subgruppen – und wann ist eine Subgruppen-Differenz überhaupt belegt?** – Gleiche AUC heißt gleiche Rangliste, aber bei gleicher Schwelle liegt das Modell in einer Gruppe systematisch früher falsch: ungleiche Identifikationsraten. Ein Punktschätzer-Unterschied allein belegt keine Fairness-Lücke – die AUC ist in kleinen Subgruppen hochvariabel; erst ein Konfidenzintervall der AUC-Differenz, das 0 ausschließt, spricht für mehr als Stichprobenrauschen (nicht überlappende Einzelintervalle sind ein strengeres, konservatives Kriterium).
+4. **Ab welcher EU-AI-Act-Risikoklasse gelten die strengsten Pflichten?** – Bei Hochrisiko-KI; ob ein klinisches Prädiktionsmodell darunter fällt, hängt vom Verwendungszweck und Produktkontext ab.
+5. **Was ist Alert Fatigue, und warum widerspricht sie Automation Bias?** – Alert Fatigue ist das Ignorieren von Warnungen nach zu vielen Fehlalarmen; Automation Bias ist das unkritische Übernehmen von Modellvorhersagen. Beide untergraben sinnvolle Entscheidungsunterstützung, aber in entgegengesetzte Richtungen, zu viel bzw. zu wenig Vertrauen ins Modell.

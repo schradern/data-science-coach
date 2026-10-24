@@ -67,7 +67,7 @@ def load() -> pd.DataFrame:
 
 def _oracle_odds_ratio() -> float:
     """OR per 0.1 pH drop on the full, un-masked truth. Only possible because
-    the cohort is synthetic — this is the target the MAR analysis should hit."""
+    the cohort is synthetic – this is the target the MAR analysis should hit."""
     import statsmodels.formula.api as smf
 
     truth = pd.read_csv(ROOT / "data" / "bga_ph_wahrheit.csv")
@@ -81,7 +81,7 @@ def conditional_sd_of_ph() -> float:
 
     The natural yardstick for delta: a shift of `delta` pH units is a shift of
     `delta / conditional_sd` residual standard deviations. Judging delta against
-    assay noise would be a category error — assay noise is random, delta is a
+    assay noise would be a category error – assay noise is random, delta is a
     *systematic* difference between measured and unmeasured patients.
     """
     import statsmodels.formula.api as smf
@@ -308,7 +308,8 @@ def section_3_tipping_point(work: pd.DataFrame, df: pd.DataFrame) -> dict:
             f"\n  Significance boundary (secondary, more informative number): the\n"
             f"  pooled 95% CI EXCLUDES 1 -- i.e. the acidosis-mortality association is\n"
             f"  statistically supported -- only for delta in [{lo:+.2f}, {hi:+.2f}].\n"
-            f"  Outside that window (including delta = 0) the finding is not robust."
+            f"  Outside that window the finding is not robust"
+            + ("." if lo <= 0 <= hi else " -- and that includes delta = 0 itself.")
         )
         # The boundary closest to 0 is the meaningful "how far must the MNAR
         # assumption move before/after the conclusion holds" number.
@@ -368,9 +369,10 @@ def section_5_plausibility(tipping: dict) -> None:
 
     boundary = tipping["boundary_delta"]
     literal = tipping["literal_tipping"]
-    delta_for_verdict = boundary if boundary is not None else (
-        literal["delta"] if literal is not None else None
-    )
+    # Judge the tipping point itself (the first delta at which the CI includes
+    # 1), not the last delta at which the conclusion still holds -- the lesson
+    # quotes the tipping point in conditional SDs.
+    delta_for_verdict = literal["delta"] if literal is not None else boundary
 
     if delta_for_verdict is None:
         print("  No finite tipping-point delta was found -- no plausibility judgement to make.")
@@ -420,17 +422,19 @@ def section_6_report(tipping: dict, conservative: str) -> None:
     print("=" * 78)
     literal = tipping["literal_tipping"]
     region = tipping["significance_region"]
-    lit_txt = f"{literal['delta']:+.2f}" if literal is not None else "nicht gefunden"
+    lit_txt = f"{literal['delta']:+.2f}".replace(".", ",") if literal is not None else "nicht gefunden"
     region_txt = (
-        f"[{region[0]:+.2f}, {region[1]:+.2f}]" if region is not None else "keinen Bereich"
+        f"[{region[0]:+.2f}; {region[1]:+.2f}]".replace(".", ",")
+        if region is not None else "keinen Bereich"
     )
+    richtung = "positiv (delta > 0)" if conservative.startswith("positive") else "negativ (delta < 0)"
     print(
         f'  "Eine Delta-Adjustment-Sensitivitätsanalyse (m = {M}, 21 Werte von delta\n'
-        f"   zwischen -0,10 und +0,10 pH-Einheiten, Rubin's rules) zeigt: das gepoolte\n"
-        f"   Odds Ratio je -0,1 pH-Abfall verlässt den signifikanten Bereich (KI\n"
-        f"   schließt 1 nicht ein) nur für delta in {region_txt}. Der kleinste |delta|,\n"
+        f"   zwischen -0,10 und +0,10 pH-Einheiten, Rubins Regeln) zeigt: das gepoolte\n"
+        f"   Odds Ratio je -0,1 pH-Abfall bleibt im signifikanten Bereich (KI\n"
+        f"   schließt die 1 aus) nur für delta in {region_txt}. Der kleinste |delta|,\n"
         f"   bei dem das 95-%-KI die 1 einschließt, ist delta = {lit_txt}. Die\n"
-        f"   konservative, den Effekt abschwächende Richtung ist delta {conservative}:\n"
+        f"   konservative, den Effekt abschwächende Richtung ist delta {richtung}:\n"
         f"   sie entspricht der Annahme, unbeobachtete Patient:innen seien trotz\n"
         f'   höherer Mortalität pH-mäßig unauffälliger gewesen als von der\n'
         f'   MAR-Imputation vorhergesagt."'
@@ -458,9 +462,9 @@ def make_figure(df: pd.DataFrame, tipping: dict) -> None:
     ax.text(0.0, ymax, "MAR-Annahme", rotation=90, va="top", ha="right",
             fontsize=10, color="#16181C")
 
-    # Der Kipppunkt ist das ERSTE δ, dessen KI die 1 einschließt — nicht das
-    # letzte, bei dem sie es noch nicht tut (`boundary_delta`). Dort steht die
-    # Schlussfolgerung noch, sie fällt einen Schritt später.
+    # The tipping point is the FIRST δ whose CI includes 1, not the last one
+    # where it does not yet (`boundary_delta`). At that delta the conclusion
+    # still holds; it only flips one step later.
     literal = tipping.get("literal_tipping")
     if literal is not None:
         kipp = float(literal["delta"])
@@ -469,7 +473,7 @@ def make_figure(df: pd.DataFrame, tipping: dict) -> None:
             ax.text(kipp, ymax, f"Kipppunkt (δ={kipp:+.2f})", rotation=90,
                     va="top", ha="right", fontsize=10, color=EVENT)
 
-    ax.set_xlabel("δ — pH-Verschiebung der imputierten Werte")
+    ax.set_xlabel("δ – pH-Verschiebung der imputierten Werte")
     ax.set_ylabel("gepooltes OR je 0,1 pH-Abfall")
     ax.set_title("MNAR-Sensitivitätsanalyse: Delta-Adjustment und Kipppunkt")
     ax.legend(loc="upper right")

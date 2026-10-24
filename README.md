@@ -11,9 +11,9 @@ klinischen Fragestellungen, reproduzierbar angelegt.
 
 | Weg | Wofür | Was du brauchst |
 |-----|-------|-----------------|
-| **Im Browser lesen & rechnen** | der Standard | nichts zum Lesen; Python **oder** R zum Mitrechnen. Jeder Codeblock lädt die Daten über eine Web-Adresse. |
+| **Im Browser lesen, lokal mitrechnen** | der Standard | nichts zum Lesen; Python **oder** R auf deinem Rechner zum Mitrechnen. Jeder Codeblock lädt die Daten über eine Web-Adresse, ein Klonen ist nicht nötig. |
 | **In Google Colab** | rechnen ohne lokale Installation | ein Google-Konto. Das [Start-Notebook](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb) klont den Kurs und installiert alles. |
-| **Lokal (geklont)** | volle Reproduzierbarkeit, offline | `git clone` + Python/R — die Einrichtung erklärt [Modul 02](module/02-werkzeuge/README.md) Schritt für Schritt. |
+| **Lokal (geklont)** | volle Reproduzierbarkeit, offline | `git clone` + Python/R – die Einrichtung erklärt [Modul 02](module/02-werkzeuge/README.md) Schritt für Schritt. |
 
 <!-- nur-github -->
 Lokal einrichten:
@@ -21,7 +21,8 @@ Lokal einrichten:
 ```bash
 git clone https://github.com/schradern/data-science-coach
 cd data-science-coach
-uv venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+uv venv .venv --python 3.12
+source .venv/bin/activate                    # Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt           # + requirements-ml.txt für Teil 5
 ```
 
@@ -31,7 +32,7 @@ Für R: siehe [`DEPENDENCIES-R.md`](DEPENDENCIES-R.md). Details und Fehlerbehebu
 ## Direkt einsteigen
 
 Zum **Lesen** musst du nichts installieren. Zum **Rechnen** brauchst du Python
-oder R — Modul 02 richtet beides ein. Wähle einen kleinen Einstieg:
+oder R – Modul 02 richtet beides ein. Wähle einen kleinen Einstieg:
 
 - **Orientieren:** [Modul 01](module/01-einfuehrung/README.md) erklärt den
   Analyseweg. Kein Setup, ~30 Minuten Lesezeit.
@@ -40,12 +41,13 @@ oder R — Modul 02 richtet beides ein. Wähle einen kleinen Einstieg:
 - **Code ausführen:** [Modul 02](module/02-werkzeuge/README.md) richtet Python
   **oder** R und den Editor ein, sobald du Übungen rechnen möchtest. Rechne mit
   45–60 Minuten für die Einrichtung. Die Datensätze liest jeder Codeblock über
-  eine Web-Adresse — du musst nichts herunterladen oder erzeugen, und reine
+  eine Web-Adresse – du musst nichts herunterladen oder erzeugen, und reine
   R-Nutzung braucht kein Python.
 
 Der vollständige Kurs umfasst 34 Module und rund **43 Stunden**. Die
-[Modulübersicht](module/README.md) zeigt Dauer und Werkzeugfokus je Modul; über
-die Lernpfade lässt sich der Kurs auf 5–14 Module verkürzen.
+[Modulübersicht](module/README.md) listet alle Module (auf der Website mit Dauer
+und Werkzeugfokus je Modul); über die Lernpfade lässt sich der Kurs auf 5–15
+Module verkürzen.
 
 Schon eingerichtet? Springe über die [Modulübersicht](module/README.md) direkt zu dem Thema, das gerade klemmt.
 
@@ -62,11 +64,11 @@ Schon eingerichtet? Springe über die [Modulübersicht](module/README.md) direkt
 - **Prädiktionsmodelle** bauen, leckfrei validieren, kalibrieren, erklären (SHAP) und einsetzen
 - moderne KI einordnen: **Gradient Boosting, Survival-ML, Deep Learning, klinisches NLP/LLMs**
 
-## Reproduzierbarkeit — und ihre Grenzen
+## Reproduzierbarkeit – und ihre Grenzen
 
-Der Kurs ist reproduzierbar angelegt: fester Seed, relative Pfade, gepinnte Paketversionen. Was du **liest**, ist stabil — die Datensätze und Abbildungen sind eingecheckt und ändern sich nicht.
+Der Kurs ist reproduzierbar angelegt: fester Seed, relative Pfade, gepinnte Paketversionen. Was du **liest**, ist stabil – die Datensätze und Abbildungen sind eingecheckt und ändern sich nicht.
 
-Führst du den Code **selbst** aus, können einzelne Zahlen in den letzten Nachkommastellen je nach Betriebssystem, mathematischer Bibliothek (BLAS) und Paketversion minimal abweichen — vor allem bei iterativen Verfahren wie der multiplen Imputation. An den Schlussfolgerungen ändert das nichts; die Abweichungen liegen weit unter jeder klinisch oder statistisch relevanten Schwelle. Warum bitweise Gleichheit über alle Rechner hinweg nicht garantiert ist, erklärt [Modul 22](module/22-reproduzierbare-berichte/README.md).
+Führst du den Code **selbst** aus, können einzelne Zahlen in den letzten Nachkommastellen je nach Betriebssystem, mathematischer Bibliothek (BLAS) und Paketversion minimal abweichen – vor allem bei iterativen Verfahren wie der multiplen Imputation. An den Schlussfolgerungen ändert das nichts; die Abweichungen liegen weit unter jeder klinisch oder statistisch relevanten Schwelle. Warum bitweise Gleichheit über alle Rechner hinweg nicht garantiert ist, erklärt [Modul 22](module/22-reproduzierbare-berichte/README.md).
 
 ## Rechtliches und Datenschutz
 

@@ -22,7 +22,7 @@ print(names(cohort))
 ```python
 import pandas as pd
 cohort = pd.read_csv("{{DATEN}}kohorte.csv")
-cohort.groupby("aufnahmegrund")["verstorben_30d"].mean().sort_values(ascending=False).round(3)
+print(cohort.groupby("aufnahmegrund")["verstorben_30d"].mean().sort_values(ascending=False).round(3))
 ```
 ```r
 library(dplyr)
@@ -34,7 +34,7 @@ cohort |>
   arrange(desc(mortality))
 ```
 **Beobachtung:** Sepsis-Patient:innen haben erwartungsgemäß die höchste
-30-Tage-Mortalität, eingebaut in die synthetische Wahrheit des Datensatzes
+30-Tage-Mortalität (37,2 %, alle anderen Gründe 7–14 %), eingebaut in die synthetische Wahrheit des Datensatzes
 (vgl. `data/README.md`).
 
 ## Aufgabe 3 – Altersverteilung
@@ -51,16 +51,17 @@ cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 cat("Mittelwert:", round(mean(cohort$alter), 1), "Jahre\n")
 cat("Median:    ", median(cohort$alter), "Jahre\n")
 ```
-**Interpretation:** Liegen Mittelwert und Median nah beieinander, ist die
-Verteilung annähernd symmetrisch. Ein deutlich höherer Mittelwert würde auf
-Ausreißer nach oben (sehr alte Patient:innen) hinweisen.
+**Interpretation:** Mittelwert (63,7 Jahre) und Median (64 Jahre) liegen fast
+gleichauf, die Altersverteilung ist also annähernd symmetrisch. Ein deutlich
+höherer Mittelwert würde auf eine rechtsschiefe Verteilung hinweisen: Einzelne
+sehr alte Patient:innen ziehen den Mittelwert nach oben, den Median kaum.
 
 ## Aufgabe 4 – Lernpfad wählen
 Keine Musterlösung, dies ist eine persönliche Reflexion. Orientierung:
 
-- Hauptsächlich Auswertung eigener Studiendaten → „Schnell zur Auswertung"
-- Daten aus KIS/REDCap extrahieren → „Fokus Datenextraktion"
-- Paper schreiben / Table 1 erstellen → „Klinische Forschung / Publikation"
+- Hauptsächlich Auswertung eigener Studiendaten → „Schnell zur Auswertung“
+- Daten aus KIS/REDCap extrahieren → „Datenextraktion im Fokus“
+- Paper schreiben / Table 1 erstellen → „Klinische Forschung / Publikation“
 
 ## Bonus
 
@@ -71,7 +72,7 @@ def check_datasets() -> None:
     """Check that all four core datasets are present locally."""
     data_dir = Path("data")
     for name in ["kohorte.csv", "vitalwerte.csv", "labor.csv", "notizen.csv"]:
-        status = "OK" if (data_dir / name).exists() else "MISSING — run: python data/generate_data.py"
+        status = "OK" if (data_dir / name).exists() else "MISSING – run: python data/generate_data.py"
         print(f"  {name}: {status}")
 
 check_datasets()
@@ -83,7 +84,7 @@ check_datasets <- function() {
     if (file.exists(path)) {
       cat("  OK:", name, "\n")
     } else {
-      cat("  MISSING:", name, "— run: python data/generate_data.py\n")
+      cat("  MISSING:", name, "– run: python data/generate_data.py\n")
     }
   }
 }

@@ -1,4 +1,4 @@
-"""Module 02 — Tools & reproducible environment.
+"""Module 02 – Tools & reproducible environment.
 
 Runs standalone from the project root:
     python module/02-werkzeuge/code/python.py
@@ -29,7 +29,7 @@ def package_version(name: str) -> str:
 
 
 def main() -> None:
-    print("=== Module 02 — Environment check ===\n")
+    print("=== Module 02 – Environment check ===\n")
 
     print(f"Python version:   {sys.version.split()[0]}")
     print(f"Project root:     {ROOT}")
@@ -63,7 +63,7 @@ def main() -> None:
         print("All checks passed. Environment is ready.")
     else:
         print("Some packages are missing. Install with:")
-        print("  uv pip install pandas numpy matplotlib seaborn scipy statsmodels scikit-learn")
+        print("  uv pip install -r requirements.txt")
 
 
 if __name__ == "__main__":

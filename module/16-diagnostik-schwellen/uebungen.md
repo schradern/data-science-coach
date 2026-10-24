@@ -26,7 +26,7 @@ Schreibe einen kurzen Diagnostik-Abschnitt für Laktat als Marker.
 ## Aufgabe 6 – Net Benefit
 
 Fitte ein logistisches Modell `verstorben_30d ~ laktat_mmol_l` und berechne den
-Net Benefit des Modells sowie der Strategie „alle behandeln" für die
+Net Benefit des Modells sowie der Strategie „alle behandeln“ für die
 Schwellenwahrscheinlichkeiten $p_t \in \{0{,}10;\ 0{,}15;\ 0{,}20;\ 0{,}25\}$.
 
 - In welchem Bereich liegt das Modell über **beiden** Referenzstrategien?

@@ -1,4 +1,4 @@
-"""Module 03 — Programming fundamentals for data.
+"""Module 03 – Programming fundamentals for data.
 
 Runs standalone from the project root:
     python module/03-grundlagen/code/python.py
@@ -20,7 +20,7 @@ from lib.helpers import SEED, load_cohort  # noqa: E402
 
 pd.set_option("display.width", 100)
 
-# Constant instead of magic number — change in one place only.
+# Constant instead of magic number – change in one place only.
 FEVER_THRESHOLD = 38.0   # degrees Celsius
 
 
@@ -45,7 +45,7 @@ def assess_map(map_mmhg: float) -> str:
     """Classify mean arterial pressure (MAP) by clinical thresholds."""
     if map_mmhg < 65:
         return "Schock-Grenzwert unterschritten"
-    elif map_mmhg <= 90:
+    elif map_mmhg <= 100:
         return "Normbereich"
     else:
         return "Erhöht"
@@ -57,10 +57,10 @@ def main() -> None:
     # ---------------------------------------------------------------------- #
     print("=== 1) Variables and data types ===")
 
-    age: int = 67                    # integer  — patient age
-    temperature: float = 38.9       # float    — body temperature
-    admission_reason: str = "Sepsis"  # str    — diagnosis
-    has_diabetes: bool = True        # bool     — comorbidity flag
+    age: int = 67                    # integer  – patient age
+    temperature: float = 38.9       # float    – body temperature
+    admission_reason: str = "Sepsis"  # str    – diagnosis
+    has_diabetes: bool = True        # bool     – comorbidity flag
 
     print(f"age:              {age}  ({type(age).__name__})")
     print(f"temperature:      {temperature}  ({type(temperature).__name__})")
@@ -81,11 +81,11 @@ def main() -> None:
     mean_temp = sum(temperatures) / len(temperatures)
     print(f"Mean: {mean_temp:.2f}")
 
-    # Indexing — Python counts from 0.
+    # Indexing – Python counts from 0.
     print(f"First measurement (index 0): {temperatures[0]}")
     print(f"Last measurement  (index -1): {temperatures[-1]}")
 
-    # Dictionary: key-value pairs — e.g. one patient as a structured record.
+    # Dictionary: key-value pairs – e.g. one patient as a structured record.
     patient = {
         "id": 42,
         "age": 71,
@@ -118,25 +118,25 @@ def main() -> None:
     # ---------------------------------------------------------------------- #
     print("\n=== 4) Control flow ===")
 
-    # if/elif/else — fever severity tiers.
+    # if/elif/else – fever severity tiers.
     for temp in [37.2, 38.4, 39.6]:
         if temp >= 39.0:
-            level = "Hohes Fieber — ärztliche Beurteilung erforderlich"
+            level = "Hohes Fieber – ärztliche Beurteilung erforderlich"
         elif temp >= FEVER_THRESHOLD:
             level = "Fieber"
         else:
             level = "Kein Fieber"
         print(f"  {temp} °C -> {level}")
 
-    # MAP assessment — Surviving Sepsis Campaign threshold.
+    # MAP assessment – Surviving Sepsis Campaign threshold.
     print("\nMAP assessment (sample values):")
-    for map_val in [58, 72, 95, 63, 88]:
+    for map_val in [58, 72, 105, 63, 88]:
         print(f"  MAP {map_val:3d} mmHg -> {assess_map(map_val)}")
 
     # ---------------------------------------------------------------------- #
-    #  5) DataFrames — tables in code                                        #
+    #  5) DataFrames – tables in code                                        #
     # ---------------------------------------------------------------------- #
-    print("\n=== 5) DataFrames — tables in code ===")
+    print("\n=== 5) DataFrames – tables in code ===")
 
     cohort = load_cohort()
 
@@ -149,12 +149,12 @@ def main() -> None:
     print(cohort[["patient_id", "alter", "aufnahmegrund", "sofa_score",
                   "verstorben_30d"]].head())
 
-    # Filter rows — only patients with Sepsis.
+    # Filter rows – only patients with Sepsis.
     septic = cohort[cohort["aufnahmegrund"] == "Sepsis"]
     print(f"\nSeptic patients: {len(septic)}")
     print(f"Deceased within 30 days: {septic['verstorben_30d'].sum()}")
 
-    # Derive a new column — BMI category for the whole dataset.
+    # Derive a new column – BMI category for the whole dataset.
     cohort["bmi_cat"] = cohort["bmi"].apply(
         lambda b: bmi_category(b) if pd.notna(b) else "unbekannt"
     )
@@ -162,7 +162,7 @@ def main() -> None:
     print(cohort["bmi_cat"].value_counts())
 
     # Descriptive statistics.
-    print("\nAge — descriptive statistics:")
+    print("\nAge – descriptive statistics:")
     print(cohort["alter"].describe().round(1))
 
     # Group comparison.

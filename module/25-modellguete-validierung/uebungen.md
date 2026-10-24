@@ -7,7 +7,7 @@ Berechne sowohl ROC-AUC als auch PR-AUC für das logistische Modell auf dem Test
 Bei welchem Modellwert liegt die PR-AUC-Baseline (Zufallsklassifikator)?
 Warum ist es bei ~15 % Ereignisrate irreführend, nur die ROC-AUC zu berichten?
 
-## Aufgabe 2 – Erst rekalibrieren, dann kalibrieren
+## Aufgabe 2 – Erst rekalibrieren, dann Kalibrierung prüfen
 Vergleiche die mittlere vorhergesagte Mortalität von `proba` (roh, aus dem
 `class_weight="balanced"`-Modell) und `proba_cal` (nach `CalibratedClassifierCV`)
 mit der beobachteten Ereignisrate im Testset. Welche der beiden würdest du für

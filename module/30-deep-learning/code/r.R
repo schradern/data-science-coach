@@ -1,9 +1,9 @@
-# Module 30 — Deep learning intro with nnet / tidymodels (R, parallel to Python).
+# Module 30 – Deep learning intro with nnet / tidymodels (R, parallel to Python).
 #   Rscript module/30-deep-learning/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
 # Code is English; German dataset column names are kept as-is.
-# torch is NOT used — nnet provides a single-hidden-layer MLP.
+# torch is NOT used – nnet provides a single-hidden-layer MLP.
 
 suppressPackageStartupMessages({
   missing_pkgs <- setdiff(c("tidyverse", "tidymodels", "nnet"), rownames(installed.packages()))
@@ -113,8 +113,8 @@ tryCatch({
 # ── AUC comparison: per fold, not just the mean ───────────────────────────────
 # Same rationale as code/python.py: with k=5 folds on ~500 patients, the
 # fold-to-fold SD can rival the gap between models' means. Report per-fold
-# scores + a 95% CI per model, and — the right comparison, since every
-# model sees the exact same folds — the *paired* per-fold difference.
+# scores + a 95% CI per model, and – the right comparison, since every
+# model sees the exact same folds – the *paired* per-fold difference.
 cat("\n=== AUC comparison via 5-fold CV (per-fold, not just the mean) ===\n")
 fold_tbl <- fold_lr |> inner_join(fold_mlp, by = "id")
 if (!is.null(fold_gb)) fold_tbl <- fold_tbl |> inner_join(fold_gb, by = "id")
@@ -131,7 +131,7 @@ winner_col <- c("Logistische Regression" = "lr", "Gradient Boosting" = "gb", "ML
 cat(sprintf("\n  Highest mean CV-AUC (point estimate only): %s (%.3f)\n", winner, sorted_means[1]))
 
 # Paired per-fold differences vs. the winner, with 95% CI. A CI that
-# excludes 0 is not automatically "robust" at k=5 folds — flag CIs whose
+# excludes 0 is not automatically "robust" at k=5 folds – flag CIs whose
 # bound sits within FRAGILE_MARGIN of 0 as fragile rather than established.
 FRAGILE_MARGIN <- 0.03
 cat(sprintf("\n  Paired per-fold differences vs. %s (same folds for every model):\n", winner))
@@ -159,5 +159,5 @@ for (name in other_names) {
   }
 }
 cat("\n  Befund: nur Unterschiede, deren paarweises 95%-CI 0 ausschliesst, sind bei\n")
-cat("  dieser Fold-Zahl ueberhaupt belegt — und selbst dann kann das Ergebnis knapp sein.\n")
+cat("  dieser Fold-Zahl ueberhaupt belegt – und selbst dann kann das Ergebnis knapp sein.\n")
 cat("  Deep Learning gewinnt auf kleinen klinischen Tabellendaten nicht automatisch.\n")

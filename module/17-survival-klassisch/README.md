@@ -31,6 +31,12 @@ Die Kaplan-Meier-Kurve schätzt die Überlebenswahrscheinlichkeit über die Zeit
 Sie fällt nur bei Ereignissen. Zensierte Beobachtungen reduzieren die Zahl der
 noch beobachteten Patient:innen, erzeugen aber keinen Sprung.
 
+Das ist nur unter einer Annahme korrekt: Die Zensierung ist **nicht
+informativ**. Wer zensiert wird, muss dasselbe Ereignisrisiko haben wie die, die
+weiter beobachtet werden. Wird jemand aus der Beobachtung genommen, *weil* es
+ihm besser oder schlechter geht (Entlassung nach Hause, Verlegung ins Hospiz),
+ist die Kurve verzerrt.
+
 Gute KM-Abbildungen zeigen:
 
 - Gruppen klar beschriftet,
@@ -72,7 +78,7 @@ Kommunikation oft verständlicher als HR allein.
 zensiert) sind die echten Zeit-bis-Ereignis-Spalten der Kohorte.
 `verweildauer_tage` (Verweildauer) ist eine rein deskriptive Spalte
 (Krankenhausaufenthalt) und darf **nicht** als Überlebenszeit verwendet
-werden, sie hat keinen definierten Bezug zum Ereignis „Tod".
+werden, sie hat keinen definierten Bezug zum Ereignis „Tod“.
 
 ```python
 import pandas as pd
@@ -122,13 +128,14 @@ Verletzung der PH-Annahme).
 
 ## 7 Das Ergebnis
 
-Beide Wege liefern dieselben Zahlen — deshalb stehen sie hier und nicht in
+Beide Wege liefern dieselben Zahlen – deshalb stehen sie hier und nicht in
 einem der beiden Sprachabschnitte.
 
 Bei Tag 30 überleben Sepsis-Patient:innen mit ≈ 62 % deutlich seltener als
 Nicht-Sepsis-Patient:innen mit ≈ 89 % (Log-rank p < 0,0001). Das adjustierte
 Cox-Modell zeigt HR(Sepsis) ≈ 1,52 (95%-KI [0,86; 2,71], hier nicht
-signifikant, da Alter und SOFA einen Teil des Effekts erklären),
+signifikant; SOFA liegt auf dem Pfad Sepsis → SOFA → Tod, das Modell schätzt
+also nur den nicht über SOFA vermittelten Teil, vgl. Modul 15),
 HR(Alter) ≈ 1,04/Jahr und HR(SOFA) ≈ 1,42 pro Punkt, alle in die erwartete
 Richtung (> 1, höheres Risiko).
 
@@ -143,7 +150,7 @@ Beispiel:
 > berichtet; die Proportional-Hazards-Annahme wurde mit `cox.zph()` geprüft
 > und nicht verletzt.
 
-> **Wann du Hilfe holst.** Wenn die Proportional-Hazards-Annahme verletzt ist, konkurrierende Ereignisse (z. B. Entlassung) das Zielereignis verhindern, oder sich eine Exposition erst im Verlauf ändert, reichen Kaplan-Meier und Standard-Cox nicht mehr aus — dann sollte eine Biostatistikerin das passende Modell mitwählen.
+> **Wann du Hilfe holst.** Wenn die Proportional-Hazards-Annahme verletzt ist, konkurrierende Ereignisse (z. B. Entlassung) das Zielereignis verhindern, oder sich eine Exposition erst im Verlauf ändert, reichen Kaplan-Meier und Standard-Cox nicht mehr aus – dann sollte eine Biostatistikerin das passende Modell mitwählen.
 
 ## Fallstricke und Merksätze
 
@@ -154,9 +161,9 @@ Beispiel:
 
 ## Selbstcheck
 
-1. **Warum ist zensiert nicht fehlend?**, Weil bekannt ist, dass bis zum letzten Beobachtungszeitpunkt kein Ereignis auftrat.
-2. **Was prüft der Log-rank-Test?**, Ob sich die Überlebenskurven über die Zeit unterscheiden.
-3. **Was bedeutet HR 1,5?**, Unter PH-Annahme ist die momentane Ereignisrate zu jedem Zeitpunkt 50 % höher.
+1. **Warum ist zensiert nicht fehlend?** – Weil bekannt ist, dass bis zum letzten Beobachtungszeitpunkt kein Ereignis auftrat.
+2. **Was prüft der Log-rank-Test?** – Ob sich die Überlebenskurven über die Zeit unterscheiden.
+3. **Was bedeutet HR 1,5?** – Unter PH-Annahme ist die momentane Ereignisrate zu jedem Zeitpunkt 50 % höher.
 
 ## Abschluss
 Übungen: [`uebungen.md`](uebungen.md) · Lösungen: [`loesungen.md`](loesungen.md)

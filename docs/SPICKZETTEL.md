@@ -7,11 +7,13 @@ und **SQL**. Zum Offenhalten neben der Arbeit.
 
 ```python
 from lib.helpers import load_cohort, load_labs, load_vitals
-df = load_cohort()
+df = load_cohort().merge(load_labs(), on="patient_id", how="left")   # cohort + labs
+v = load_vitals()                                                     # vital signs (long)
 ```
 ```r
 source(file.path("lib", "helpers.R")); library(tidyverse)
-df <- load_cohort()
+df <- load_cohort() |> left_join(load_labs(), by = "patient_id")    # cohort + labs
+v <- load_vitals()                                                  # vital signs (long)
 ```
 
 ## Die fünf Kern-Verben
@@ -22,7 +24,7 @@ df <- load_cohort()
 | Spalten wählen | `df[["alter","sofa_score"]]` | `select(alter, sofa_score)` | `SELECT alter, sofa_score` |
 | Spalte ableiten | `df.assign(alt70 = df.alter >= 70)` | `mutate(alt70 = alter >= 70)` | `... , alter >= 70 AS alt70` |
 | sortieren | `df.sort_values("alter")` | `arrange(alter)` | `ORDER BY alter` |
-| gruppieren + zusammenfassen | `df.groupby("aufnahmegrund")["crp_mg_l"].mean()` | `group_by(aufnahmegrund) \|> summarise(m = mean(crp_mg_l))` | `SELECT aufnahmegrund, AVG(crp_mg_l) GROUP BY aufnahmegrund` |
+| gruppieren + zusammenfassen | `df.groupby("aufnahmegrund")["crp_mg_l"].mean()` | `group_by(aufnahmegrund) \|> summarise(m = mean(crp_mg_l))` | `SELECT aufnahmegrund, AVG(crp_mg_l) FROM kohorte GROUP BY aufnahmegrund` |
 | verbinden (join) | `a.merge(b, on="patient_id", how="left")` | `left_join(a, b, by = "patient_id")` | `a LEFT JOIN b USING (patient_id)` |
 
 ## Erster Blick auf die Daten
@@ -39,7 +41,7 @@ df <- load_cohort()
 
 ```python
 df["geschlecht"] = df["geschlecht"].replace({"w": "weiblich"})
-df["laktat_mmol_l"].fillna(df["laktat_mmol_l"].median())   # bewusst, nicht reflexhaft
+df["laktat_mmol_l"].fillna(df["laktat_mmol_l"].median())   # deliberately, not by reflex
 df.dropna(subset=["bmi"])
 ```
 ```r
@@ -96,6 +98,7 @@ tbl_summary(df, by = verstorben_30d) |> add_p()
 ## Modelle
 
 ```python
+import numpy as np
 import statsmodels.formula.api as smf
 m = smf.logit("verstorben_30d ~ alter + sofa_score + crp_mg_l + diabetes", df).fit()
 m.summary(); np.exp(m.params)        # Odds Ratios

@@ -14,8 +14,8 @@ from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, stratify=y, random_state=42)
-X_train_imp = pre.fit_transform(X_train)   # fit auf TRAIN
-X_test_imp  = pre.transform(X_test)        # TEST nur transformiert
+X_train_imp = pre.fit_transform(X_train)   # fit on TRAIN
+X_test_imp  = pre.transform(X_test)        # TEST is only transformed
 
 train_aucs, val_aucs = [], []
 for d in range(1, 16):
@@ -42,7 +42,7 @@ for n in [10, 50, 100, 300, 500]:
     auc = cross_val_score(build_pipeline(rf), X, y, cv=cv, scoring="roc_auc").mean()
     print(f"n={n:>4}: AUC = {auc:.3f}")
 ```
-Typischerweise stagniert die Güte ab ~200–300 Bäumen (bei n=300: AUC 0,778 in
+Typischerweise stagniert die Güte ab ~200–300 Bäumen (bei n=300: AUC 0,791 in
 unserem Lauf). Mehr Bäume reduzieren Varianz weiter, aber der Grenznutzen ist
 gering. Rechenaufwand skaliert linear; ab 300 lohnt sich die Investition kaum
 noch.
@@ -60,8 +60,8 @@ for lr, n_iter in [(0.30, 50), (0.01, 1500)]:
                           cv=cv, scoring="roc_auc").mean()
     dt = time.time() - t0
     print(f"lr={lr:.2f}, n_iter={n_iter}: AUC={auc:.3f}, Zeit={dt:.1f}s")
-# lr=0.30, n_iter=50:   AUC=0.734
-# lr=0.01, n_iter=1500: AUC=0.718
+# lr=0.30, n_iter=50:   AUC=0.728
+# lr=0.01, n_iter=1500: AUC=0.719
 ```
 Kleine Lernrate macht jeden Schritt vorsichtiger, das Modell passt sich weniger
 stark an Trainingsrauschen an und generalisiert oft besser, braucht aber mehr
@@ -80,9 +80,11 @@ for cw in [None, "balanced"]:
     print(f"\nclass_weight={cw}")
     print(classification_report(y_test, pipe.predict(X_test), digits=3))
 ```
-Ohne Gewichtung ist Recall für die positive Klasse (Verstorbene) oft niedrig:
-das Modell ignoriert seltene Ereignisse zugunsten von Accuracy. Mit
-`class_weight="balanced"` steigt Recall deutlich, Precision fällt etwas. Im
+Ohne Gewichtung ist Recall für die positive Klasse (Verstorbene) an der
+Standardschwelle 0,5 niedrig (auf diesem Split 0,32): Das Modell ignoriert
+seltene Ereignisse zugunsten von Accuracy. Mit `class_weight="balanced"` steigt
+Recall deutlich (0,58), Precision fällt etwas. Eine ähnliche Verschiebung
+erreicht man ohne Gewichtung über eine niedrigere Schwelle (Modul 24). Im
 klinischen Kontext (Hochrisikoerkennung) ist ein übersehener Todesfall teurer
 als ein Fehlalarm, Recall hat Vorrang, siehe auch Modul 23/25 zur
 Kalibrierungskehrseite dieser Gewichtung.
@@ -94,18 +96,23 @@ from sklearn.inspection import permutation_importance
 rf = RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=42)
 pipe = build_pipeline(rf).fit(X_train, y_train)
 
-# Gini-basiert (schnell, aber verzerrt bei korrelierten Merkmalen)
+# Gini-based (fast, but computed on training data and biased towards features with many levels)
 gini_imp = pipe.named_steps["model"].feature_importances_
 
-# Permutation-basiert (robuster, aber teurer) — auf den bereits transformierten Testdaten
+# Permutation-based (more robust, but more expensive) – on the already transformed test data
 X_test_imp = pipe.named_steps["pre"].transform(X_test)
 perm_res = permutation_importance(pipe.named_steps["model"], X_test_imp, y_test,
                                   n_repeats=20, scoring="roc_auc", random_state=42)
 perm_imp = perm_res.importances_mean
 ```
-Gini-Importance überschätzt Merkmale mit vielen Ausprägungen oder hoher
-Korrelation zu anderen Merkmalen. Alter und SOFA sind beide stark mit dem Outcome
-korreliert und teilen sich bei Gini-Importance die Punkte, Permutation-Importance
-zeigt häufig, welches der beiden für das Modell tatsächlich informativer ist.
+Gini-Importance gibt kontinuierlichen Merkmalen mit vielen Ausprägungen (BMI,
+Kreatinin, Laktat, CRP) deutliche Anteile, obwohl ihre Permutation Importance
+auf dem Testset um null liegt (BMI sogar leicht negativ): Sie bieten viele
+mögliche Schnittpunkte, an die sich Trainingsrauschen anpassen lässt, und die
+Gini-Werte stammen aus den Trainingsdaten. One-Hot-Dummies wie der
+Aufnahmegrund bekommen dagegen kleine Gini-Werte. Bei korrelierten Merkmalen
+(die Leukozyten hängen im Datensatz direkt vom SOFA-Score ab) unterschätzt
+Permutation Importance eher beide, weil das Modell beim Durchmischen des einen
+auf das andere ausweichen kann.
 Siehe Modul 27 für den vollständigen Permutation-Importance-Workflow inklusive
 Korrelations-Caveat.

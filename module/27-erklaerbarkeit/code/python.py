@@ -1,4 +1,4 @@
-"""Module 27 — Explainable AI: permutation importance, PDP/ICE, and SHAP.
+"""Module 27 – Explainable AI: permutation importance, PDP/ICE, and SHAP.
 
 Runs standalone from the project root:
     python module/27-erklaerbarkeit/code/python.py
@@ -46,7 +46,7 @@ def build_data() -> tuple[pd.DataFrame, pd.Series]:
 
 def train_model(X_train: pd.DataFrame, y_train: pd.Series
                 ) -> HistGradientBoostingClassifier:
-    """Fit a HistGradientBoostingClassifier — handles missing values natively."""
+    """Fit a HistGradientBoostingClassifier – handles missing values natively."""
     model = HistGradientBoostingClassifier(
         random_state=SEED, max_iter=200, learning_rate=0.05,
         max_depth=4, class_weight="balanced",
@@ -78,7 +78,7 @@ def explain_permutation(model, X_test: pd.DataFrame,
         print(f"  {name:<30} {mean:+.4f}  ±{std:.4f}")
 
     # Compare with impurity importance (train-based, only for models that support it).
-    print("\n  (Impurity importance from training data — compare critically:)")
+    print("\n  (Impurity importance from training data – compare critically:)")
     if hasattr(model, "feature_importances_"):
         impurity = model.feature_importances_
         imp_order = np.argsort(impurity)[::-1]
@@ -94,7 +94,7 @@ def explain_permutation(model, X_test: pd.DataFrame,
 def explain_shap(model, X_train: pd.DataFrame,
                  X_test: pd.DataFrame) -> bool:
     """Try SHAP explanation; fall back to a note if shap is not installed."""
-    print("\n=== 4) SHAP — local explanation ===")
+    print("\n=== 4) SHAP – local explanation ===")
     try:
         import shap  # optional dependency
     except ImportError:
@@ -119,8 +119,8 @@ def explain_shap(model, X_train: pd.DataFrame,
     for feat, val in sorted(zip(FEATURES, mean_abs), key=lambda x: -x[1]):
         print(f"    {feat:<30} {val:.4f}")
     print(
-        "  CAVEAT: correlated features (e.g. alter/sofa_score both track"
-        "\n  severity) can SPLIT credit between them in SHAP -- a feature with a"
+        "  CAVEAT: correlated features (e.g. leukozyten_g_l, which depends on"
+        "\n  sofa_score in this cohort) can SPLIT credit between them in SHAP -- a feature with a"
         "\n  small mean |SHAP| is not necessarily unimportant, its signal may be"
         "\n  shared with a correlated partner. Check feature correlations before"
         "\n  concluding a feature 'doesn't matter'."
@@ -185,9 +185,9 @@ def main() -> None:
     explain_permutation(model, X_test, y_test)
 
     # --- Section 3: PDP / ICE (printed summary; figure is in figures.py) ---
-    print("\n=== 3) Partial Dependence — concept check ===")
+    print("\n=== 3) Partial Dependence – concept check ===")
     print("  PDP averages predictions over all patients while varying one feature.")
-    print("  ICE shows individual patient curves — crossing lines = interaction.")
+    print("  ICE shows individual patient curves – crossing lines = interaction.")
     print("  See assets/partial_dependence.png for the visual output.")
 
     # --- Section 4: SHAP ---

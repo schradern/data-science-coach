@@ -24,7 +24,8 @@ Umgebung? Was passiert, wenn ich keine verwende?
 ## Aufgabe 4 – Git initialisieren
 Lege im Projektordner ein Git-Repository an (falls noch nicht geschehen) und
 erstelle einen ersten Commit mit der Nachricht `"Initial commit: environment set up"`.
-Was zeigt `git log --oneline` danach?
+Was zeigt `git log --oneline` danach? Tipp: Erledige vorher den Bonus
+(`.gitignore`), sonst landet `.venv/` im ersten Commit.
 
 ## Bonus
 Erstelle eine `.gitignore`-Datei im Projektordner, die `.venv/`,

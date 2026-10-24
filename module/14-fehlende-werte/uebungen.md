@@ -2,10 +2,10 @@
 
 > **Grundpfad (Aufgabe 1–6, ~45 min).** Handwerk (1–2), Entscheidung (3–4),
 > Verfahren und Imputationsmodell (5–6). Wer nur §1–§6 der Lektion gelesen hat,
-> hört hier auf — das reicht, um fehlende Werte in einer Publikation korrekt zu
+> hört hier auf – das reicht, um fehlende Werte in einer Publikation korrekt zu
 > behandeln.
 >
-> **Vertiefung (Aufgabe 7–11, ~75 min).** Rubin's rules von Hand (7), Wahl von
+> **Vertiefung (Aufgabe 7–11, ~75 min).** Rubins Regeln von Hand (7), Wahl von
 > `m` (8), eine Methode überführen (9), MNAR beziffern (10), Bericht (11).
 > Rechne mit 15–20 Minuten je Aufgabe; sie sind keine Fingerübungen.
 
@@ -33,7 +33,7 @@ Für das Modell `verstorben_30d ~ laktat_mmol_l + alter + sofa_score`:
 1. Wovon hängt das Fehlen von `laktat_mmol_l` ab?
 2. Steht diese Variable im Modell?
 3. Ist die Complete-Case-Schätzung des Laktat-Koeffizienten damit verzerrt oder unverzerrt? Begründe.
-4. Und der Mittelwert von `laktat_mmol_l` in einer Table 1 — verzerrt oder nicht?
+4. Und der Mittelwert von `laktat_mmol_l` in einer Table 1 – verzerrt oder nicht?
 
 ## Aufgabe 4 – Was Complete Case beim pH kostet
 
@@ -53,15 +53,15 @@ Ergänze zwei weitere Schätzungen für `bga_ph`: Median-Imputation und multiple
 Imputation (m = 20, Outcome im Imputationsmodell).
 
 Vergleiche Odds Ratio **und** Standardfehler. Die Median-Imputation liefert
-einen kleineren Standardfehler als die Complete-Case-Analyse, obwohl sie weniger
-Information hat. Erkläre den Widerspruch.
+einen kleineren Standardfehler als die Complete-Case-Analyse, obwohl sie über den
+pH keine zusätzliche Information hat. Erkläre den Widerspruch.
 
 ## Aufgabe 6 – Transfer: das Imputationsmodell sabotieren
 
 Wiederhole die multiple Imputation, aber **lasse `verstorben_30d` aus dem
 Imputationsmodell weg** (imputiere `bga_ph ~ alter + sofa_score`).
 
-Vergleiche das Odds Ratio mit dem der korrekten Imputation. Was bricht — das
+Vergleiche das Odds Ratio mit dem der korrekten Imputation. Was bricht – das
 Odds Ratio oder das absolute Risiko? Erkläre den Mechanismus und formuliere in
 einem Satz, warum das Imputationsmodell reicher sein muss als das Analysemodell.
 
@@ -69,7 +69,7 @@ einem Satz, warum das Imputationsmodell reicher sein muss als das Analysemodell.
 
 ## Vertiefung
 
-## Aufgabe 7 – Rubin's rules von Hand
+## Aufgabe 7 – Rubins Regeln von Hand
 
 Erzeuge m = 20 vervollständigte Datensätze, fitte auf jedem
 `verstorben_30d ~ bga_ph + alter + sofa_score` und sammle `Q̂ₗ` (den
@@ -83,7 +83,7 @@ pH-Koeffizienten) und `Uₗ` (dessen quadrierten Standardfehler).
    sie mit `n − k = 496`. Was fällt auf? Berechne dann `ν_BR` nach
    Barnard & Rubin (1999).
 4. Setze `B = 0` und rechne `T` erneut. Welchen Standardfehler hättest du dann
-   berichtet — und welchem Verfahren aus §4 entspricht das?
+   berichtet – und welchem Verfahren aus §4 entspricht das?
 
 ## Aufgabe 8 – Wie viele Imputationen?
 
@@ -102,16 +102,16 @@ die Tabelle für `beta_bga_ph` an.
 1. Die **deterministische Regressions-Imputation** hat den kleinsten RMSE aller
    Einfachimputationen (0,0501) und die **schlechteste Überdeckung** (73,2 %).
    Erkläre den Widerspruch.
-2. Mittelwert-Imputation hat eine SE-Ratio von 1,06 — ihr Standardfehler ist also
+2. Mittelwert-Imputation hat eine SE-Ratio von 1,06 – ihr Standardfehler ist also
    *ehrlich*. Warum überdeckt sie trotzdem nur 83,8 %?
 3. Complete Case überdeckt die Steigung zu 93,4 %, das absolute Risiko aber nur
    zu 57,0 %. Welche der beiden Größen würdest du in einem Prognosemodell
-   berichten — und was folgt daraus für die Methodenwahl?
+   berichten – und was folgt daraus für die Methodenwahl?
 
 ## Aufgabe 10 – Klinikfall: MNAR beziffern
 
 Eine Gutachterin schreibt: *„Die Autoren nehmen MAR an. Was, wenn die
-Patient:innen ohne Blutgasanalyse in Wahrheit unauffälligere pH-Werte hatten?"*
+Patient:innen ohne Blutgasanalyse in Wahrheit unauffälligere pH-Werte hatten?“*
 
 1. Führe eine Delta-Adjustment-Analyse durch: verschiebe **nur die imputierten**
    pH-Werte um δ ∈ [−0,05; +0,05] und poole jeweils neu.

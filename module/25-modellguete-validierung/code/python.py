@@ -1,4 +1,4 @@
-"""Module 25 — Model quality and clinical validation.
+"""Module 25 – Model quality and clinical validation.
 
 Runs standalone from the project root:
     python module/25-modellguete-validierung/code/python.py
@@ -7,13 +7,13 @@ Data: read from data/ (committed with the repo); if that folder is
 missing, the same files are fetched from the published URL.
 Only scikit-learn / scipy / statsmodels / numpy are required.
 
-IMPORTANT — calibration and class_weight="balanced":
+IMPORTANT – calibration and class_weight="balanced":
 Module 23/24 use class_weight="balanced" so the model does not ignore the
 minority class when RANKING patients (AUC, thresholds). But re-weighting the
 loss function distorts predict_proba(): the model was trained as if deaths
 were as common as survivals, so its probabilities systematically overshoot
 the true risk (see the CITL demo below). Ranking (AUC/PR-AUC) is a monotonic
-function of the score, so it is unaffected — but Brier score, the
+function of the score, so it is unaffected – but Brier score, the
 calibration curve, calibration-in-the-large/slope, and Decision-Curve
 Analysis all consume the probabilities *as absolute numbers*, so we
 recalibrate with CalibratedClassifierCV before computing any of them.
@@ -135,11 +135,11 @@ def calibration_stats(y_true, proba):
     2016; Steyerberg's `val.prob`):
 
     - Calibration-in-the-large: intercept of a GLM where log_odds enters as an
-      OFFSET (coefficient fixed at 1) — "if the model's ranking/shape is taken
+      OFFSET (coefficient fixed at 1) – "if the model's ranking/shape is taken
       as given, is the overall predicted risk level too high or too low?"
       0 = on average correct, negative = model overestimates risk, positive =
       model underestimates risk.
-    - Calibration slope: coefficient of log_odds as a covariate — 1 = ideal,
+    - Calibration slope: coefficient of log_odds as a covariate – 1 = ideal,
       <1 = predictions too extreme (overfit), >1 = predictions too
       conservative (underfit / need sharpening).
 
@@ -147,7 +147,7 @@ def calibration_stats(y_true, proba):
     with NO reference to `proba` at all) always returns logit(mean(y_true)),
     completely independent of the model's predictions. It looks plausible
     (some number comes out) but silently ignores whether the model is any
-    good — it would report the exact same "calibration" for a well-calibrated
+    good – it would report the exact same "calibration" for a well-calibrated
     model and a badly miscalibrated one, as long as both target the same
     mean event rate. The offset formulation below actually depends on `proba`.
     """
@@ -177,7 +177,7 @@ def main() -> None:
 
     # --- 1) Discrimination ---------------------------------------------------
     # Ranking metrics (AUC, PR-AUC) only depend on the ORDER of scores, so
-    # class_weight="balanced" does not distort them — use the raw pipeline.
+    # class_weight="balanced" does not distort them – use the raw pipeline.
     print("=== 1) Diskriminierung: ROC-AUC und PR-AUC ===")
     auc_roc = roc_auc_score(y_test, proba)
     auc_pr  = average_precision_score(y_test, proba)

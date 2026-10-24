@@ -5,8 +5,6 @@
 ## Aufgabe 1 – Erste Erkundung
 
 ```python
-import matplotlib
-matplotlib.use("Agg")
 import pandas as pd
 
 labs   = pd.read_csv("{{DATEN}}labor.csv")
@@ -40,14 +38,14 @@ treibt die Verteilung nach rechts.
 ## Aufgabe 2 – Häufigkeiten und fehlende Werte
 
 ```python
-# Raucherstatus – absolut und relativ
+# Smoking status – absolute and relative
 print(df["raucherstatus"].value_counts())
 print(df["raucherstatus"].value_counts(normalize=True).round(3))
 
-# Fehlende Werte – alle Spalten
+# Missing values – all columns
 print(df.isna().sum()[df.isna().sum() > 0])
 
-# Anteil Laktat fehlend
+# Share of missing lactate values
 anteil = df["laktat_mmol_l"].isna().mean()
 print(f"laktat_mmol_l fehlend: {anteil:.1%}")
 ```
@@ -59,7 +57,7 @@ colSums(is.na(df))[colSums(is.na(df)) > 0]
 
 mean(is.na(df$laktat_mmol_l))
 ```
-**Befund:** „nie" (~47 %), „ehemalig" (~31 %), „aktiv" (~22 %). Fehlende Werte
+**Befund:** „nie“ (~47 %), „ehemalig“ (~31 %), „aktiv“ (~22 %). Fehlende Werte
 gibt es bei `gewicht_kg`/`bmi` (~6 %, zufällig, MCAR) und `laktat_mmol_l`
 (~17 %). Das Laktat-Fehlen ist **informativ**, aber **MAR** (nicht MNAR): die
 Fehlwahrscheinlichkeit hängt vom beobachteten `sofa_score` ab, Laktat wird bei
@@ -87,8 +85,8 @@ sum(vals > upper, na.rm = TRUE)
 sort(vals[vals > upper], decreasing = TRUE) |> head(5)
 ```
 **Befund:** ~15 Werte liegen oberhalb der Obergrenze (~3,37 mg/dl), der höchste
-Wert bei ~5,6 mg/dl. Auf einer Intensivstation klinisch plausibel, kein Datenfehler,
-sondern akutes Nierenversagen. Nicht ohne weiteres entfernen.
+Wert bei ~5,6 mg/dl. Bei stationären Patient:innen klinisch plausibel: eher akutes
+oder chronisches Nierenversagen als ein Datenfehler. Nicht ohne weiteres entfernen.
 
 ## Aufgabe 4 – Histogramm
 
@@ -128,13 +126,14 @@ Multiorganversagen. Alle Gruppen zeigen leichte Rechtsschiefe (wenige Langlieger
 ## Aufgabe 5 – Boxplot
 
 ```python
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 order = (df.groupby("raucherstatus")["sofa_score"]
            .median().sort_values(ascending=False).index.tolist())
 fig, ax = plt.subplots(figsize=(7, 4))
 sns.boxplot(data=df, x="raucherstatus", y="sofa_score",
-            order=order, palette="Set2", ax=ax)
+            order=order, hue="raucherstatus", palette="Set2", legend=False, ax=ax)
 ax.set_xlabel("Raucherstatus")
 ax.set_ylabel("SOFA-Score bei Aufnahme")
 ax.set_title("SOFA-Score nach Raucherstatus")
@@ -155,13 +154,15 @@ p_sofa <- ggplot(df, aes(x = factor(raucherstatus, levels = order_lvl),
   theme_minimal()
 ggsave("sofa_nach_raucherstatus_r.png", p_sofa, width = 7, height = 4, dpi = 120)
 ```
-**Befund:** Die Gruppen zeigen starke Überlappung und nur geringe Unterschiede.
-Das ist ein typisches Beispiel dafür, warum EDA nicht mit Kausalschlüssen
-verwechselt werden darf, Confounding durch Alter und Aufnahmegrund ist wahrscheinlich.
+**Befund:** Die Gruppen überlappen fast vollständig (Median 4 bei „nie“, 3 bei
+„ehemalig“ und „aktiv“). Auch ein deutlicher Unterschied wäre noch kein
+Kausalbefund: ohne Adjustierung, etwa für Alter und Aufnahmegrund, bleibt
+Confounding möglich. EDA beschreibt, sie erklärt nicht.
 
 ## Aufgabe 6 – Streudiagramm und Korrelation
 
 ```python
+import matplotlib.pyplot as plt
 from scipy import stats
 
 sub = df[["crp_mg_l", "verweildauer_tage"]].dropna()
@@ -222,8 +223,8 @@ sort(korr["verstorben_30d", -which(colnames(korr)=="verstorben_30d")],
 ```
 **Befund:** `sofa_score` (r ≈ 0,36) korreliert mit Abstand am stärksten mit
 `verstorben_30d`, gefolgt von `leukozyten_g_l` (r ≈ 0,24) und `alter`
-(r ≈ 0,22). Nicht überraschend: der SOFA-Score wurde klinisch für die
-Intensivprognose entwickelt, höheres Alter ist ein bekannter Risikofaktor, und
+(r ≈ 0,22). Nicht überraschend: der SOFA-Score bildet das Organversagen ab und ist
+ein etablierter Prognosemarker, höheres Alter ist ein bekannter Risikofaktor, und
 erhöhte Leukozyten sind ein klassisches Entzündungs-/Infektzeichen. Die übrigen
 Labormarker (u. a. CRP, Kreatinin) zeigen kaum linearen Zusammenhang,
 nichtlineare oder kombinierte Effekte werden erst in Modul 12 sichtbar.

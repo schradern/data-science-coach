@@ -12,15 +12,15 @@ Ein CDSS warnt auf der Intensivstation vor akutem Nierenversagen. Du planst eine
 1. Erkläre, warum eine Randomisierung auf Patient:innenebene bei diesem Studiendesign zu einer Verzerrung (Kontamination) der Ergebnisse führen kann.
 2. Welches Studiendesign löst dieses Problem?
 
-## Übung 3: Alarm-Müdigkeit und Spectrum Bias — den positiven Vorhersagewert berechnen
+## Übung 3: Alarm-Müdigkeit und Spectrum Bias – den positiven Vorhersagewert berechnen
 Ein Sepsis-Frühwarnsystem läuft auf einer Intensivstation. In der validierten Population beträgt die Sepsis-Prävalenz (pro überwachtem Patient:innen-Zeitfenster) 5 %. Das Modell hat eine Sensitivität von 90 % und eine Spezifität von 80 %.
 
 1. Lege eine Vierfeldertafel für 1 000 Zeitfenster an und berechne den positiven Vorhersagewert (PPV). Welcher Anteil aller Alarme ist ein Fehlalarm?
 2. Dasselbe (eingefrorene) Modell wird nun auf einer Normalstation eingesetzt, wo die Prävalenz nur 1 % beträgt (Spectrum Bias). Berechne den PPV erneut.
 3. Was folgt aus dem Vergleich für die Alarm-Müdigkeit?
 
-## Übung 4: AUC vs. Brier-Score — Diskriminierung und Kalibrierung von Hand
-Ein im Training gut kalibriertes Sepsis-Modell wird im Schattenbetrieb auf eine kränker gewordene Population angewendet. Für fünf Patient:innen liegen die vorhergesagte Risikowahrscheinlichkeit `p` und das tatsächliche Outcome `y` (1 = Sepsis) vor:
+## Übung 4: AUC vs. Brier-Score – Diskriminierung und Kalibrierung von Hand
+Ein im Training gut kalibriertes Sepsis-Modell wird im Schattenbetrieb auf eine Population angewendet, deren Grundrisiko inzwischen gestiegen ist. Für fünf Patient:innen liegen die vorhergesagte Risikowahrscheinlichkeit `p` und das tatsächliche Outcome `y` (1 = Sepsis) vor:
 
 | Patient:in | p | y |
 |---|---|---|

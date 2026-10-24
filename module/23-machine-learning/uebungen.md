@@ -5,7 +5,7 @@ Lösungen: [`loesungen.md`](loesungen.md).
 
 ## Aufgabe 1 – Genauigkeitsparadox
 Implementiere einen naiven Klassifikator, der immer die häufigere Klasse
-(„lebt") vorhersagt. Berechne Accuracy und ROC-AUC. Erkläre in zwei Sätzen,
+(„lebt“) vorhersagt. Berechne Accuracy und ROC-AUC. Erkläre in zwei Sätzen,
 warum Accuracy bei diesem Outcome kein geeignetes Gütemaß ist und was AUC
 stattdessen misst.
 

@@ -58,7 +58,7 @@ def fig_calibration(y_test, proba) -> None:
     """Calibration curve on RECALIBRATED probabilities.
 
     `proba` here must already be the CalibratedClassifierCV output (see
-    main()) — class_weight="balanced" inflates raw predict_proba() and would
+    main()) – class_weight="balanced" inflates raw predict_proba() and would
     make this figure show a miscalibrated model regardless of true quality.
     """
     brier = brier_score_loss(y_test, proba)

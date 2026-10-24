@@ -1,4 +1,4 @@
-"""Module 31 — Clinical text classification with TF-IDF and logistic regression.
+"""Module 31 – Clinical text classification with TF-IDF and logistic regression.
 
 Runs standalone from the project root:
     python module/31-klinische-texte-llm/code/python.py
@@ -38,7 +38,7 @@ def load_data() -> tuple[pd.Series, pd.Series]:
 
 
 def build_pipeline(C: float = 1.0, ngram_max: int = 2) -> Pipeline:
-    """TF-IDF vectoriser followed by logistic regression — both in one pipeline.
+    """TF-IDF vectoriser followed by logistic regression – both in one pipeline.
 
     Keeping the vectoriser inside the pipeline ensures IDF weights are estimated
     only on training documents, preventing information leakage into the test set.
@@ -86,7 +86,7 @@ def main() -> None:
     cv_aucs = cross_val_score(pipe_cv, X_train, y_train, cv=cv, scoring="roc_auc")
     print(f"  CV-AUC: {cv_aucs.mean():.3f} ± {cv_aucs.std():.3f}")
 
-    print("\n=== 4) Final model — fit on full training set, evaluate on held-out test ===")
+    print("\n=== 4) Final model – fit on full training set, evaluate on held-out test ===")
     pipe = build_pipeline()
     pipe.fit(X_train, y_train)
 
@@ -107,7 +107,7 @@ def main() -> None:
     vocab_size = len(pipe.named_steps["tfidf"].vocabulary_)
     print(f"  Vocabulary: {vocab_size} unique tokens/bigrams")
     print("\nA bag-of-words model ignores word order and negation context.")
-    print("Embeddings (sentence-transformers) capture semantics — see README, section 5.")
+    print("Embeddings (sentence-transformers) capture semantics – see README, section 5.")
 
 
 if __name__ == "__main__":

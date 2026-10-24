@@ -1,4 +1,4 @@
-# Module 01 — Introduction & learning path (R, parallel to Python).
+# Module 01 – Introduction & learning path (R, parallel to Python).
 #   Rscript module/01-einfuehrung/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -13,7 +13,7 @@ set.seed(SEED)
 
 cohort <- load_cohort()
 
-cat("=== Module 01 — First look at the cohort ===\n\n")
+cat("=== Module 01 – First look at the cohort ===\n\n")
 cat("Dataset loaded:  ", nrow(cohort), "patients,", ncol(cohort), "columns\n")
 cat("Columns:         ", paste(names(cohort), collapse = ", "), "\n")
 
@@ -33,5 +33,5 @@ cohort |>
   mutate(mortality = sprintf("%.1f%%", mortality * 100)) |>
   print()
 
-cat(sprintf("\nSeed: %d  — results are fully reproducible.\n", SEED))
-cat("Done. Next: Module 02 — Tools & reproducible environment.\n")
+cat(sprintf("\nSeed: %d  – results are fully reproducible.\n", SEED))
+cat("Done. Next: Module 02 – Tools & reproducible environment.\n")

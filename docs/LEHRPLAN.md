@@ -20,7 +20,7 @@ gleiches Ergebnis), **Zugänglichkeit** (klinische Beispiele, deutsche Sprache).
 - **R parallel** – dasselbe Ergebnis idiomatisch in R (`tidyverse`), für die
  klinisch-statistische Community. Jede Lektion zeigt beide Wege nebeneinander.
 
-- **SQL als Werkzeug** – fokussiert auf Datenextraktion (Modul 05 (Datenbank-Abfragen mit SQL)), später
+- **SQL als Werkzeug** – fokussiert auf Datenextraktion (Modul 05: Datenbank-Abfragen mit SQL), später
  punktuell eingebunden.
 
 ## Aufbau in fünf Teilen
@@ -33,7 +33,7 @@ gleiches Ergebnis), **Zugänglichkeit** (klinische Beispiele, deutsche Sprache).
 | 4 | **Statistische Inferenz und medizinische Statistik** | 10–22 | *Wie ziehe ich belastbare Schlüsse, plane Studien und berichte publikationstauglich?* |
 | 5 | **Machine Learning und KI in der Medizin** | 23–34 | *Wie baue, prüfe, erkläre und überwache ich klinische Modelle verantwortungsvoll?* |
 
-Die klassische, „traditionelle" Statistik (Inferenz, Regression, Studiendesign,
+Die klassische, „traditionelle“ Statistik (Inferenz, Regression, Studiendesign,
 fehlende Werte, Kausalität, Diagnostik, Survival, Berichte) ist in **Teil 4**
 zusammengeführt; **Machine Learning und KI in der Medizin** bilden als **Teil 5** den Abschluss.
 So folgt der Kurs einer durchgehenden Kurve von den Grundlagen über die etablierte
@@ -100,7 +100,7 @@ Lage- und Streumaße, Häufigkeiten, Baseline-Tabelle wie in klinischen Papern
 
 ### Teil 4 – Statistische Inferenz und medizinische Statistik
 
-Der komplette „traditionelle" Auswertungs- und Publikationsweg: von
+Der komplette „traditionelle“ Auswertungs- und Publikationsweg: von
 Hypothesentests über Regression und Studienplanung bis zum reproduzierbaren
 Bericht – bevor in Teil 5 datengetriebene Verfahren dazukommen.
 
@@ -123,9 +123,9 @@ das Ergebnis schönrechnet.
 
 **14 · Fehlende Werte und Imputation**
 MCAR/MAR/MNAR, Missingness-Profile, wann Complete Case verzerrt und wann nicht,
-einfache Imputation als Fehlerquelle, Multiple Imputation mit Rubin's rules,
+einfache Imputation als Fehlerquelle, Multiple Imputation mit Rubins Regeln,
 Sensitivitätsanalyse. *Ziel:* fehlende Daten nicht wegklicken, sondern begründet
-behandeln — und wissen, welcher Schätzer dabei bricht.
+behandeln – und wissen, welcher Schätzer dabei bricht.
 
 **15 · Kausale Inferenz und Directed Acyclic Graphs**
 DAGs, Confounder, Mediator, Kollider, crude vs. adjustiert, Propensity Score,
@@ -223,7 +223,7 @@ als freie Ratgeber einsetzen.
 
 **34 · Studiendesign zur Validierung klinischer KI-Systeme**
 Retrospektive vs. prospektive Validierung, Silent Deployment, Automation Bias,
-Cluster-Randomisierung, TRIPOD-AI/DECIDE-AI/CONSORT-AI. *Ziel:* prüfen, ob ein
+Cluster-Randomisierung, TRIPOD+AI/DECIDE-AI/CONSORT-AI. *Ziel:* prüfen, ob ein
 KI-System Patient:innenversorgung verbessert, nicht nur Metriken.
 
 ## Lernpfade
@@ -244,7 +244,7 @@ als Einstiegsorientierung.
 Alle Module nutzen denselben synthetischen Kohortendatensatz (fiktive
 Intensiv-/Stationskohorte, N = 500), erzeugt von
 [`../data/generate_data.py`](../data/README.md) und geladen direkt über eine
-Web-Adresse (Platzhalter `{{DATEN}}` in Codebeispielen) — ein lokaler Klon des
+Web-Adresse (Platzhalter `{{DATEN}}` in Codebeispielen) – ein lokaler Klon des
 `data/`-Ordners ist zum Mitrechnen nicht nötig.
 
 Vier Kern-Dateien bilden den Hauptdatensatz: `kohorte.csv` (eine Zeile je
@@ -259,7 +259,7 @@ ergänzen den Datensatz: `kohorte_de.csv` (deutsches Klinik-Export-Format),
 kommen hinzu: `bga_ph_wahrheit.csv` (Ground Truth für Modul 14, nur möglich weil
 die Kohorte synthetisch ist) und `konkurrenz_risiken.csv` (kohärenter
 Konkurrenzrisiko-Prozess Tod vs. Entlassung plus zeitabhängige Exposition, Modul
-20) — macht insgesamt **zehn** generierte Dateien.
+20) – macht insgesamt **zehn** generierte Dateien.
 
 Die 30-Tage-Mortalität liegt bei Seed 42 bei **≈ 15,6 %**. `alter` ist in der
 zugrunde liegenden DAG ein **Confounder**, `sofa_score` ein **Mediator**
@@ -274,7 +274,7 @@ Fortgeschrittene Module verweisen zusätzlich auf reale offene Datensätze
 1. **Lernziele** explizit zu Beginn (3–5 Stichpunkte).
 2. **Klinischer Aufhänger** – eine echte ärztliche Frage.
 3. **Konzept vor Code** – kurze Erklärung, dann lauffähiges Beispiel.
-4. **Python und R nebeneinander**, gleiches Ergebnis.
+4. **Python und R nebeneinander**: gleiches Ergebnis.
 5. **Übungen** mit getrennten **Lösungen**.
 6. **Fallstricke und Merksätze** am Ende.
 7. **Reproduzierbar** – fester Seed, relativer Datenpfad, läuft ohne Internet

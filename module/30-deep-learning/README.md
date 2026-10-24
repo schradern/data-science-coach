@@ -10,7 +10,7 @@
 - Das Konzept von **CNNs für medizinische Bildgebung** in Prosa verstehen (ohne lauffähigen Torch-Code).
 
 ## Klinischer Aufhänger
-„Deep Learning revolutioniert die Medizin", so die Schlagzeile. Auf klinischen Tabellendaten mit einigen hundert bis wenigen tausend Fällen ist die Realität nüchterner: einfachere Modelle wie logistische Regression und Gradient Boosting sind neuronalen Netzen auf solchen Tabellendaten oft mindestens ebenbürtig, teils sogar überlegen. Dieses Modul zeigt, *wann* und *warum*, und wann Deep Learning tatsächlich seinen Platz hat (Bildgebung, Sequenzen, Freitext).
+„Deep Learning revolutioniert die Medizin“, so die Schlagzeile. Auf klinischen Tabellendaten mit einigen hundert bis wenigen tausend Fällen ist die Realität nüchterner: einfachere Modelle wie logistische Regression und Gradient Boosting sind neuronalen Netzen auf solchen Tabellendaten oft mindestens ebenbürtig, teils sogar überlegen. Dieses Modul zeigt, *wann* und *warum*, und wann Deep Learning tatsächlich seinen Platz hat (Bildgebung, Sequenzen, Freitext).
 
 ## 1 MLPClassifier in einer Pipeline
 
@@ -110,16 +110,16 @@ loss_curve = mlp.loss_curve_
 val_curve   = mlp.validation_scores_
 ```
 
-![MLP-Lernkurve: Trainingsverlust und Validierungsgüte über die Trainingsepochen. Der Schnittpunkt, an dem die Validierungsgüte aufhört zu steigen, markiert den Zeitpunkt des Early Stopping.](assets/lernkurve.png)
+![MLP-Lernkurve: Trainingsverlust und Validierungsgüte über die Trainingsepochen. Der Punkt, an dem die Validierungsgüte aufhört zu steigen, markiert den Zeitpunkt des Early Stopping.](assets/lernkurve.png)
 
-**Stolperstein:** `mlp.best_validation_score_` ist bei `early_stopping=True` die **Genauigkeit (Accuracy)** auf dem internen Validierungssplit, keine AUC. Bei einem seltenen Zielereignis (hier ~16 % 30-Tage-Mortalität) ist Genauigkeit ein irreführendes Maß: Ein Modell, das stur „überlebt" vorhersagt, erreicht bereits ~84 % Genauigkeit, ohne einen einzigen Todesfall zu erkennen. Verlass dich für den Modellvergleich in diesem Modul auf die **AUC** (Abschnitt 3), nicht auf `best_validation_score_`. 
+**Stolperstein:** `mlp.best_validation_score_` ist bei `early_stopping=True` die **Genauigkeit (Accuracy)** auf dem internen Validierungssplit, keine AUC. Bei einem seltenen Zielereignis (hier ~16 % 30-Tage-Mortalität) ist Genauigkeit ein irreführendes Maß: Ein Modell, das stur „überlebt“ vorhersagt, erreicht bereits ~84 % Genauigkeit, ohne einen einzigen Todesfall zu erkennen. Genau das passiert im Skriptlauf: Das Training stoppt nach 15 Epochen bei einer Validierungsgenauigkeit von 0,842, praktisch dem Anteil der Überlebenden, und das Netz hat bis dahin kaum etwas gelernt (Test-AUC 0,407, unter der Zufallsgrenze). Verlass dich für den Modellvergleich in diesem Modul auf die **AUC** (Abschnitt 3), nicht auf `best_validation_score_`. 
 **Stolperstein:** Der Validierungssplit für `early_stopping` wird **intern** aus den Trainingsdaten entnommen und reduziert so die effektive Trainingsmenge. Bei wenig Daten solltest du abwägen, ob Early Stopping lohnt oder ein festes `max_iter` besser ist. 
 **Darüber hinaus:** Bei `solver="adam"` (Standard) reagiert die Lernrate auf den Gradientenverlauf. `learning_rate_init` ist ein wichtiger Hyperparameter, zu groß führt zu Oszillation, zu klein zu sehr langsamer Konvergenz.
 
 In R:
 
 ```r
-# nnet gibt keine Epochenhistorie; brulee (torch-Backend) würde:
+# nnet returns no epoch history; brulee (torch backend) would:
 # history <- fit$fit$fit$training_history
 ```
 
@@ -148,6 +148,14 @@ def make_gb():
                                                         max_depth=3,
                                                         random_state=SEED))])
 
+def make_mlp():
+    # Without early_stopping (see section 2): with accuracy-driven early
+    # stopping, the same network only reaches AUC ≈ 0.50 in this CV.
+    return Pipeline([("pre", pre),
+                     ("mlp", MLPClassifier(hidden_layer_sizes=(64, 32),
+                                           alpha=0.01, max_iter=500,
+                                           random_state=SEED))])
+
 def summarise_folds(scores):
     k, mean, sd = len(scores), scores.mean(), scores.std(ddof=1)
     half_width = stats.t.ppf(0.975, df=k - 1) * sd / np.sqrt(k)
@@ -156,38 +164,38 @@ def summarise_folds(scores):
 fold_scores = {
     "Logistische Regression": cross_val_score(make_lr(), X, y, cv=cv, scoring="roc_auc"),
     "Gradient Boosting":      cross_val_score(make_gb(), X, y, cv=cv, scoring="roc_auc"),
-    "MLP":                    cross_val_score(mlp_pipe,  X, y, cv=cv, scoring="roc_auc"),
+    "MLP":                    cross_val_score(make_mlp(), X, y, cv=cv, scoring="roc_auc"),
 }
 for name, scores in fold_scores.items():
     mean, sd, lo, hi = summarise_folds(scores)
     print(f"  {name:<28} Mean={mean:.3f} SD={sd:.3f} 95%-CI=[{lo:.3f}, {hi:.3f}]")
 
-# Paired per-fold difference — the right comparison, since every model was
+# Paired per-fold difference – the right comparison, since every model was
 # evaluated on the exact same 5 folds.
 diff_lr_gb = fold_scores["Logistische Regression"] - fold_scores["Gradient Boosting"]
 mean, sd, lo, hi = summarise_folds(diff_lr_gb)
 print(f"  LR - GB  Mean diff={mean:+.3f}  95%-CI=[{lo:+.3f}, {hi:+.3f}]")
 ```
 
-![AUC-Vergleich (Punktschätzer, 5-fache Kreuzvalidierung): Logistische Regression 0,775, Gradient Boosting 0,735, MLP 0,656. Die Balken zeigen nur die Mittelwerte, die Streuung zwischen Folds ist hier nicht abgebildet — siehe Text und Skript für die 95-%-Konfidenzintervalle.](assets/auc_vergleich.png)
+![AUC-Vergleich (Punktschätzer, 5-fache Kreuzvalidierung): Logistische Regression 0,775, Gradient Boosting 0,735, MLP 0,656. Die Balken zeigen nur die Mittelwerte, die Streuung zwischen Folds ist hier nicht abgebildet – siehe Text und Skript für die 95-%-Konfidenzintervalle.](assets/auc_vergleich.png)
 
 Ausgeführt auf diesem Datensatz (n=500, 78 Ereignisse, k=5 Folds) liefert das:
 
 | Modell | Mean | SD | 95-%-CI |
 |---|---|---|---|
 | Logistische Regression | 0,775 | 0,037 | [0,729; 0,821] |
-| Gradient Boosting | 0,735 | 0,036 | [0,690; 0,780] |
+| Gradient Boosting | 0,735 | 0,036 | [0,691; 0,780] |
 | MLP | 0,656 | 0,047 | [0,598; 0,714] |
 
 Und die gepaarten Differenzen pro Fold (Logistische Regression minus jeweils anderes Modell):
 
 | Vergleich | Mean-Diff | 95-%-CI | Befund |
 |---|---|---|---|
-| LR − Gradient Boosting | +0,040 | [+0,010; +0,069] | CI schließt 0 knapp aus — bei k=5 Folds ein fragiles, kein robustes Ergebnis |
-| LR − MLP | +0,119 | [+0,072; +0,166] | CI schließt 0 deutlich aus — vergleichsweise klarer Unterschied |
+| LR − Gradient Boosting | +0,040 | [+0,012; +0,067] | CI schließt 0 knapp aus – bei k=5 Folds ein fragiles, kein robustes Ergebnis |
+| LR − MLP | +0,119 | [+0,072; +0,166] | CI schließt 0 deutlich aus – vergleichsweise klarer Unterschied |
 
-**Stolperstein:** Eine bloße Rangfolge der Mittelwerte (0,775 > 0,735 > 0,656) suggeriert einen klaren Sieger, verschweigt aber, dass bei nur k=5 Folds die Fold-zu-Fold-Streuung (SD ≈ 0,03–0,05) in der Größenordnung des LR-GB-Abstands (0,040) liegt. Erst die **gepaarte** Betrachtung pro Fold zeigt, wie belastbar ein Unterschied wirklich ist: Der LR-GB-Vorsprung ist zwar statistisch von 0 verschieden, aber nur knapp (CI-Untergrenze 0,010) und beruht auf gerade einmal 5 Wertepaaren, kein robuster Beleg. Der Abstand MLP zu den beiden Klassikern (≈ 0,12 AUC-Punkte, CI-Untergrenze 0,072) ist dagegen klar und deutet auf einen echten Unterschied hin. Die ehrliche Aussage lautet daher: **Das MLP ist auf diesem Datensatz eindeutig schwächer; ob logistische Regression oder Gradient Boosting das bessere der beiden Klassiker-Modelle ist, lässt sich bei dieser Stichprobengröße nicht zuverlässig entscheiden.** Das stützt weiterhin die Kernaussage des Moduls, mehr Modellkomplexität bringt auf kleinen klinischen Tabellendaten keinen verlässlichen Vorteil, nur eben mit der tatsächlich belegten Unsicherheit statt einer scheinbar sauberen Rangfolge.
-**Darüber hinaus:** Auf sehr großen Registerdaten (>100 000 Zeilen) mit vielen Interaktionen können spezialisierte Architekturen wie **TabNet** oder **FT-Transformer** Gradient Boosting übertreffen. Bis dahin lohnt es sich, mit dem einfacheren Modell zu starten.
+**Stolperstein:** Eine bloße Rangfolge der Mittelwerte (0,775 > 0,735 > 0,656) suggeriert einen klaren Sieger, verschweigt aber, dass bei nur k=5 Folds die Fold-zu-Fold-Streuung (SD ≈ 0,03–0,05) in der Größenordnung des LR-GB-Abstands (0,040) liegt. Erst die **gepaarte** Betrachtung pro Fold zeigt, wie belastbar ein Unterschied wirklich ist: Der LR-GB-Vorsprung ist zwar statistisch von 0 verschieden, aber nur knapp (CI-Untergrenze 0,012) und beruht auf gerade einmal 5 Wertepaaren, kein robuster Beleg. Hinzu kommt: Die fünf Fold-Werte sind nicht unabhängig (die Trainingsmengen überlappen), solche t-Intervalle fallen daher eher zu schmal aus. Der Abstand MLP zu den beiden Klassikern (≈ 0,12 AUC-Punkte, CI-Untergrenze 0,072) ist dagegen klar und deutet auf einen echten Unterschied hin. Die ehrliche Aussage lautet daher: **Das MLP ist auf diesem Datensatz eindeutig schwächer; ob logistische Regression oder Gradient Boosting das bessere der beiden Klassiker-Modelle ist, lässt sich bei dieser Stichprobengröße nicht zuverlässig entscheiden.** Das stützt weiterhin die Kernaussage des Moduls, mehr Modellkomplexität bringt auf kleinen klinischen Tabellendaten keinen verlässlichen Vorteil, nur eben mit der tatsächlich belegten Unsicherheit statt einer scheinbar sauberen Rangfolge.
+**Darüber hinaus:** Ob spezialisierte Architekturen wie **TabNet** oder **FT-Transformer** Gradient Boosting auf sehr großen Registerdaten (>100 000 Zeilen) übertreffen, ist in Vergleichsstudien uneinheitlich. Vortrainierte Tabellen-Foundation-Modelle (z. B. **TabPFN**) erzielen inzwischen auch auf kleinen Datensätzen konkurrenzfähige Ergebnisse, sind für klinische Fragestellungen aber noch kaum extern validiert. Bis dahin lohnt es sich, mit dem einfacheren Modell zu starten.
 
 In R:
 
@@ -212,21 +220,21 @@ for alpha in [0.0001, 0.001, 0.01, 0.1, 1.0]:
     pipe = Pipeline([("pre", pre),
                      ("mlp", MLPClassifier(hidden_layer_sizes=(64, 32),
                                            alpha=alpha,
-                                           max_iter=300,
+                                           max_iter=500,
                                            random_state=SEED))])
     auc = cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc").mean()
     print(f"  alpha={alpha:.4f}  AUC={auc:.3f}")
 ```
 
-**Stolperstein:** `early_stopping=True` hält einen internen Validierungssplit zurück, bei 500 Patient:innen kostet das ~75 Trainingsbeispiele. Bei kleinen Kohorten wählst du besser ein stabiles `max_iter` und regularisierst über `alpha`. 
-**Darüber hinaus:** **Dropout** (zufälliges Abschalten von Neuronen während des Trainings) ist die wirksamste Regularisierungstechnik für tiefe Netze, in sklearn nicht verfügbar, aber in PyTorch/Keras trivial zu ergänzen.
+**Stolperstein:** `early_stopping=True` hält einen internen Validierungssplit zurück, bei 375 Trainingszeilen und `validation_fraction=0.15` kostet das ~56 Trainingsbeispiele. Bei kleinen Kohorten wählst du besser ein stabiles `max_iter` und regularisierst über `alpha`. 
+**Darüber hinaus:** **Dropout** (zufälliges Abschalten von Neuronen während des Trainings) ist eine der gängigsten Regularisierungstechniken für tiefe Netze, in sklearn nicht verfügbar, aber in PyTorch/Keras trivial zu ergänzen.
 
 ## 5 CNNs für medizinische Bildgebung (Konzept)
 
 Bei Bildgebungsdaten (Röntgen, CT, Histologie) verschiebt Deep Learning tatsächlich den Stand der Technik, weil **Faltungsschichten** translationsinvariante Muster (Kanten, Texturen, Formen) automatisch lernen.
 
 ```python
-# ILLUSTRATIV — NICHT AUSFÜHREN (torch ist auf diesem System nicht installiert)
+# ILLUSTRATIVE – DO NOT RUN (torch is not one of the course dependencies)
 
 # import torch
 # import torch.nn as nn
@@ -249,23 +257,23 @@ Bei Bildgebungsdaten (Röntgen, CT, Histologie) verschiebt Deep Learning tatsäc
 # # torchvision.models.resnet50(weights="IMAGENET1K_V1")
 ```
 
-In der Praxis nutzt du für die Röntgenklassifikation **vortrainierte Modelle** (ResNet, EfficientNet) und passt nur die letzte Schicht an, dieses Transfer Learning benötigt deutlich weniger Daten als ein Training von Null.
+In der Praxis nutzt du für die Röntgenklassifikation **vortrainierte Modelle** (z. B. ResNet, EfficientNet, Vision Transformer, zunehmend auch auf medizinischen Bildern vortrainierte Foundation-Modelle) und passt die letzten Schichten oder mit kleiner Lernrate das ganze Netz an, dieses Transfer Learning benötigt deutlich weniger Daten als ein Training von Null.
 
-**Stolperstein:** Vortrainierte Gewichte stammen aus ImageNet (Naturfotos), medizinische Bilder unterscheiden sich davon fundamental (Graustufen, spezifische Texturen). Die Übertragbarkeit muss validiert werden, nicht einfach „nimm ResNet" und fertig. 
-**Darüber hinaus:** Für klinisch einsetzbare Bildmodelle zählen **Erklärbarkeit** (Grad-CAM, Saliency Maps) und **Kalibrierung** ebenso wie die AUC. Ein Modell, das den Scanner-Typ statt den Befund lernt, ist am Bett wertlos.
+**Stolperstein:** Vortrainierte Gewichte stammen aus ImageNet (Naturfotos), medizinische Bilder unterscheiden sich davon fundamental (Graustufen, spezifische Texturen). Die Übertragbarkeit muss validiert werden, nicht einfach „nimm ResNet“ und fertig. 
+**Darüber hinaus:** Für klinisch einsetzbare Bildmodelle zählen **Erklärbarkeit** (Grad-CAM, Saliency Maps, deren Verlässlichkeit selbst umstritten ist) und **Kalibrierung** ebenso wie die AUC. Ein Modell, das den Scanner-Typ statt den Befund lernt, ist am Bett wertlos.
 
-> **Wann du Hilfe holst.** Für Bildgebung, Sequenzen oder Freitext, wo Deep Learning tatsächlich seinen Platz hat, und erst recht vor jedem klinischen Einsatz brauchst du spezialisierte ML-Expertise, ausreichend große Datensätze und externe Validierung — auf kleinen Tabellendaten ist die ehrlichere Beratung oft, gar kein neuronales Netz zu nehmen.
+> **Wann du Hilfe holst.** Für Bildgebung, Sequenzen oder Freitext, wo Deep Learning tatsächlich seinen Platz hat, und erst recht vor jedem klinischen Einsatz brauchst du spezialisierte ML-Expertise, ausreichend große Datensätze und externe Validierung – auf kleinen Tabellendaten ist die ehrlichere Beratung oft, gar kein neuronales Netz zu nehmen.
 
 ## Fallstricke und Merksätze
 - **Skalierung ist bei MLP zwingend**, nicht optional. Ohne StandardScaler konvergiert das Netz kaum.
 - **Eine CV-AUC-Rangfolge ohne Streuungsmaß ist Kaffeesatzleserei.** Bei k=5 Folds vergleiche immer die (gepaarten) 95-%-Konfidenzintervalle, nicht nur die Mittelwerte, ein optisch klarer Abstand kann innerhalb der Fold-zu-Fold-Streuung liegen.
-- **Mehr Parameter != besseres Modell** auf kleinen klinischen Datensätzen. Auf diesem Datensatz ist das MLP klar schwächer als die beiden Klassiker (CI schließt 0 deutlich aus); ob Gradient Boosting oder logistische Regression die Nase vorn hat, ist bei dieser Stichprobengröße dagegen nicht robust entscheidbar.
-- **Early Stopping kostet Trainingsdaten**, bei kleinen Kohorten abwägen.
-- **torch ist auf diesem System nicht installiert**, CNN-Code ist nur illustrativ, nicht ausführbar.
+- **Mehr Parameter ≠ besseres Modell** auf kleinen klinischen Datensätzen. Auf diesem Datensatz ist das MLP klar schwächer als die beiden Klassiker (CI schließt 0 deutlich aus); ob Gradient Boosting oder logistische Regression die Nase vorn hat, ist bei dieser Stichprobengröße dagegen nicht robust entscheidbar.
+- **Early Stopping kostet Trainingsdaten**: bei kleinen Kohorten abwägen.
+- **torch gehört nicht zu den Kurs-Abhängigkeiten**: der CNN-Code ist nur illustrativ, nicht ausführbar.
 - **Transfer Learning > Training von Null** für medizinische Bildgebung, die Validierung der Übertragbarkeit bleibt Pflicht.
 
 ## Selbstcheck
-1. **Warum sind einfachere Modelle wie Gradient Boosting und logistische Regression dem MLP auf kleinen Tabellendaten oft ebenbürtig oder überlegen?**, Sie sind dateneffizient (Gradient Boosting kommt ohne Skalierung aus und nutzt Nichtlinearitäten implizit über Splits; logistische Regression hat wenige Parameter und überpasst kaum) und haben weniger Parameter zu schätzen. MLPs brauchen große Datenmengen, um ihre Parameterzahl sinnvoll zu nutzen, das ist bei einigen hundert klinischen Fällen selten gegeben. Wichtig ist dabei die gepaarte CI-Betrachtung: Auf unserem Datensatz ist der Abstand des MLP zu beiden Klassikern robust belegt (CI schließt 0 klar aus), während der Abstand zwischen Gradient Boosting und logistischer Regression selbst nur knapp signifikant und bei k=5 Folds nicht als verlässliche Rangfolge zu werten ist.
-2. **Was regelt `alpha` im MLPClassifier?**, L2-Regularisierung (Weight Decay): größeres alpha dämpft die Gewichte stärker und reduziert Überanpassung, kann aber zu Unteranpassung führen.
-3. **Warum ist Transfer Learning für medizinische Bildgebung oft besser als Training von Grund auf?**, Vortrainierte Modelle haben bereits generische Bild-Merkmale gelernt; nur die aufgabenspezifische letzte Schicht muss auf wenigen medizinischen Bildern angepasst werden.
+1. **Warum sind einfachere Modelle wie Gradient Boosting und logistische Regression dem MLP auf kleinen Tabellendaten oft ebenbürtig oder überlegen?** – Sie sind dateneffizient (Gradient Boosting kommt ohne Skalierung aus und nutzt Nichtlinearitäten implizit über Splits; logistische Regression hat wenige Parameter und überpasst kaum) und haben weniger Parameter zu schätzen. MLPs brauchen große Datenmengen, um ihre Parameterzahl sinnvoll zu nutzen, das ist bei einigen hundert klinischen Fällen selten gegeben. Wichtig ist dabei die gepaarte CI-Betrachtung: Auf unserem Datensatz ist der Abstand des MLP zu beiden Klassikern robust belegt (CI schließt 0 klar aus), während der Abstand zwischen Gradient Boosting und logistischer Regression selbst nur knapp signifikant und bei k=5 Folds nicht als verlässliche Rangfolge zu werten ist.
+2. **Was regelt `alpha` im MLPClassifier?** – L2-Regularisierung (Weight Decay): größeres alpha dämpft die Gewichte stärker und reduziert Überanpassung, kann aber zu Unteranpassung führen.
+3. **Warum ist Transfer Learning für medizinische Bildgebung oft besser als Training von Grund auf?** – Vortrainierte Modelle haben bereits generische Bild-Merkmale gelernt; vor allem die aufgabenspezifischen letzten Schichten müssen auf wenigen medizinischen Bildern angepasst werden.
 

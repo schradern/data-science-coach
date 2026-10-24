@@ -1,4 +1,4 @@
-# Module 25 — model quality and clinical validation (R, parallel to Python).
+# Module 25 – model quality and clinical validation (R, parallel to Python).
 #   Rscript module/25-modellguete-validierung/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -99,10 +99,10 @@ cat(sprintf("PR-AUC:  %.3f  (95%%-Bootstrap-KI %.3f-%.3f, Baseline = %.3f)\n",
             pr_auc, pr_ci[1], pr_ci[2], mean(y_test)))
 
 # --- 2) Calibration ----------------------------------------------------------
-# NOTE: the recipe/glmnet spec above has NO class weighting, so `proba` here
+# NOTE: the recipe/glm spec above has NO class weighting, so `proba` here
 # is already reasonably calibrated. The Python script uses
 # class_weight="balanced" (for consistent ranking behaviour with modules
-# 18/19) and therefore recalibrates with CalibratedClassifierCV BEFORE
+# 23/24) and therefore recalibrates with CalibratedClassifierCV BEFORE
 # computing Brier/CITL/slope/DCA -- see code/python.py for that step and why
 # it is necessary (class_weight="balanced" inflates predicted risk).
 brier <- mean((proba - y_test)^2)

@@ -1,4 +1,4 @@
-# Module 08 — Exploratory data analysis and visualisation (R / ggplot2)
+# Module 08 – Exploratory data analysis and visualisation (R / ggplot2)
 #
 # Runs standalone from the project root:
 #   Rscript module/08-eda-visualisierung/code/r.R
@@ -103,7 +103,7 @@ ggsave(path_box, p_box, width = 8, height = 4, dpi = 120)
 cat("Saved:", path_box, "\n")
 
 # Scatter: CRP vs. length of stay, coloured by mortality, with linear trend line
-# — the same figure the chapter (§7) discusses.
+# – the same figure the chapter (§7) discusses.
 p_scatter <- ggplot(df,
                     aes(x = crp_mg_l, y = verweildauer_tage)) +
   geom_point(aes(colour = factor(verstorben_30d, labels = c("Überlebt", "Verstorben"))),

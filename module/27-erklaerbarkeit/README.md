@@ -12,16 +12,16 @@
 ## Klinischer Aufhänger
 Du hast in Modul 26 ein Ensemble trainiert, das `verstorben_30d` mit guter AUC
 vorhersagt. Die Stationsleitung fragt: „Warum sagt das Modell bei Patient 42 ein
-hohes Sterberisiko voraus?" Und der Ethikausschuss: „Welche Variablen treibt das
-Modell überhaupt?" Erklärbarkeit ist keine Kür, sondern Voraussetzung für Vertrauen,
+hohes Sterberisiko voraus?“ Und der Ethikausschuss: „Welche Variablen treibt das
+Modell überhaupt?“ Erklärbarkeit ist keine Kür, sondern Voraussetzung für Vertrauen,
 Fehlerdiagnose und regulatorische Akzeptanz (MDR, EU-AI-Act).
 
 ## 1 Globale vs. lokale Erklärbarkeit
 **Globale Erklärbarkeit** beschreibt, welche Merkmale das Modell *im Durchschnitt*
-über alle Patient:innen antreiben. Sie beantwortet: „Was hat das Modell gelernt?"
+über alle Patient:innen antreiben. Sie beantwortet: „Was hat das Modell gelernt?“
 **Lokale Erklärbarkeit** beschreibt, warum das Modell *für eine konkrete Person*
 eine bestimmte Vorhersage macht. Sie beantwortet: „Warum bekommt Patient 42 diesen
-Score?"
+Score?“
 
 Kein Verfahren allein genügt: Globale Methoden überdecken wichtige
 Einzelfälle, lokale Methoden verzerren das Gesamtbild.
@@ -34,7 +34,7 @@ prüft deshalb zuerst die kreuzvalidierte AUC (Abschnitt 0), bevor es
 irgendeine Erklärungsmethode aufruft:
 
 <!-- excerpt-note -->
-> **Hinweis — die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/27-erklaerbarkeit/code/python.py` — siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+> **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/27-erklaerbarkeit/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -42,16 +42,19 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
 probe = HistGradientBoostingClassifier(random_state=SEED, max_iter=200,
-                                        class_weight="balanced")
+                                       learning_rate=0.05, max_depth=4,
+                                       class_weight="balanced")
 cv_auc = cross_val_score(probe, X, y, cv=cv, scoring="roc_auc")
 print(f"CV-AUC: {cv_auc.mean():.3f} ± {cv_auc.std():.3f}")
-# Auf unserer Kohorte: CV-AUC = 0.722 ± 0.048 — klar über der Zufallsgrenze,
-# Erklärbarkeit lohnt sich hier.
+# On our cohort: CV-AUC = 0.711 ± 0.060 – clearly above chance level,
+# so explainability is worthwhile here.
 
-# Nur wenn die Prädiktivität bestätigt ist: finales Modell trainieren.
+# Only once predictive value is confirmed: train the final model.
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, stratify=y, random_state=SEED)
-model = HistGradientBoostingClassifier(random_state=SEED, max_iter=200)
+model = HistGradientBoostingClassifier(random_state=SEED, max_iter=200,
+                                       learning_rate=0.05, max_depth=4,
+                                       class_weight="balanced")
 model.fit(X_train, y_train)
 ```
 
@@ -66,9 +69,9 @@ technische Erklärbarkeit allein nicht; es braucht klinische Validierung und
 Dokumentation der Entscheidungslogik.
 
 ## 2 Permutation Importance, das ehrliche Maß
-Impurity-basierte Wichtigkeit (Standard bei RandomForest) bevorzugt Merkmale mit
-vielen Ausprägungen und *überschätzt* hochdimensionale oder kontinuierliche
-Variablen. **Permutation Importance** (PI) mischt die Werte eines Merkmals
+Impurity-basierte Wichtigkeit (Standard bei RandomForest) wird auf den
+Trainingsdaten berechnet und *überschätzt* kontinuierliche Variablen mit vielen
+Ausprägungen, weil sie viele mögliche Schnittpunkte bieten. **Permutation Importance** (PI) mischt die Werte eines Merkmals
 zufällig durch und misst den Leistungsabfall auf dem **Testset**. So zeigt sie,
 wie stark das Modell von diesem Merkmal abhängt, unabhängig von Skaleneffekten.
 
@@ -94,16 +97,16 @@ kann das gemischte Merkmal durch sein Korrelat kompensieren. Dann sind beide
 Variablen scheinbar unwichtig, obwohl sie zusammen viel tragen.
 **Darüber hinaus:** `n_repeats=10` (wie in `code/python.py`) ist ein guter
 Kompromiss zwischen Laufzeit und Stabilität für die Kursbeispiele. Für
-Veröffentlichungen empfiehlt sich mindestens 30 Wiederholungen.
+Veröffentlichungen empfehlen sich mindestens 30 Wiederholungen.
 
 ## 3 Partial Dependence und ICE
 **Partial Dependence Plots (PDP)** zeigen, wie sich die mittlere Modellvorhersage
-ändert, wenn du ein Merkmal variierst und alle anderen konstant halten
-(marginalisieren). Sie sind globale Aussagen über den durchschnittlichen Effekt.
+ändert, wenn du ein Merkmal variierst und über die beobachteten Werte aller
+anderen Merkmale mittelst (marginalisierst). Sie sind globale Aussagen über den durchschnittlichen Effekt.
 
 **Individual Conditional Expectation (ICE)**: dieselbe Variation je Patient:in,
-aber ohne Mittelung der Kurven. Kreuzen sich die ICE-Kurven,
-gibt es eine **Interaktion**, der Effekt des Merkmals hängt vom Wert anderer
+aber ohne Mittelung der Kurven. Verlaufen die ICE-Kurven nicht parallel (oder
+kreuzen sich), hat das Modell eine **Interaktion** gelernt, der Effekt des Merkmals hängt vom Wert anderer
 Variablen ab.
 
 ```python
@@ -156,7 +159,7 @@ try:
         print(f"  {feat:<30} {val:.4f}")
     SHAP_AVAILABLE = True
 except ImportError:
-    print("SHAP not installed — using permutation importance for local explanation proxy.")
+    print("SHAP not installed – using permutation importance for local explanation proxy.")
     print("Install with: uv pip install shap")
     SHAP_AVAILABLE = False
 ```
@@ -170,17 +173,18 @@ Modellen) oder LIME approximieren.
 **Stolperstein:** SHAP-Werte für baumbasierte Modelle (TreeSHAP) sind exakt und
 schnell. Für neuronale Netze oder Kernel-SHAP steigt der Rechenaufwand stark an.
 
-**Stolperstein — korrelierte Merkmale:** Wie bei Permutation Importance (Abschnitt 2)
-können zwei korrelierte Merkmale (z. B. Alter und SOFA-Score, beide Marker für
-Schwere) sich den SHAP-Beitrag teilen. Ein kleiner mittlerer |SHAP|-Wert
-bedeutet dann nicht zwingend „unwichtig", sondern eventuell nur „das Signal
-steckt teilweise im korrelierten Partner". Prüfe Merkmalskorrelationen, bevor
+**Stolperstein – korrelierte Merkmale:** Wie bei Permutation Importance (Abschnitt 2)
+können zwei korrelierte Merkmale (z. B. SOFA-Score und Leukozyten; im
+synthetischen Datensatz hängen die Leukozyten direkt vom SOFA-Score ab) sich den
+SHAP-Beitrag teilen. Ein kleiner mittlerer |SHAP|-Wert
+bedeutet dann nicht zwingend „unwichtig“, sondern eventuell nur „das Signal
+steckt teilweise im korrelierten Partner“. Prüfe Merkmalskorrelationen, bevor
 du ein Merkmal aufgrund niedriger SHAP-Werte als irrelevant einstufst.
 
-**Darüber hinaus:** SHAP-Interaktionswerte (`shap_values.values` bei `TreeExplainer`)
+**Darüber hinaus:** SHAP-Interaktionswerte (`shap_interaction_values()` von `TreeExplainer`)
 erklären Wechselwirkungen zwischen Merkmalen, wichtig, wenn PDP-Kreuzungen aufgefallen sind.
 
-> **Wann du Hilfe holst.** Sobald jemand SHAP- oder Importance-Werte kausal deutet („Variable X senkt das Risiko“), stark korrelierte Merkmale die Zuschreibung verzerren, oder eine Erklärung regulatorisch (MDR, EU-AI-Act) belastbar sein muss, hol methodische Beratung — Wichtigkeit ist nicht Kausalität.
+> **Wann du Hilfe holst.** Sobald jemand SHAP- oder Importance-Werte kausal deutet („Variable X senkt das Risiko“), stark korrelierte Merkmale die Zuschreibung verzerren, oder eine Erklärung regulatorisch (MDR, EU-AI-Act) belastbar sein muss, hol methodische Beratung – Wichtigkeit ist nicht Kausalität.
 
 ## Fallstricke und Merksätze
 - **Erst Prädiktivität prüfen, dann erklären.** Ein Modell nahe der Zufallsgrenze
@@ -202,7 +206,7 @@ erklären Wechselwirkungen zwischen Merkmalen, wichtig, wenn PDP-Kreuzungen aufg
  großen Datensätzen kostet SHAP erheblich Rechenzeit.
 
 ## Selbstcheck
-1. **Warum bevorzugt Impurity-Importance hochdimensionale Variablen, und wie hilft Permutation Importance?**, Impurity-Splits wählen häufiger aus vielen Schwellwerten; PI misst dagegen den tatsächlichen Leistungsabfall auf dem Testset und ist damit maßstabsunabhängig.
-2. **Was zeigt ein PDP, und wann ist es irreführend?**, Den durchschnittlichen Effekt eines Merkmals; irreführend bei stark korrelierten Merkmalen, da dann unrealistische Merkmalskombinationen marginalisiert werden.
-3. **Was ist der Unterschied zwischen globalem und lokalem SHAP?**, Globale SHAP-Zusammenfassungen mitteln |SHAP|-Werte über alle Patient:innen; lokale Erklärungen (Force/Waterfall) zeigen den Beitrag für einen einzelnen Fall.
-4. **Warum prüft `code/python.py` die kreuzvalidierte AUC, bevor es Permutation Importance oder SHAP berechnet?**, Weil Erklärbarkeitsmethoden für jedes Modell ein Ergebnis liefern, auch für eines, das nicht besser als der Zufall ist. Ohne diesen Prädiktivitäts-Check könnte man Rauschen als „wichtige Merkmale" fehlinterpretieren; auf unserer Kohorte liegt die CV-AUC bei 0,722, klar über der Zufallsgrenze 0,5.
+1. **Warum bevorzugt Impurity-Importance Variablen mit vielen Ausprägungen, und wie hilft Permutation Importance?** – Impurity-Splits wählen häufiger aus vielen Schwellwerten; PI misst dagegen den tatsächlichen Leistungsabfall auf dem Testset und ist damit maßstabsunabhängig.
+2. **Was zeigt ein PDP, und wann ist es irreführend?** – Den durchschnittlichen Effekt eines Merkmals; irreführend bei stark korrelierten Merkmalen, da dann unrealistische Merkmalskombinationen marginalisiert werden.
+3. **Was ist der Unterschied zwischen globalem und lokalem SHAP?** – Globale SHAP-Zusammenfassungen mitteln |SHAP|-Werte über alle Patient:innen; lokale Erklärungen (Force/Waterfall) zeigen den Beitrag für einen einzelnen Fall.
+4. **Warum prüft `code/python.py` die kreuzvalidierte AUC, bevor es Permutation Importance oder SHAP berechnet?** – Weil Erklärbarkeitsmethoden für jedes Modell ein Ergebnis liefern, auch für eines, das nicht besser als der Zufall ist. Ohne diesen Prädiktivitäts-Check könnte man Rauschen als „wichtige Merkmale“ fehlinterpretieren; auf unserer Kohorte liegt die CV-AUC bei 0,711, klar über der Zufallsgrenze 0,5.

@@ -1,4 +1,4 @@
-"""Module 12 — Regression models: OLS, logistic regression, and Cox regression.
+"""Module 12 – Regression models: OLS, logistic regression, and Cox regression.
 
 Runs standalone from the project root:
     python module/12-regression/code/python.py
@@ -46,13 +46,13 @@ def prepare_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["active_smoker"] = (df["raucherstatus"] == "aktiv").astype(int)
     df["sepsis"]        = (df["aufnahmegrund"] == "Sepsis").astype(int)
-    # Centre age on 64 — matches the synthetic data generator intercept
+    # Centre age on 64 – matches the synthetic data generator intercept
     df["age_centred"]   = df["alter"] - 64
     return df
 
 
 # ---------------------------------------------------------------------------
-# Section 1 — OLS: length of stay
+# Section 1 – OLS: length of stay
 # ---------------------------------------------------------------------------
 
 def fit_ols(df: pd.DataFrame) -> None:
@@ -62,7 +62,7 @@ def fit_ols(df: pd.DataFrame) -> None:
     A Gamma-GLM would be more appropriate for production use.
     """
     print("=" * 65)
-    print("SECTION 1 — LINEAR REGRESSION: length of stay (days)")
+    print("SECTION 1 – LINEAR REGRESSION: length of stay (days)")
     print("=" * 65)
     print("Note: length of stay is right-skewed; OLS is illustrative.")
     print("A Gamma-GLM or log-transform would be more appropriate.\n")
@@ -88,12 +88,12 @@ def fit_ols(df: pd.DataFrame) -> None:
         f" {sofa_coef:.2f} extra days of stay, adjusting for the other predictors."
     )
 
-    # The sepsis/diabetes rows above are DIRECT effects — they hold sofa_score
+    # The sepsis/diabetes rows above are DIRECT effects – they hold sofa_score
     # fixed, and sofa_score is a mediator. Reading "sepsis: p = 0.42" as "sepsis
     # does not prolong the stay" is exactly the overadjustment error §5 warns
     # about. Show the total effect next to it instead of leaving the trap open.
     total = smf.ols("verweildauer_tage ~ age_centred + sepsis + diabetes", data=df).fit()
-    print("\nDirect vs. total effect (sofa_score is a MEDIATOR, see README §5):")
+    print("\nDirect vs. total effect (sofa_score is a MEDIATOR, see README §4):")
     print(f"{'':12s}{'direct (sofa in model)':>26}{'total (sofa omitted)':>24}")
     for term in ("sepsis", "diabetes"):
         print(f"{term:12s}"
@@ -104,7 +104,7 @@ def fit_ols(df: pd.DataFrame) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Section 2 — Logistic regression: 30-day mortality
+# Section 2 – Logistic regression: 30-day mortality
 # ---------------------------------------------------------------------------
 
 def fit_logistic(df: pd.DataFrame) -> None:
@@ -117,7 +117,7 @@ def fit_logistic(df: pd.DataFrame) -> None:
     - Model fit statistics (pseudo-R², AIC, EPV)
     """
     print("\n" + "=" * 65)
-    print("SECTION 2 — LOGISTIC REGRESSION: 30-day mortality")
+    print("SECTION 2 – LOGISTIC REGRESSION: 30-day mortality")
     print("=" * 65)
 
     formula = (
@@ -139,7 +139,7 @@ def fit_logistic(df: pd.DataFrame) -> None:
     print(or_table.to_string())
 
     # ------------------------------------------------------------------
-    # Truth comparison — against the true ODDS ratios.
+    # Truth comparison – against the true ODDS ratios.
     #
     # The generative model in data/generate_data.py is a Weibull proportional-
     # hazards process, so its coefficients are log-HAZARDS. Exponentiating them
@@ -183,13 +183,13 @@ def fit_logistic(df: pd.DataFrame) -> None:
     print(f"AIC:                  {result.aic:.2f}")
     print(f"\nEvents per variable (EPV): {n_events} events / {n_pred} predictors = {epv:.1f}")
     if epv < 10:
-        print("  WARNING: EPV < 10 — model may be over-parametrised.")
+        print("  WARNING: EPV < 10 – model may be over-parametrised.")
     else:
-        print("  EPV >= 10 — model complexity is defensible.")
+        print("  EPV >= 10 – model complexity is defensible.")
 
 
 # ---------------------------------------------------------------------------
-# Section 3 — Cox regression: time-to-event analysis
+# Section 3 – Cox regression: time-to-event analysis
 # ---------------------------------------------------------------------------
 
 def confounder_vs_mediator(df: pd.DataFrame) -> None:
@@ -200,10 +200,12 @@ def confounder_vs_mediator(df: pd.DataFrame) -> None:
     cell, and a future edit that breaks one is caught by tools/check_numbers.py.
     """
     print("\n" + "=" * 65)
-    print("SECTION 2b — CONFOUNDER vs. MEDIATOR (README §4, Aufgabe 3)")
+    print("SECTION 2b – CONFOUNDER vs. MEDIATOR (README §4, Aufgabe 3)")
     print("=" * 65)
-    print("alter is a confounder (adjust). sofa_score is a MEDIATOR (do not adjust,")
-    print("if the total effect is the question).")
+    print("alter confounds diabetes (DAG arrow alter -> diabetes) but not sepsis")
+    print("(no arrow alter -> sepsis; the sepsis OR still moves because ORs are")
+    print("non-collapsible). sofa_score is a MEDIATOR (do not adjust, if the total")
+    print("effect is the question).")
     print("True ORs replayed at N = 400 000 (Monte-Carlo error ~1 %, far below the")
     print("width of the N=500 confidence intervals they sit next to).\n")
 
@@ -228,8 +230,9 @@ def confounder_vs_mediator(df: pd.DataFrame) -> None:
             print(f"    {label:18s}{est:>9.2f}{f'[{lo:.2f}, {hi:.2f}]':>20}{wahr:>10.3f}")
         print()
 
-    print("Sepsis: 5.75 -> 1.92 when the mediator enters, and the CIs barely overlap —")
-    print("the overadjustment bias is demonstrable. Diabetes shows the same pattern,")
+    print("Sepsis: 5.75 -> 1.92 when the mediator enters; against the true total effect")
+    print("the overadjustment bias is demonstrable (both CIs come from the same data, so")
+    print("their overlap is no formal test). Diabetes shows the same pattern,")
     print("but its CI [0.52, 1.87] contains both the true total and direct effects:")
     print("at 78 events the bias can be derived, not shown.")
 
@@ -240,10 +243,10 @@ def fit_cox(df: pd.DataFrame) -> None:
     Uses fu_zeit_tage (follow-up time until event/censoring) as the time
     variable and status (1 = died, 0 = censored) as the event indicator.
     verweildauer_tage (length of stay) is NOT a time-to-event variable, it
-    is generated independently of the survival process — see data/README.md.
+    is generated independently of the survival process – see data/README.md.
     """
     print("\n" + "=" * 65)
-    print("SECTION 3 — COX REGRESSION: time-to-event analysis")
+    print("SECTION 3 – COX REGRESSION: time-to-event analysis")
     print("=" * 65)
     print(
         "Duration: fu_zeit_tage | Event: status (1 = died, 0 = censored)"
@@ -275,7 +278,7 @@ def fit_cox(df: pd.DataFrame) -> None:
         "\n  HR < 1 → reduced hazard (protective)"
         "\n  HR = 1 → no difference from reference"
         "\n\nNote: the proportional-hazards assumption should be checked with"
-        "\nSchoenfeld residuals — use cph.check_assumptions(cox_df) in lifelines."
+        "\nSchoenfeld residuals – use cph.check_assumptions(cox_df) in lifelines."
     )
 
 

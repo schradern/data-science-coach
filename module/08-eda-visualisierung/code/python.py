@@ -1,4 +1,4 @@
-"""Module 08 — Exploratory data analysis and visualisation (Python / pandas + matplotlib).
+"""Module 08 – Exploratory data analysis and visualisation (Python / pandas + matplotlib).
 
 Runs standalone from the project root:
     python module/08-eda-visualisierung/code/python.py
@@ -6,7 +6,7 @@ Runs standalone from the project root:
 Data: read from data/ (committed with the repo); if that folder is
 missing, the same files are fetched from the published URL.
 
-Figures are written to this module's assets/ directory — the SAME files the
+Figures are written to this module's assets/ directory – the SAME files the
 chapter (README §5–§7) displays, with the SAME variables and the SAME trend
 line as the shared generator data/figures.py:
     ../assets/verteilung_alter.png
@@ -124,7 +124,9 @@ def plot_lactate_boxplot(df: pd.DataFrame) -> None:
         x="aufnahmegrund",
         y="laktat_mmol_l",
         order=order,
+        hue="aufnahmegrund",
         palette="Set2",
+        legend=False,
         ax=ax,
         flierprops=dict(marker="o", markersize=4, alpha=0.5),
     )
@@ -140,7 +142,7 @@ def plot_lactate_boxplot(df: pd.DataFrame) -> None:
 
 def plot_crp_los_scatter(df: pd.DataFrame) -> None:
     """Scatter plot: CRP vs length of stay, coloured by mortality, with an
-    overall linear trend line — the figure the chapter (§7) discusses."""
+    overall linear trend line – the figure the chapter (§7) discusses."""
     fig, ax = plt.subplots(figsize=(7, 5))
     colors = {0: PRIMARY, 1: EVENT}
     for outcome, label in [(0, "Überlebt"), (1, "Verstorben")]:

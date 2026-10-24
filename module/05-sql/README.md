@@ -13,8 +13,8 @@
  wählen.
 
 ## Klinischer Aufhänger
-Ihr Rechenzentrum gibt dir schreibgeschützten Zugriff auf die Klinikdatenbank, nur via SQL-Query. Um die Frage *„Unterscheidet sich das mittlere Laktat je nach
-Aufnahmegrund?"* zu beantworten, musst du `kohorte` und `labor` verbinden und
+Das Rechenzentrum gibt dir schreibgeschützten Zugriff auf die Klinikdatenbank, nur per SQL-Abfrage. Um die Frage *„Unterscheidet sich das mittlere Laktat je nach
+Aufnahmegrund?“* zu beantworten, musst du `kohorte` und `labor` verbinden und
 gruppiert aggregieren. Mit SQL geht das in vier Zeilen.
 
 ## 1 Relationales Denken
@@ -52,11 +52,11 @@ LIMIT 10;
 ```
 
 <div class="code-verbalization" markdown="1">
-🗣 **Code-Verbalisierung:**
+**Zeile für Zeile:**
 
 * `SELECT patient_id, alter, ...`: Wähle die Spalten `patient_id`, `alter`, `aufnahmegrund` und `sofa_score` aus.
 * `FROM kohorte`: Beziehe diese Spalten aus der Tabelle namens `kohorte`.
-* `WHERE aufnahmegrund = 'Sepsis' AND sofa_score >= 6`: Filter die Zeilen so, dass nur Patient:innen mit dem Aufnahmegrund `'Sepsis'` **und** einem `sofa_score` von mindestens 6 übrig bleiben.
+* `WHERE aufnahmegrund = 'Sepsis' AND sofa_score >= 6`: Filtere die Zeilen so, dass nur Patient:innen mit dem Aufnahmegrund `'Sepsis'` **und** einem `sofa_score` von mindestens 6 übrig bleiben.
 * `ORDER BY sofa_score DESC`: Sortiere das Ergebnis nach dem `sofa_score` in absteigender Reihenfolge (höchster Score zuerst).
 * `LIMIT 10`: Begrenze die Ausgabe auf maximal 10 Zeilen.
 </div>
@@ -67,9 +67,10 @@ LIMIT 10;
 - `ORDER BY` – sortieren (Standard: aufsteigend, `DESC` für absteigend)
 - `LIMIT` – maximale Zeilenzahl
 
-DuckDB kann keine Web-Adresse direkt als Tabelle öffnen, wohl aber ein
-`pandas`-DataFrame oder R-`data.frame`, das du zuvor ganz normal (Modul 04)
-geladen hast. Das Muster ist deshalb immer: **erst mit `pandas`/`readr` von
+DuckDB öffnet eine Web-Adresse nur über seine Erweiterung `httpfs` (siehe
+Fallstricke). Einfacher registrierst du ein `pandas`-DataFrame oder
+R-`data.frame`, das du zuvor ganz normal (Modul 04) geladen hast. Das Muster in
+diesem Modul ist deshalb: **erst mit `pandas`/`readr` von
 `{{DATEN}}` laden, dann bei DuckDB registrieren.** Die `con`-Verbindung aus
 diesem Abschnitt bleibt für den Rest des Moduls offen, alle folgenden
 Abfragen bauen darauf auf.
@@ -160,11 +161,13 @@ ORDER BY mortalitaet_pct DESC;
 ```
 
 **Stolperstein:** `AVG(verstorben_30d)` ergibt eine Proportion nur, weil das Feld
-mit `0`/`1` kodiert ist. Bei Textfeldern (`ja`/`nein`) schlägt das still fehl.
+mit `0`/`1` kodiert ist. Bei Textfeldern (`ja`/`nein`) bricht DuckDB mit einem
+Fehler ab, andere Systeme (etwa SQLite) rechnen stillschweigend mit 0.
 Immer den Datentyp prüfen, bevor man arithmetische Aggregatfunktionen einsetzt.
 **Darüber hinaus:** `MEDIAN(x)` ist in Standard-SQL nicht definiert; in DuckDB
-funktioniert es nativ. In anderen Systemen (PostgreSQL, SQLite) braucht man
-`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)`, gut zu wissen, wenn man die
+funktioniert es nativ. In anderen Systemen (etwa PostgreSQL) braucht man
+`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)`, SQLite kennt ohne Erweiterung
+gar keinen Median; gut zu wissen, wenn man die
 Abfrage später auf einen echten Klinikserver überträgt.
 
 ## 4 JOIN: Tabellen verbinden
@@ -178,11 +181,17 @@ LEFT JOIN labor AS l ON k.patient_id = l.patient_id
 WHERE l.laktat_mmol_l IS NOT NULL;
 ```
 
+Achtung: Die `WHERE`-Bedingung auf eine Spalte der rechten Tabelle wirft die
+`NULL`-Zeilen wieder hinaus; das Ergebnis gleicht damit einem `INNER JOIN` auf
+gemessene Werte (414 statt 500 Zeilen). Hier ist das gewollt, weil nur
+gemessene Laktatwerte interessieren. Sollen alle Patient:innen erhalten
+bleiben, gehört die Bedingung in die `ON`-Klausel oder entfällt.
+
 | JOIN-Typ | Ergebnis |
 |----------|----------|
 | `INNER JOIN` | Nur Zeilen, die in **beiden** Tabellen vorhanden sind |
 | `LEFT JOIN` | Alle Zeilen aus der **linken** Tabelle; rechts: NULL wenn kein Match |
-| `RIGHT JOIN` | Alle aus der **rechten**; selten nötig (swap stattdessen) |
+| `RIGHT JOIN` | Alle aus der **rechten**; selten nötig (stattdessen die Tabellen tauschen) |
 | `FULL OUTER JOIN` | Alle Zeilen beider Tabellen |
 
 ![Abbildung: `INNER JOIN` gegen `LEFT JOIN` von `kohorte` mit `labor`. Der `INNER JOIN` behält nur die drei Patient:innen mit vorhandenem Laborwert, die beiden ohne Wert verschwinden ohne Fehlermeldung. Der `LEFT JOIN` behält alle fünf; die fehlenden Laktatwerte erscheinen sichtbar als `NULL`.](assets/join_typen.svg)
@@ -191,9 +200,11 @@ WHERE l.laktat_mmol_l IS NOT NULL;
 alle Patient:innen behalten, auch wenn ein Laborwert fehlt.
 
 **Stolperstein:** Ein `INNER JOIN` auf `labor` verwirft stillschweigend alle
-Patient:innen ohne Laborwert, bei ~17 % fehlenden Laktatwerten schrumpft die
-Kohorte entsprechend, ganz ohne Fehlermeldung. Zähle `COUNT(*)` vor und nach
-dem JOIN.
+Patient:innen, die in `labor` **keine Zeile** haben, ganz ohne Fehlermeldung.
+Ein fehlender *Wert* in einer vorhandenen Zeile (`NULL`) ist etwas anderes: Im
+Kursdatensatz hat jede Patient:in eine Laborzeile, das fehlende Laktat steht
+dort als `NULL`, und ein `INNER JOIN` behält alle 500. In echten Klinikexporten
+fehlen dagegen oft ganze Zeilen. Zähle `COUNT(*)` vor und nach dem JOIN.
 **Darüber hinaus:** Nach einem `LEFT JOIN` sind fehlende Werte der rechten Tabelle
 als `NULL` erkennbar. Mit `WHERE l.laktat_mmol_l IS NULL` lassen sich genau die
 Patient:innen ohne Laborwert selektieren, nützlich zur Missingness-Analyse.
@@ -234,21 +245,27 @@ in R.
  alle Zeilen, `COUNT(spalte)` nur Nicht-NULL-Werte.
 
 - **`LEFT JOIN` vs. `INNER JOIN`:** Ein `INNER JOIN` auf `labor` schließt
- Patient:innen ohne Laborwert still aus, das ist fast immer ein Fehler.
+ Patient:innen ohne Laborzeile still aus; in einer klinischen Kohorte ist das
+ fast immer ein Fehler.
 
-- **Reihenfolge der Klauseln:** `SELECT → FROM → WHERE → GROUP BY → HAVING →
- ORDER BY → LIMIT`. SQL prüft `HAVING` erst nach dem Gruppieren.
+- **Reihenfolge der Klauseln:** geschrieben wird `SELECT → FROM → WHERE →
+ GROUP BY → HAVING → ORDER BY → LIMIT`, ausgewertet aber `FROM → WHERE →
+ GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`. Deshalb prüft SQL `HAVING`
+ erst nach dem Gruppieren, und ein Alias aus `SELECT` taugt in `ORDER BY`,
+ in `WHERE` aber nicht.
 
 - **DuckDB und Daten:** Ein DataFrame erst mit `pandas`/`readr` laden (auch von
  einer Web-Adresse) und dann mit `con.register()` / `duckdb_register()`
  sichtbar machen, keine Datei nötig. Alternativ liest DuckDBs `read_csv_auto()`
- auch direkt CSV-Pfade, lokal ohne Zusatzschritt, von einer URL erst nach
+ auch direkt CSV-Pfade, lokal ohne Zusatzschritt, von einer URL über die
+ Erweiterung `httpfs`. Neuere DuckDB-Versionen laden sie beim ersten Zugriff
+ automatisch nach, brauchen dafür aber Internet; sonst einmalig
  `INSTALL httpfs; LOAD httpfs;`.
 - **Spaltenaliase** (`AS anzahl`) verbessern Lesbarkeit und sind in `ORDER BY`
  referenzierbar.
 
 ## Selbstcheck
-1. **Warum schließt ein `INNER JOIN` auf `labor` Patient:innen ohne Laborwert aus, und wann ist das ein Fehler?**, `INNER JOIN` gibt nur Zeilen zurück, die in beiden Tabellen einen Match haben; fehlt der Laborwert, fällt die Patient:in raus, bei klinischen Kohorten fast immer unbeabsichtigt.
-2. **Was ist der Unterschied zwischen `WHERE` und `HAVING`?**, `WHERE` filtert vor der Aggregation auf Zeilenebene; `HAVING` filtert nach `GROUP BY` auf Gruppenebene.
+1. **Warum schließt ein `INNER JOIN` auf `labor` Patient:innen ohne Laborwert aus, und wann ist das ein Fehler?** – `INNER JOIN` gibt nur Zeilen zurück, die in beiden Tabellen einen Match haben; hat eine Patient:in keine Laborzeile, fällt sie raus (eine vorhandene Zeile mit `NULL`-Wert genügt dagegen für den Match), bei klinischen Kohorten fast immer unbeabsichtigt.
+2. **Was ist der Unterschied zwischen `WHERE` und `HAVING`?** – `WHERE` filtert vor der Aggregation auf Zeilenebene; `HAVING` filtert nach `GROUP BY` auf Gruppenebene.
 3. **Was gibt `COUNT(laktat_mmol_l)` vs. `COUNT(*)` zurück, wenn ~17 % der Laktatwerte fehlen?**, `COUNT(laktat_mmol_l)` zählt nur Nicht-NULL-Werte (~83 % der Zeilen); `COUNT(*)` zählt alle Zeilen unabhängig von NULL.
 

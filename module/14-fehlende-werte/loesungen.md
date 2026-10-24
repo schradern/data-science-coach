@@ -1,9 +1,12 @@
 # Musterlösungen · Fehlende Werte und Imputation
 
-Alle Zahlen stammen aus [`code/python.py`](code/python.py) (Seed 42). Das
-R-Skript [`code/r.R`](code/r.R) liefert dieselben Werte; nur die multiple
-Imputation weicht leicht ab, weil sie stochastisch ist und `mice` predictive
-mean matching statt Regressions-Imputation nutzt.
+Die Zahlen zu Aufgabe 1–6 stammen aus [`code/python.py`](code/python.py)
+(Seed 42), die zu Aufgabe 7–10 aus den dort genannten Vertiefungsskripten. Die
+R-Skripte liefern dieselben deterministischen Werte; nur die multiple Imputation
+weicht ab, weil sie stochastisch ist und `mice` predictive mean matching statt
+Regressions-Imputation nutzt. Beim Punktschätzer ist das wenig, bei der
+Between-Varianz deutlich: [`code/rubin.R`](code/rubin.R) misst λ ≈ 0,41 statt
+0,16.
 
 ## Aufgabe 1 – Missingness-Tabelle
 
@@ -43,7 +46,7 @@ for col in ["laktat_fehlt", "bga_fehlt"]:
 | `bga_ph` | −0,071 (p = 0,22) | **+1,455** (p < 0,0001) |
 
 **Laktat fehlt nach Schweregrad:** je höher der SOFA-Score, desto seltener fehlt
-es — Schwerkranke bekommen häufiger eine BGA. Das Outcome erklärt nichts.
+es – Schwerkranke bekommen häufiger eine BGA. Das Outcome erklärt nichts.
 
 **Der pH fehlt nach Outcome:** Verstorbene haben ein `exp(1,455) ≈ 4,3`-fach
 höheres Odds, keinen pH-Wert zu haben. Konkret fehlt der pH bei **41,0 %** der
@@ -67,7 +70,7 @@ Verstorbenen und bei **15,9 %** der Überlebenden.
    beobachtete Mittelwert von 2,16 mmol/l über dem wahren Kohortenmittel. Eine
    Table 1 aus vollständigen Fällen beschreibt die falsche Kohorte.
 
-> **Merksatz:** Dieselbe Spalte, dasselbe „MAR“ — und trotzdem ist der
+> **Merksatz:** Dieselbe Spalte, dasselbe „MAR“ – und trotzdem ist der
 > Regressionskoeffizient in Ordnung, während die Table 1 falsch ist.
 
 ## Aufgabe 4 – Was Complete Case beim pH kostet
@@ -77,13 +80,13 @@ Verstorbenen und bei **15,9 %** der Überlebenden.
 | volle Daten (Wahrheit) | 68,05 | 2,76 | 0,106 |
 | Complete Case | 65,72 | 2,67 | 0,076 |
 
-- **Das Odds Ratio überlebt** (2,67 vs. 2,76 — der Unterschied ist Rauschen).
+- **Das Odds Ratio überlebt** (2,67 vs. 2,76 – der Unterschied ist Rauschen).
 - **Intercept und absolutes Risiko brechen:** 0,076 statt 0,106, also **28 % zu
   niedrig**.
 
 **Warum:** Die Selektion erfolgt nach dem Outcome `Y`, nicht nach den
 Prädiktoren. In einem logistischen Modell verschiebt eine Selektion nach `Y`
-ausschließlich den Intercept — die Steigungen bleiben unverzerrt. Das ist exakt
+ausschließlich den Intercept – die Steigungen bleiben unverzerrt. Das ist exakt
 derselbe Grund, aus dem man aus einer Fall-Kontroll-Studie Odds Ratios schätzen
 darf, aber keine Prävalenz (Prentice & Pyke 1979).
 
@@ -105,7 +108,7 @@ vollständige Fälle   N=401   30-Tage-Mortalität 11,5 %
 | volle Daten (Wahrheit) | −10,14 | 3,00 | 2,76 | 0,106 |
 | Complete Case | −9,82 | 3,77 | 2,67 | 0,076 |
 | Median-Imputation | −5,76 | **3,21** | **1,78** | 0,115 |
-| Multiple Imputation (m = 20) | −9,50 | 3,64 | 2,59 | 0,107 |
+| Multiple Imputation (m = 20) | −9,62 | 3,63 | 2,62 | 0,107 |
 
 **Der Widerspruch:** Die Median-Imputation setzt 99 Patient:innen auf exakt
 denselben pH-Wert. Damit
@@ -117,52 +120,52 @@ denselben pH-Wert. Damit
    Beobachtungen und behandelt die 99 erfundenen Werte wie gemessene.
 
 Der SE ist also nicht kleiner, weil mehr Information vorläge, sondern weil die
-Methode so tut. Rubin's rules addieren die **Between-Imputation-Varianz** wieder
-hinzu: der MI-Standardfehler (3,64) ist ehrlich größer als der der
+Methode so tut. Rubins Regeln addieren die **Between-Imputation-Varianz** wieder
+hinzu: der MI-Standardfehler (3,63) ist ehrlich größer als der der
 Median-Imputation und kleiner als der der Complete-Case-Analyse (3,77), die
 ganze Fälle verwirft.
 
 ## Aufgabe 6 – Das Imputationsmodell sabotieren
 
 ```python
-imputer.set_imputer("bga_ph", "alter + sofa_score")   # ohne verstorben_30d
+imputer.set_imputer("bga_ph", "alter + sofa_score")   # without verstorben_30d
 ```
 
 | | OR je −0,1 pH | Risiko (Referenz) |
 |---|---|---|
 | volle Daten (Wahrheit) | 2,76 | 0,106 |
-| MI, Outcome **im** Imputationsmodell | 2,59 | 0,107 |
-| MI, Outcome **weggelassen** | **1,80** | 0,114 |
+| MI, Outcome **im** Imputationsmodell | 2,62 | 0,107 |
+| MI, Outcome **weggelassen** | **1,75** | 0,114 |
 
-**Es bricht das Odds Ratio, nicht das absolute Risiko** — das Spiegelbild von
+**Es bricht das Odds Ratio, nicht das absolute Risiko** – das Spiegelbild von
 Aufgabe 4.
 
 **Mechanismus:** Ohne `verstorben_30d` werden die fehlenden pH-Werte allein aus
 `alter` und `sofa_score` vorhergesagt, also *unabhängig vom Outcome*. Die 99
 imputierten Patient:innen tragen per Konstruktion keinen pH-Outcome-Zusammenhang
-bei, und die gepoolte Steigung wird gegen Null verdünnt — genau wie bei der
+bei, und die gepoolte Steigung wird gegen Null verdünnt – genau wie bei der
 Median-Imputation. Die Missingness war MAR **gegeben das Outcome**; lässt man das
 Outcome weg, ist sie es nicht mehr.
 
 > **Merksatz:** Das Imputationsmodell muss jede Variable enthalten, von der die
-> Missingness abhängt — auch dann, wenn sie im Analysemodell die abhängige
+> Missingness abhängt – auch dann, wenn sie im Analysemodell die abhängige
 > Variable ist. Ein Imputationsmodell ist kein Analysemodell.
 
-## Aufgabe 7 – Rubin's rules von Hand
+## Aufgabe 7 – Rubins Regeln von Hand
 
 Vollständig in [`code/rubin.py`](code/rubin.py) / [`code/rubin.R`](code/rubin.R).
 
 **1.** Aus den m = 20 Fits (Python, `statsmodels`):
 
 ```text
-Q̄  = -9,9576      Ū = 9,1857      B = 1,6821
-T  = Ū + (1 + 1/20)·B = 9,1857 + 1,7662 = 10,9519
-SE = √T = 3,3094
+Q̄  = -9,9641      Ū = 9,1880      B = 1,6824
+T  = Ū + (1 + 1/20)·B = 9,1880 + 1,7665 = 10,9544
+SE = √T = 3,3098
 ```
 
 `MICE.combine()` auf **denselben** vervollständigten Datensätzen liefert exakt
-`Q̄ = -9,957600`, `SE = 3,309358` — bis auf Gleitkommarauschen identisch. Rubin's
-rules sind keine Blackbox, sondern vier Zeilen Arithmetik.
+`Q̄ = -9,964097`, `SE = 3,309751` – bis auf Gleitkommarauschen identisch. Rubins
+Regeln sind keine Blackbox, sondern vier Zeilen Arithmetik.
 
 **2.**
 
@@ -175,13 +178,13 @@ RE = 1 / (1 + λ/m)    = 0,9920
 **λ = 0,161** heißt: **16,1 % der Unsicherheit** über den pH-Koeffizienten
 entstehen daraus, dass 99 Werte fehlen; die übrigen 83,9 % hätte man auch bei
 vollständigen Daten. `RE = 0,992` heißt: `m = 20` schöpft 99,2 % der Effizienz
-von `m = ∞` aus — für den **Punktschätzer**. Für den **Standardfehler** gilt das
+von `m = ∞` aus – für den **Punktschätzer**. Für den **Standardfehler** gilt das
 nicht (siehe Aufgabe 8).
 
 **3.**
 
 ```text
-ν_alt = (m − 1)/λ² = 19 / 0,0260 = 730,6
+ν_alt = (m − 1)/λ² = 19 / 0,0260 = 730,7
 n − k                            = 496
 ```
 
@@ -192,20 +195,22 @@ Formel von 1987 nimmt implizit `n → ∞` an. Barnard & Rubin (1999) korrigiere
 ```text
 ν_com = 496
 ν_obs = ((496+1)/(496+3)) · 496 · (1 − 0,1613) = 414,3
-ν_BR  = (730,6 · 414,3)/(730,6 + 414,3)        = 264,4
+ν_BR  = (730,7 · 414,3)/(730,7 + 414,3)        = 264,4
 ```
 
-Ergebnis: `t = −3,009`, `p = 0,0029`, 95-%-KI `[−16,47; −3,44]`.
+Ergebnis: `t = −3,011`, `p = 0,0029`, 95-%-KI `[−16,48; −3,45]`.
 
 **Stolperstein:** `statsmodels` rechnet für MI gar keine Freiheitsgrade, sondern
-einen Wald-**z**-Test (df = ∞) — und meldet für dieselbe Analyse `p = 0,0047`
-statt 0,0029, weil es ein anderes Verfahren ist, nicht weil eines rechnet.
-`mice::pool()` implementiert Barnard–Rubin korrekt.
+einen Wald-**z**-Test (df = ∞). Auf denselben 20 Datensätzen ergäbe das
+`p = 0,0026` statt 0,0029, also etwas zu liberal. Ein frischer
+`mice.MICE(...).fit()`-Lauf meldet `p = 0,0043`, aber nur, weil er andere
+Datensätze zieht (`code/rubin.py`, Abschnitt 4b). `mice::pool()` implementiert
+Barnard–Rubin korrekt.
 
 **4.** Mit `B = 0`:
 
 ```text
-T  = Ū = 9,1857      SE = 3,0308      (statt 3,3094)
+T  = Ū = 9,1880      SE = 3,0312      (statt 3,3098)
 ```
 
 Das ist genau das, was eine **Einfachimputation** berichtet: sie behandelt die
@@ -217,24 +222,24 @@ Fehler der Einfachimputation.
 ## Aufgabe 8 – Wie viele Imputationen?
 
 **1.** `m ≳ 100 · λ = 100 · 0,1613 = 16,1`. Mit `m = 20` ist die Faustregel
-(White, Royston & Wood 2011) **gerade erfüllt** — kein Spielraum.
+(White, Royston & Wood 2011) **gerade erfüllt** – kein Spielraum.
 
 **2./3.** `code/rubin.py` wiederholt die gesamte Pipeline über 10 Seeds je `m`:
 
 | m | mittlerer SE | sd(SE) | cv(SE) |
 |---|---|---|---|
-| 2 | 3,44 | 0,687 | **20,0 %** |
-| 5 | 3,62 | 0,267 | 7,4 % |
-| 10 | 3,68 | 0,282 | 7,7 % |
-| 20 | 3,50 | 0,145 | 4,1 % |
-| 50 | 3,67 | 0,115 | 3,1 % |
+| 2 | 3,55 | 0,821 | **23,1 %** |
+| 5 | 3,63 | 0,283 | 7,8 % |
+| 10 | 3,68 | 0,277 | 7,5 % |
+| 20 | 3,49 | 0,136 | 3,9 % |
+| 50 | 3,69 | 0,123 | 3,3 % |
 
-Bei `m = 2` schwankt der **berichtete Standardfehler** um 20 % — allein je nach
-Zufallsseed. Bei `m = 5` sind es noch ~7 %.
+Bei `m = 2` schwankt der **berichtete Standardfehler** um 23 % – allein je nach
+Zufallsseed. Bei `m = 5` sind es noch ~8 %.
 
 > **Merksatz:** Die alte Regel „m = 5“ zielt auf die Effizienz des
-> *Punktschätzers* (`RE` > 0,96 schon bei m = 5). Der *Standardfehler* — und
-> damit dein p-Wert und dein Konfidenzintervall — ist dann noch deutlich
+> *Punktschätzers* (`RE` > 0,96 schon bei m = 5). Der *Standardfehler* – und
+> damit dein p-Wert und dein Konfidenzintervall – ist dann noch deutlich
 > seed-abhängig. Rechenzeit ist heute kein Argument mehr: nimm m = 20–50.
 
 ## Aufgabe 9 – Eine Methode überführen
@@ -242,23 +247,25 @@ Zufallsseed. Bei `m = 5` sind es noch ~7 %.
 **1. Der Widerspruch (RMSE gegen Überdeckung).**
 Die deterministische Regressions-Imputation setzt jeden fehlenden pH auf seinen
 **bedingten Erwartungswert** `E[pH | alter, sofa, outcome]`. Das ist per
-Definition der Wert, der den mittleren quadratischen Fehler minimiert — deshalb
+Definition der Wert, der den mittleren quadratischen Fehler minimiert – deshalb
 der beste RMSE (0,0501).
 
 Genau dadurch entfernt sie aber die **Streuung** aus den imputierten Werten. Die
 99 imputierten Patient:innen liegen alle exakt auf der Regressionsfläche, ohne
 Residualvarianz. Das Analysemodell hält diese künstliche Enge für echte
 Information und meldet einen viel zu kleinen Standardfehler: **SE-Ratio 0,66**,
-d. h. es berichtet nur 66 % der Streuung, die es tatsächlich hat. Überdeckung:
+d. h. es berichtet nur 66 % der Streuung, die es tatsächlich hat. Dazu kommt ein
+Bias von −3,37: Weil die eingesetzten Werte exakt dem Outcome folgen (es steht im
+Imputationsmodell), übertreibt die Methode den Zusammenhang. Überdeckung:
 **73,2 %** statt 95 %.
 
 > **Merksatz:** Imputation ist keine Vorhersageaufgabe. Wer die imputierten Werte
 > nach RMSE optimiert, optimiert die falsche Größe. Die stochastische Variante
-> derselben Methode hat den **schlechtesten** RMSE (0,0709 — sie addiert Rauschen)
+> derselben Methode hat den **schlechtesten** RMSE (0,0709 – sie addiert Rauschen)
 > und zugleich zehn Prozentpunkte bessere Überdeckung.
 
 **2. Mittelwert-Imputation: ehrlicher SE, trotzdem kaputt.**
-Ihre SE-Ratio ist 1,06 — der Standardfehler stimmt also. Sie scheitert nicht an
+Ihre SE-Ratio ist 1,06 – der Standardfehler stimmt also. Sie scheitert nicht an
 der Varianz, sondern am **Bias**: +3,08 auf einem wahren Wert von −9,52, also
 knapp ein Drittel des Effekts weg. Ein korrekt breites Intervall um einen falschen
 Punkt trifft die Wahrheit trotzdem nicht: **83,8 %**.
@@ -270,14 +277,14 @@ Punkt trifft die Wahrheit trotzdem nicht: **83,8 %**.
 **3. Complete Case: Steigung 93,4 %, absolutes Risiko 57,0 %.**
 In einem **Prognosemodell** ist das absolute Risiko die Zahl, die man einer
 Patientin nennt. Ein nominal 95-prozentiges Intervall, das die Wahrheit in 43 %
-der Fälle verfehlt, ist unbrauchbar — unabhängig davon, wie korrekt das Odds
+der Fälle verfehlt, ist unbrauchbar – unabhängig davon, wie korrekt das Odds
 Ratio ist.
 
 Daraus folgt: **die Methodenwahl hängt vom Estimand ab.** Willst du nur den
 Effekt (OR) berichten, ist Complete Case hier vertretbar. Willst du Risiken
-vorhersagen oder kalibrieren, brauchst du MI (93,6 % Überdeckung auf dem Risiko).
-Der Missing-Indikator ist für die Vorhersage attraktiv, weil „nicht gemessen"
-zur Anwendungszeit bekannt und selbst prädiktiv ist — für die kausale
+vorhersagen oder kalibrieren, brauchst du MI (93,4 % Überdeckung auf dem Risiko).
+Der Missing-Indikator ist für die Vorhersage attraktiv, weil „nicht gemessen“
+zur Anwendungszeit bekannt und selbst prädiktiv ist – für die kausale
 Effektschätzung ist er ungeeignet, weil der Indikator zum Kollider wird, sobald
 das Fehlen vom Outcome abhängt.
 
@@ -290,11 +297,11 @@ Skript prüft das per Assertion):
 
 | δ | OR je −0,1 pH | 95-%-KI | Schluss hält? |
 |---|---|---|---|
-| −0,02 | 3,33 | (1,55; 7,13) | ja |
-| 0,00 (MAR) | 2,38 | (1,11; 5,10) | ja |
-| +0,01 | 2,22 | (1,03; 4,76) | ja, knapp |
-| **+0,02** | 1,83 | (0,92; 3,63) | **nein — Kipppunkt** |
-| +0,05 | 1,32 | (0,69; 2,51) | nein |
+| −0,02 | 3,31 | (1,56; 6,99) | ja |
+| 0,00 (MAR) | 2,40 | (1,12; 5,13) | ja |
+| +0,01 | 2,21 | (1,05; 4,65) | ja, knapp |
+| **+0,02** | 1,83 | (0,93; 3,62) | **nein – Kipppunkt** |
+| +0,05 | 1,33 | (0,70; 2,53) | nein |
 
 Der Kipppunkt liegt bei **δ = +0,02**.
 
@@ -305,15 +312,15 @@ SOFA und Outcome) beträgt **0,050**. Der Kipppunkt entspricht also
 Der Vergleich mit der Messungenauigkeit des Blutgasanalysators wäre ein
 **Kategorienfehler**: Analysenrauschen ist *zufällig* und mittelt sich über 99
 Patient:innen praktisch weg. `δ` ist ein *systematischer* Unterschied im wahren
-Mittelwert zwischen gemessenen und nicht gemessenen Patient:innen — er mittelt
+Mittelwert zwischen gemessenen und nicht gemessenen Patient:innen – er mittelt
 sich nicht weg. Das richtige Maß ist die Streuung, die das Imputationsmodell
 ohnehin nicht erklären kann.
 
 **4. Antwort an die Gutachterin:**
 
 > Die Schlussfolgerung hält, solange die nicht gemessenen Patient:innen im wahren
-> pH um weniger als 0,02 Einheiten — 0,4 bedingte Standardabweichungen — von dem
-> abweichen, was das Imputationsmodell für sie annimmt. Sie müsste zudem in die
+> pH um weniger als 0,02 Einheiten – 0,4 bedingte Standardabweichungen – von dem
+> abweichen, was das Imputationsmodell für sie annimmt. Sie müssten zudem in die
 > Richtung abweichen, die ihrer *höheren* Sterblichkeit widerspricht: die
 > unbeobachteten Patient:innen müssten trotz ihrer Übersterblichkeit
 > **unauffälligere** pH-Werte gehabt haben. Wir halten das für unplausibel,
@@ -329,20 +336,20 @@ ohnehin nicht erklären kann.
 > SOFA-Score. Das Fehlen von Laktat war umgekehrt mit dem SOFA-Score assoziiert
 > (β = −0,27; p < 0,001) und unabhängig vom Outcome.
 >
-> Die Hauptanalyse verwendet daher multiple Imputation (m = 20, Seed 42, Rubin's
-> rules mit Barnard–Rubin-Freiheitsgraden); das Imputationsmodell enthielt Alter,
+> Die Hauptanalyse verwendet daher multiple Imputation (m = 20, Seed 42, Rubins
+> Regeln mit Barnard–Rubin-Freiheitsgraden); das Imputationsmodell enthielt Alter,
 > SOFA-Score und das Outcome. Die Fraktion fehlender Information für den
 > pH-Koeffizienten betrug λ = 0,16, womit m = 20 die Empfehlung m ≳ 100·λ erfüllt.
 > Eine Complete-Case-Analyse als Sensitivitätsanalyse lieferte vergleichbare Odds
-> Ratios (2,67 vs. 2,59 je 0,1 pH-Abfall), aber systematisch zu niedrige absolute
+> Ratios (2,67 vs. 2,62 je 0,1 pH-Abfall), aber systematisch zu niedrige absolute
 > Risiken (−28 % am Referenzpatienten), da vollständige Fälle die Verstorbenen
 > unterrepräsentieren. Eine Delta-Adjustment-Analyse zeigte, dass die
-> Schlussfolgerung bis zu einer angenommenen systematischen pH-Differenz von
-> +0,02 Einheiten (0,4 bedingte Standardabweichungen) zwischen nicht gemessenen
-> und gemessenen Patient:innen bestehen bleibt. Auf Complete-Case-basierte
+> Schlussfolgerung bestehen bleibt, solange die angenommene systematische
+> pH-Differenz zwischen nicht gemessenen und gemessenen Patient:innen unter
+> +0,02 Einheiten (0,4 bedingte Standardabweichungen) liegt. Auf Complete-Case-basierte
 > absolute Risiken wird verzichtet.
 
 **Was der Absatz leistet:** Fehlquoten *pro Variable*; der Mechanismus mit Zahlen
 statt Vermutungen belegt; Imputationsmodell, `m`, Seed und λ explizit benannt;
-die Sensitivitätsanalyse **beziffert** statt behauptet — und die Aussage, welche
+die Sensitivitätsanalyse **beziffert** statt behauptet – und die Aussage, welche
 Schlussfolgerung stabil ist und welche Größe deshalb *nicht* berichtet wird.

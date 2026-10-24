@@ -4,7 +4,7 @@
 Nach einer Matching-Analyse liegen für das Merkmal „Alter“ in den beiden Gruppen folgende Kennzahlen vor:
 
 - **Behandlungsgruppe:** Mittelwert = 68,5 Jahre, Standardabweichung (SD) = 8,2 Jahre
-- **Kontrollgruppe (gemacht):** Mittelwert = 69,1 Jahre, Standardabweichung (SD) = 7,8 Jahre
+- **Kontrollgruppe (gematcht):** Mittelwert = 69,1 Jahre, Standardabweichung (SD) = 7,8 Jahre
 
 1. Berechne die gepoolte Standardabweichung (Pooled SD) unter der vereinfachten Annahme gleicher Gruppengrößen:
 
@@ -16,7 +16,7 @@ Pooled SD = sqrt((SD_treated² + SD_control²) / 2)
 3. Beurteile, ob das Alter nach dem Matching ausreichend balanciert ist.
 
 ## Übung 2: Overlap-Verlust interpretieren
-Betrachte das folgende Diagramm, das die Verteilung der Propensity Scores in einer Studie zeigt:
+Ein Diagramm der Propensity-Score-Verteilung in einer Studie zeigt Folgendes:
 
 - Die Behandlungsgruppe hat fast ausschließlich Scores zwischen 0,7 und 0,95.
 - Die Kontrollgruppe hat fast ausschließlich Scores zwischen 0,05 und 0,3.

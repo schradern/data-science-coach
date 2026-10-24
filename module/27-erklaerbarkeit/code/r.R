@@ -1,4 +1,4 @@
-# Module 27 — Explainable AI with R (parallel to Python).
+# Module 27 – Explainable AI with R (parallel to Python).
 #   Rscript module/27-erklaerbarkeit/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -41,7 +41,7 @@ rec <- recipe(verstorben_30d ~ alter + sofa_score + crp_mg_l + bmi +
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors())
 
-# Use ranger (Random Forest) — supports both permutation importance and PDPs.
+# Use ranger (Random Forest) – supports both permutation importance and PDPs.
 spec <- rand_forest(trees = 300, mtry = 4) |>
   set_engine("ranger", importance = "permutation", seed = SEED) |>
   set_mode("classification")
@@ -93,7 +93,7 @@ if (requireNamespace("DALEXtra", quietly = TRUE)) {
     y = as.numeric(test$verstorben_30d == "1"),
     label = "RandomForest", verbose = FALSE
   )
-  # Shapley values for the first 5 test patients.
+  # Shapley values for the first test patient (one local explanation).
   shap_vals <- predict_parts(explainer, new_observation = test[1, ],
                               type = "shap", B = 15)
   print(shap_vals)

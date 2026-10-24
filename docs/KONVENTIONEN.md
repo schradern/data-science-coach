@@ -42,7 +42,9 @@ Data Science Coach/
 │   └── README.md              # Website-Doku
 ├── tools/
 │   ├── install_r_packages.R   # installiert die R-Pakete aus DEPENDENCIES-R.md
-│   └── check_repo.py          # Konsistenz-Check, CI-Gate (.github/workflows/pages.yml)
+│   ├── check_repo.py          # Konsistenz-Check, CI-Gate (.github/workflows/pages.yml)
+│   ├── check_numbers.py       # prüft lokal: jede Ergebniszahl der Prosa kommt aus dem Code
+│   └── numbers_allow.json     # begründete Ausnahmen für check_numbers.py
 └── module/
     ├── README.md              # Modulübersicht (Index aller 34 Module)
     └── NN-kurzname/
@@ -57,23 +59,23 @@ Data Science Coach/
 ```
 
 `python.py`/`r.R` sind die **Einstiegsskripte** der Lektion; `figures.py`
-regeneriert deren Abbildungen (siehe `data/figures.py`, das ~Module 01–06, 08–10, 12–17, 21 in
+regeneriert deren Abbildungen (siehe `data/figures.py`, das die Module 01, 06, 08–10, 12, 13, 15–17 und 21 in
 einem Lauf abdeckt). Weitere, thematisch benannte Skripte sind für
 Vertiefungsmaterial erlaubt, müssen aber in der Modul-`README.md` verlinkt
-sein — z. B. Modul 14: `rubin.py`/`.R`, `benchmark.py`, `mice_praxis.py`/`.R`,
+sein – z. B. Modul 14: `rubin.py`/`.R`, `benchmark.py`, `mice_praxis.py`/`.R`,
 `mnar_delta.py`/`.R`.
 
 ## Namens- und Schreibregeln
 
-- Modulordner: `NN-kurzname`, zweistellig (`01`…`33`), Kleinbuchstaben, Bindestriche.
+- Modulordner: `NN-kurzname`, zweistellig (`01`…`34`), Kleinbuchstaben, Bindestriche.
 - **`NN` ist die Position in der Lesereihenfolge**, nicht das Entstehungsdatum.
   Verbindlich ist `TEILE` in `website/build.py`: das erste Modul dort heißt `01`,
   das siebzehnte `17`. Auch die Überschrift der Lektion (`# NN · Titel`) trägt
   genau diese Nummer. `tools/check_repo.py` erzwingt beides.
 
   Das war nicht immer so: die zuletzt geschriebenen Module bekamen die höchsten
-  Nummern und wurden dann in frühere Teile einsortiert — das Menü las sich
-  `04, 05, 06, 32, 07`, und jedes „siehe Modul 13" zeigte auf das Modul, dem
+  Nummern und wurden dann in frühere Teile einsortiert – das Menü las sich
+  `04, 05, 06, 32, 07`, und jedes „siehe Modul 13“ zeigte auf das Modul, dem
   diese Nummer gerade gehörte. Wer ein Modul einfügt oder verschiebt, nummeriert
   daher **alle** folgenden Ordner um und zieht die Verweise mit.
 - Lektionssprache (Prosa, Übungen, Bildunterschriften): **Deutsch**. Fachbegriffe
@@ -106,7 +108,7 @@ sein — z. B. Modul 14: `rubin.py`/`.R`, `benchmark.py`, `mice_praxis.py`/`.R`,
 ## Dateiverweise und Abbildungen
 
 **Jeder Dateiname im Fließtext wird zu einem Link ins Repository.** Schreibe den
-Pfad einfach als Inline-Code — `lib/helpers.py`, `kohorte.csv`, `code/rubin.py` —,
+Pfad einfach als Inline-Code – `lib/helpers.py`, `kohorte.csv`, `code/rubin.py` –,
 `website/build.py` macht daraus beim Bauen einen Link auf genau diese Datei.
 Drei Regeln, damit das nie ins Leere zeigt:
 
@@ -114,10 +116,10 @@ Drei Regeln, damit das nie ins Leere zeigt:
   (`data/roh/patienten.csv` in einer Übung) bleibt einfach Code.
 - Ein Pfad relativ zum Modul (`code/python.py`) zeigt auf die Datei **dieses**
   Moduls. Ein bloßer Dateiname wird nur verlinkt, wenn er im ganzen Repository
-  eindeutig ist — `figures.py` gibt es siebzehnmal und bleibt deshalb ungelinkt.
+  eindeutig ist – `figures.py` gibt es siebzehnmal und bleibt deshalb ungelinkt.
 - Codeblöcke werden nie angefasst.
 
-**Jede Abbildung verlinkt auf den Code, der genau sie zeichnet** — nicht auf die
+**Jede Abbildung verlinkt auf den Code, der genau sie zeichnet** – nicht auf die
 ganze erzeugende Datei. `website/figure_source.py` liest die Generatoren und
 findet den passenden Ausschnitt: die Funktion, den Abschnitt oder den
 Zeichenteil von `main()`. Von Hand gezeichnete Diagramme stehen dort in der
@@ -219,19 +221,19 @@ python data/generate_data.py     # Datensätze neu erzeugen
 python module/06-transformation/code/python.py   # Beispiel: ein Modul laufen lassen
 ```
 
-Für die R-Spur braucht dieser erste Schritt einmalig Python — Details und
-Alternative unter [„Python für die R-Spur — einmalig"](../DEPENDENCIES-R.md).
+Für die R-Spur braucht dieser erste Schritt einmalig Python – Details und
+Alternative unter [„Python für die R-Spur – einmalig“](../DEPENDENCIES-R.md).
 
 ## CI und automatisierte Prüfungen
 
 Zwei Werkzeuge prüfen den Kurs automatisiert; beide laufen lokal und in CI.
 
-- **`tools/check_repo.py`** — schnelle Struktur-Checks (Links, Platzhalter,
+- **`tools/check_repo.py`** – schnelle Struktur-Checks (Links, Platzhalter,
   Seeds, Konventionen, Assets, `code/`-Ordner ohne Abbildungen). Läuft in ~8 s
   und bei **jedem Push** (`.github/workflows/pages.yml`, zusammen mit dem
   Website-Build).
 
-- **`tools/check_numbers.py`** — führt die Python- **und** R-Skripte jedes
+- **`tools/check_numbers.py`** – führt die Python- **und** R-Skripte jedes
   Moduls aus und prüft, ob jede Zahl, die eine Lektion in einer
   **Markdown-Tabelle** oder einem ```` ```text ````-Block behauptet,
   tatsächlich vom Code produziert wird. Das dauert ~8 Minuten (Modul 14s
@@ -244,28 +246,28 @@ Zwei Werkzeuge prüfen den Kurs automatisiert; beide laufen lokal und in CI.
 
   `DSC_SKIP_SLOW=1` überspringt den Benchmark.
 
-  **Blinde Flecken — bewusst, damit niemand einem grünen Lauf zu viel
+  **Blinde Flecken – bewusst, damit niemand einem grünen Lauf zu viel
   vertraut:** Das Skript liest keine Zahlen in Prosa, in ```` ```python ````-Blöcken
   oder in Bildunterschriften; und es vergleicht **Beträge**, ein falsches
   Vorzeichen fällt also nicht auf.
 
-- **`tools/numbers_allow.json`** — das Ausnahmeventil für Zahlen, die
+- **`tools/numbers_allow.json`** – das Ausnahmeventil für Zahlen, die
   legitim nicht aus dem Skript des Moduls selbst stammen (z. B. aus
   `lib/ground_truth.py`, einem Geschwister-Skript oder der Literatur). Jeder
   Eintrag braucht ein `reason`-Feld; ohne das bricht das Skript mit Exitcode 2
   ab. Diese Datei bleibt bewusst klein.
 
 - **Exitcodes von `check_numbers.py`:**
-  - `0` — jede behauptete Zahl wird vom Code des Moduls selbst reproduziert.
-  - `1` — Drift: eine Zahl in einer Tabelle oder einem ```` ```text ````-Block
+  - `0` – jede behauptete Zahl wird vom Code des Moduls selbst reproduziert.
+  - `1` – Drift: eine Zahl in einer Tabelle oder einem ```` ```text ````-Block
     hat keine Entsprechung in der Skript-Ausgabe. Entweder die Prosa
     korrigieren oder einen begründeten Eintrag in `tools/numbers_allow.json`
     ergänzen.
-  - `2` — ein Eintrag in `tools/numbers_allow.json` hat kein `reason`-Feld.
-  - `3` — das Python- oder R-Skript eines Moduls konnte nicht laufen (fehlendes
+  - `2` – ein Eintrag in `tools/numbers_allow.json` hat kein `reason`-Feld.
+  - `3` – das Python- oder R-Skript eines Moduls konnte nicht laufen (fehlendes
     Python- oder R-Paket, fehlendes `Rscript`), seine Zahlen also gar nicht
     geprüft werden. **Das ist ein Umgebungsproblem, kein Prosa-Problem.** Das
-    Werkzeug listet die übrig gebliebenen Zahlen unter `unaccounted:` — tauchen
+    Werkzeug listet die übrig gebliebenen Zahlen unter `unaccounted:` – tauchen
     sie auch nach einem funktionierenden Lauf nicht auf, ist es echte Drift.
 
   Das Werkzeug nutzt `./.venv/bin/python`, wenn im Projektstamm ein `.venv`
@@ -281,7 +283,7 @@ Zwei Werkzeuge prüfen den Kurs automatisiert; beide laufen lokal und in CI.
   Bibliotheken in den letzten Stellen plattformabhängige Ergebnisse
   (macOS/Accelerate vs. Linux/OpenBLAS); ein strikter Zahlenabgleich über
   Läufer hinweg meldete das fälschlich als Drift. Vor größeren Zahlenänderungen
-  lohnt der lokale Lauf trotzdem — er fängt grobe Abweichungen zuverlässig.
+  lohnt der lokale Lauf trotzdem – er fängt grobe Abweichungen zuverlässig.
 
 ## Vertiefungs-Marker (`<!-- vertiefung: … -->`)
 

@@ -11,34 +11,34 @@
 
 500 Patient:innen einer Intensivstation, eine Tabelle mit Aufnahmeparametern und
 die Frage deiner Chefärztin: *„Wer ist in den ersten 30 Tagen verstorben, und
-lässt sich das vorhersagen?"*
+lässt sich das vorhersagen?“*
 
 Im Tabellenprogramm stößt du schnell an Grenzen: kein Schritt ist
 nachvollziehbar, das Ergebnis kippt mit der Sortierung, und ein Jahr später
 fängst du wieder bei null an. Data Science macht jeden Schritt explizit,
 reproduzierbar und prüfbar.
 
-## Zwei Wege durch den Kurs — wähle einen
+## Zwei Wege durch den Kurs – wähle einen
 
-**(A) Im Browser lernen — der Standard.** Installiere nur **Python _oder_ R**.
+**(A) Im Browser lernen – der Standard.** Installiere nur **Python _oder_ R**.
 Jeden Codeblock kopierst du direkt in deine Konsole; die Daten liest er über
-eine Web-Adresse (`https://…/data/kohorte.csv`) — du musst **nichts
+eine Web-Adresse (`https://…/data/kohorte.csv`) – du musst **nichts
 herunterladen, klonen oder erzeugen**. Welche Pakete du brauchst, sagt dir das
 nächste Modul.
 
-**(B) Mit dem Repository arbeiten — optional, für volle Reproduzierbarkeit.**
+**(B) Mit dem Repository arbeiten – optional, für volle Reproduzierbarkeit.**
 Klonst du das Projekt, stehen `data/`, die Hilfsfunktionen in `lib/` und die
 fertigen `code/`-Skripte lokal bereit. Nur dann gelten Abkürzungen wie
 `pip install -r requirements.txt`, `source("tools/install_r_packages.R")` oder
 `python data/generate_data.py`.
 
 > **Merke:** Codeblöcke mit einer `https://…`-Adresse laufen auf beiden Wegen.
-> Nichts in diesem Kurs verlangt, dass du das Repository klonst — es ist ein
+> Nichts in diesem Kurs verlangt, dass du das Repository klonst – es ist ein
 > Komfort, keine Voraussetzung.
 
 ## 1 Warum Data Science in der Medizin?
 
-Medizinische Daten wachsen schneller, als wir sie auswerten können, elektronische Akten, Labor, Bildgebung, Genomik, Wearables. Zugleich steigen die
+Medizinische Daten wachsen schneller, als wir sie auswerten können: elektronische Akten, Labor, Bildgebung, Genomik, Wearables. Zugleich steigen die
 Ansprüche an **Evidenz** und **Reproduzierbarkeit**, in der Forschung wie im
 klinischen Alltag.
 
@@ -62,7 +62,7 @@ Jede Datenanalyse, ob klinische Studie, Qualitätsprojekt oder Publikation, folg
 ![Abbildung: Der Datenanalyse-Zyklus in sechs Schritten – von der Frage über Datenbeschaffung, Bereinigung, Exploration und Analyse bis zur Kommunikation, dann zurück zur Frage.](assets/analyse_zyklus.svg)
 
 Schritt 3 kostet in der Praxis am meisten Zeit, deshalb widmet ihm dieser
-Kurs ein eigenes Modul.
+Kurs ein eigenes Modul (Modul 06).
 
 ## 3 Kursüberblick und Lernpfade
 
@@ -88,9 +88,9 @@ Kurs ein eigenes Modul.
 
 Jedes Modul folgt demselben Bogen:
 
-1. **Klinischer Aufhänger**, eine ärztliche Frage motiviert das Konzept.
-2. **Konzept vor Code**, erst das Prinzip, dann das lauffähige Beispiel.
-3. **Python und R nebeneinander**, beide Sprachen zeigen dasselbe Ergebnis.
+1. **Klinischer Aufhänger**: eine ärztliche Frage motiviert das Konzept.
+2. **Konzept vor Code**: erst das Prinzip, dann das lauffähige Beispiel.
+3. **Python und R nebeneinander**: beide Sprachen zeigen dasselbe Ergebnis.
 4. **Übungen** (`uebungen.md`) zum Selbst-Ausprobieren.
 5. **Lösungen** (`loesungen.md`), erst nach eigenem Versuch.
 
@@ -119,7 +119,7 @@ print(f"30-day mortality: {cohort['verstorben_30d'].mean():.1%}")
 ```
 
 <div class="code-verbalization" markdown="1">
-🗣 **Code-Verbalisierung:**
+**Zeile für Zeile:**
 
 * `import pandas as pd`: Lädt das Paket `pandas` (die zentrale Tabellen-Bibliothek für Python) und gibt ihm die Kurzbezeichnung `pd`.
 * `cohort = pd.read_csv(...)`: Liest die Tabelle `kohorte.csv` direkt von der angegebenen Web-Adresse ein und speichert sie unter dem Namen `cohort`.
@@ -156,7 +156,7 @@ cat("30-day mortality:", round(mean(cohort$verstorben_30d), 3), "\n")
 ```
 
 <div class="code-verbalization" markdown="1">
-🗣 **Code-Verbalisierung:**
+**Zeile für Zeile:**
 
 * `library(readr)`: Lädt das Paket `readr`, das die Funktion zum Einlesen von CSV-Dateien bereitstellt.
 * `cohort <- read_csv(...)`: Liest die Tabelle `kohorte.csv` direkt von der Web-Adresse ein und speichert sie unter dem Namen `cohort` (`show_col_types = FALSE` unterdrückt nur die Ausgabe der erkannten Spaltentypen).
@@ -164,25 +164,25 @@ cat("30-day mortality:", round(mean(cohort$verstorben_30d), 3), "\n")
 * `cat("30-day mortality:", ...)`: Berechnet den Mittelwert der Spalte `verstorben_30d` und rundet ihn auf drei Nachkommastellen.
 </div>
 
-> **Merksatz:** Egal ob als Skript (`Rscript datei.R`) oder Zeile für Zeile in
-> der R-Konsole (Strg/Cmd+Enter) ausgeführt, `read_csv()` mit einer
+> **Merksatz:** Egal ob als Skript (`Rscript datei.R`) oder Zeile für Zeile aus
+> dem Editor an die R-Konsole geschickt (Strg/Cmd+Enter), `read_csv()` mit einer
 > Web-Adresse funktioniert überall identisch, ganz ohne Pfad-Ermittlung.
 
 ## Fallstricke und Merksätze
-- **Data Science ersetzt nicht das klinische Urteil**, es informiert es.
+- **Data Science ersetzt nicht das klinische Urteil**, sondern informiert es.
  Modelle zeigen Muster, Ärztinnen und Ärzte interpretieren sie.
 
 - **Reproduzierbarkeit ist kein Luxus.** Ein Ergebnis, das sich nach dem
  Sortieren ändert, ist kein Ergebnis. Fester Seed (hier: `42`) und
  versionierter Code sind Pflicht, nicht Kür.
 
-- **80 % Datenaufbereitung, 20 % Analyse**, das klingt frustrierend,
- ist aber normal. Saubere Daten *sind* der erste Analyseschritt.
+- **80 % Datenaufbereitung, 20 % Analyse**, so die oft zitierte Faustregel.
+ Das klingt frustrierend, ist aber normal. Saubere Daten *sind* der erste Analyseschritt.
 
 - Alle Beispieldaten in diesem Kurs sind **vollständig fiktiv**. Für
  echte Patientendaten gelten DSGVO, Ethikvotum und ärztliche Schweigepflicht.
 
 ## Selbstcheck
-1. **Welche drei Disziplinen verbindet Data Science?**, Domänenwissen (Medizin), Statistik (Methode) und Werkzeuge/Code.
-2. **Warum ist Schritt 3 des Datenanalyse-Zyklus besonders zeitaufwändig?**, Rohdaten aus klinischen Systemen sind selten sauber: Encoding-Probleme, fehlende Werte, inkonsistente Formate müssen vor jeder Analyse behoben werden.
-3. **Was ist der Vorteil eines festen Seeds (hier: 42)?**, Zufallsoperationen (z. B. Stichproben, Modellinitialisierung) liefern bei jedem Lauf dasselbe Ergebnis, Voraussetzung für Reproduzierbarkeit.
+1. **Welche drei Disziplinen verbindet Data Science?** – Domänenwissen (Medizin), Statistik (Methode) und Werkzeuge/Code.
+2. **Warum ist Schritt 3 des Datenanalyse-Zyklus besonders zeitaufwändig?** – Rohdaten aus klinischen Systemen sind selten sauber: Encoding-Probleme, fehlende Werte, inkonsistente Formate müssen vor jeder Analyse behoben werden.
+3. **Was ist der Vorteil eines festen Seeds (hier: 42)?** – Zufallsoperationen (z. B. Stichproben, Modellinitialisierung) liefern bei jedem Lauf dasselbe Ergebnis, Voraussetzung für Reproduzierbarkeit.

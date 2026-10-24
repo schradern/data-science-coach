@@ -1,4 +1,4 @@
-# Module 02 — Tools & reproducible environment (R, parallel to Python).
+# Module 02 – Tools & reproducible environment (R, parallel to Python).
 #   Rscript module/02-werkzeuge/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -9,7 +9,7 @@ script <- normalizePath(sub("--file=", "", grep("--file=", commandArgs(), value 
 root   <- dirname(dirname(dirname(dirname(script))))
 source(file.path(root, "lib", "helpers.R"))
 
-cat("=== Module 02 — Environment check (R) ===\n\n")
+cat("=== Module 02 – Environment check (R) ===\n\n")
 cat("R version:  ", R.version.string, "\n")
 cat("Seed:       ", SEED, "\n")
 

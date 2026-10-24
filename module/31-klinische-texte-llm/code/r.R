@@ -1,4 +1,4 @@
-# Module 31 — Clinical text classification in R (parallel to Python).
+# Module 31 – Clinical text classification in R (parallel to Python).
 #   Rscript module/31-klinische-texte-llm/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.

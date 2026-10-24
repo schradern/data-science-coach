@@ -1,4 +1,4 @@
-"""Module 29 — Unsupervised learning and clinical phenotyping.
+"""Module 29 – Unsupervised learning and clinical phenotyping.
 
 Runs standalone from the project root:
     python module/29-unueberwacht-phenotyping/code/python.py
@@ -46,7 +46,7 @@ def build_features() -> tuple[np.ndarray, pd.DataFrame]:
 
 def choose_k(X: np.ndarray) -> int:
     """Print elbow (inertia) and silhouette scores for k = 2..8. Return the
-    silhouette-best k (NOT necessarily the k used downstream — see note)."""
+    silhouette-best k (NOT necessarily the k used downstream – see note)."""
     print("=== 1) Choosing k: inertia and silhouette ===")
     best_k, best_sil = 2, -1.0
     sils: dict[int, float] = {}
@@ -137,7 +137,6 @@ def name_phenotypes(profile: pd.DataFrame) -> dict[int, str]:
 def main() -> None:
     X, df = build_features()
 
-    print("=== 1) Choosing k ===")
     best_k = choose_k(X)
 
     print(f"\n=== 2) k-Means clustering (k=3; silhouette-best was k={best_k}, "

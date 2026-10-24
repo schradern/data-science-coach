@@ -233,7 +233,8 @@ section_3_tipping_point <- function(df) {
     cat(sprintf("\n  Significance boundary (secondary, more informative number): the\n"))
     cat("  pooled 95% CI EXCLUDES 1 -- i.e. the acidosis-mortality association is\n")
     cat(sprintf("  statistically supported -- only for delta in [%+.2f, %+.2f].\n", lo, hi))
-    cat("  Outside that window (including delta = 0) the finding is not robust.\n")
+    cat(sprintf("  Outside that window the finding is not robust%s\n",
+              if (lo <= 0 && 0 <= hi) "." else " -- and that includes delta = 0 itself."))
     boundary <- if (abs(lo) < abs(hi)) lo else hi
   } else {
     cat("\n  The pooled 95% CI never excludes 1 anywhere in the searched range:\n")
@@ -280,7 +281,10 @@ section_5_plausibility <- function(tipping) {
 
   boundary <- tipping$boundary_delta
   literal <- tipping$literal_tipping
-  delta_for_verdict <- if (!is.null(boundary)) boundary else if (!is.null(literal)) literal$delta else NA
+  # Judge the tipping point itself (the first delta at which the CI includes
+  # 1), not the last delta at which the conclusion still holds -- the lesson
+  # quotes the tipping point in conditional SDs.
+  delta_for_verdict <- if (!is.null(literal)) literal$delta else if (!is.null(boundary)) boundary else NA
 
   if (is.na(delta_for_verdict)) {
     cat("  No finite tipping-point delta was found -- no plausibility judgement to make.\n")
@@ -330,18 +334,19 @@ section_6_report <- function(tipping, conservative) {
   cat(strrep("=", 78), "\n")
   literal <- tipping$literal_tipping
   region <- tipping$significance_region
-  lit_txt <- if (!is.null(literal)) sprintf("%+.2f", literal$delta) else "nicht gefunden"
-  region_txt <- if (!is.null(region)) sprintf("[%+.2f, %+.2f]", region[1], region[2]) else "keinen Bereich"
+  lit_txt <- if (!is.null(literal)) chartr(".", ",", sprintf("%+.2f", literal$delta)) else "nicht gefunden"
+  region_txt <- if (!is.null(region)) chartr(".", ",", sprintf("[%+.2f; %+.2f]", region[1], region[2])) else "keinen Bereich"
+  richtung <- if (startsWith(conservative, "positive")) "positiv (delta > 0)" else "negativ (delta < 0)"
   cat(sprintf(paste0(
     '  "Eine Delta-Adjustment-Sensitivitätsanalyse (m = %d, 21 Werte von delta\n',
-    "   zwischen -0,10 und +0,10 pH-Einheiten, Rubin's rules via mice::pool()) zeigt:\n",
-    "   das gepoolte Odds Ratio je -0,1 pH-Abfall verlässt den signifikanten Bereich\n",
-    "   (KI schließt 1 nicht ein) nur für delta in %s. Der kleinste |delta|, bei\n",
+    "   zwischen -0,10 und +0,10 pH-Einheiten, Rubins Regeln via mice::pool()) zeigt:\n",
+    "   das gepoolte Odds Ratio je -0,1 pH-Abfall bleibt im signifikanten Bereich\n",
+    "   (KI schließt die 1 aus) nur für delta in %s. Der kleinste |delta|, bei\n",
     "   dem das 95-%%-KI die 1 einschließt, ist delta = %s. Die konservative, den\n",
     "   Effekt abschwächende Richtung ist delta %s: sie entspricht der Annahme,\n",
     "   unbeobachtete Patient:innen seien trotz höherer Mortalität pH-mäßig\n",
     '   unauffälliger gewesen als von der MAR-Imputation vorhergesagt."\n'
-  ), M, region_txt, lit_txt, conservative))
+  ), M, region_txt, lit_txt, richtung))
 }
 
 # -----------------------------------------------------------------------

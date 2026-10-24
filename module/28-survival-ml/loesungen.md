@@ -2,10 +2,11 @@
 
 ## Aufgabe 1 – Zensierung verstehen
 Ein **zensierter** Patient ist eine Person, die das Beobachtungsfenster (30 Tage)
-verlassen hat, **ohne** das Zielereignis (Tod) erlebt zu haben, zum Beispiel
-weil sie vorher entlassen wurde. Wir wissen nur: „Bis zum Tag der Entlassung war
-diese Person noch am Leben." Ein Klassifikator würde den Label `0` vergeben und
-annehmen, die Person sei **nie** gestorben, das ist korrekt für den Beobachtungszeitraum,
+verlassen hat, **ohne** das Zielereignis (Tod) erlebt zu haben, in diesem
+Datensatz entweder weil sie vorher aus der Nachbeobachtung gefallen ist oder
+weil Tag 30 erreicht war. Wir wissen nur: „Bis zum
+letzten Kontakt war diese Person noch am Leben.“ Ein Klassifikator würde das
+Label `0` vergeben und annehmen, die Person sei **nie** gestorben, das ist korrekt für den Beobachtungszeitraum,
 aber systematisch falsch, wenn die Beobachtungszeit kürzer als das Vorhersagefenster
 ist, da das Modell dann falsche Nullen als Grundgesamtheit lernt.
 
@@ -61,8 +62,10 @@ lr = logrank_test(times_test[groups["Niedrig"]], times_test[groups["Hoch"]],
                   event_observed_B=events_test[groups["Hoch"]])
 print(f"Log-Rank p-Wert (Niedrig vs. Hoch): {lr.p_value:.4f}")
 ```
-Gut getrennte Kurven bei niedrigem p-Wert bestätigen, dass das Modell klinisch
-relevante Risikogruppen identifiziert, nicht nur statistische Artefakte.
+Gut getrennte Kurven bei niedrigem p-Wert zeigen, dass der Score Patient:innen
+nach Risiko ordnet (auf diesem Split: 0 Todesfälle im unteren, 16 im oberen
+Tertil, Log-Rank p < 0,001). Ob die Gruppen klinisch relevant sind, hängt von den
+absoluten Risiken und der Entscheidung ab, die daraus folgen soll.
 
 ## Aufgabe 4 – RSF (sksurv)
 ```python
@@ -74,7 +77,7 @@ rsf.fit(X_tr_np, surv_train)
 chf = rsf.predict_cumulative_hazard_function(X_te_np, return_array=False)
 rsf_scores = np.array([fn(28) for fn in chf])
 
-# Pass the FULL test array + full score array in one call — cumulative_dynamic_auc
+# Pass the FULL test array + full score array in one call – cumulative_dynamic_auc
 # builds the per-time risk set internally. Masking surv_test/rsf_scores by
 # `time >= t` first (a common mistake) silently corrupts the AUC because the
 # function needs to see who is still at risk, not just who survives past t.
@@ -85,10 +88,10 @@ for t, a in zip([7, 21], auc):
 Auf diesem Datensatz (500 Patient:innen, 78 Ereignisse; Testsatz n = 125 mit 19
 Ereignissen) liegt die RSF-AUC bei Tag 7 bei ≈0,84 und bei Tag 21 bei ≈0,85, die
 Cox-Baseline mit ≈0,92 bzw. ≈0,88 als **Punktschätzer** leicht darüber (siehe
-`assets/rsf_vs_cox.png`). Das reicht aber nicht für die Aussage „Cox ist besser":
+`assets/rsf_vs_cox.png`). Das reicht aber nicht für die Aussage „Cox ist besser“:
 `code/python.py` bootstrappt den Testsatz und berichtet ein 95%-KI auf die
 **Differenz** Cox − RSF. Bei Tag 14, 21 und 28 enthält dieses KI die Null (z. B.
-Tag 28: +0,02 [−0,02, +0,06]) — der Unterschied ist dort nicht von Rauschen zu
+Tag 28: +0,02 [−0,02, +0,06]) – der Unterschied ist dort nicht von Rauschen zu
 trennen. Nur bei Tag 7 (die wenigsten Ereignisse) liegt das KI knapp über null,
 und dieser Bootstrap unterschätzt die Unsicherheit sogar noch, weil er die
 Modelle festhält. Belastbare Aussage: **kein Modell ist hier klar überlegen.**
@@ -99,10 +102,16 @@ Modell oft mindestens ebenbürtig. Der Lerneffekt: RSF ist kein Selbstläufer, u
 eine AUC-Differenz ohne Konfidenzintervall ist keine Rangfolge.
 
 ## Bonus – Konkurrierende Risiken konzeptuell
-Wenn verlegte Patient:innen als `verstorben_30d = 0` (Nicht-Ereignis) codiert
-werden, unterschätzt das Modell das wahre Risiko, diese Personen sind de facto
-in Beobachtungsabbruch (informative Zensierung), und der Klassifikator lernt
-„alle Verlegten überleben", was falsch ist. Die korrekte Strategie: Verlegung als
-**konkurrierendes Ereignis** (Status 2) definieren und den
-**Aalen-Johansen-Schätzer** (`lifelines.AalenJohansenFitter`) oder das
-Fine-Gray-Modell verwenden, das die subdistribution hazard modelliert.
+Wenn verlegte Patient:innen als Nicht-Ereignis kodiert werden (als hätten sie
+bis Tag 30 sicher überlebt), überschätzt die KM-Kurve das Überleben, also
+unterschätzt sie das Sterberisiko: Die Todesfälle nach der Verlegung fehlen. Auch
+das Zensieren am Verlegungstag hilft nur bedingt, denn diese Zensierung ist
+informativ (Verlegte sind oft kränker), KM setzt aber nicht-informative
+Zensierung voraus. Die korrekte Strategie hängt vom Estimand ab: Zählt Tod
+überall, braucht man die fehlende Nachbeobachtung (z. B. Abgleich mit
+Melderegister oder aufnehmender Klinik) oder Methoden für informative Zensierung
+(z. B. inverse Zensierungsgewichte). Zählt nur der Tod in dieser Klinik, ist die
+Verlegung ein **konkurrierendes Ereignis** (Status 2); dann schätzt man die
+kumulative Inzidenz mit dem **Aalen-Johansen-Schätzer**
+(`lifelines.AalenJohansenFitter`) oder modelliert sie mit Fine-Gray
+(subdistribution hazard).

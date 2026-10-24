@@ -1,4 +1,4 @@
-# Module 10 — Inferential statistics and hypothesis testing (R / base stats).
+# Module 10 – Inferential statistics and hypothesis testing (R / base stats).
 #
 # Runs standalone from the project root:
 #   Rscript module/10-inferenzstatistik/code/r.R
@@ -54,7 +54,7 @@ rank_biserial_r <- function(u, n1, n2) {
 
 # ---------------------------------------------------------------------------
 # 0) Shapiro-Wilk: DESCRIPTIVE normality diagnostic for laktat_mmol_l
-#    NOT a test-selection rule — see module 21 ("Normalitätstest-Autopilot").
+#    NOT a test-selection rule – see module 21 ("Normalitätstest-Autopilot").
 # ---------------------------------------------------------------------------
 cat("============================================================\n")
 cat("0) Shapiro-Wilk: descriptive normality diagnostic for laktat_mmol_l\n")
@@ -64,20 +64,23 @@ laktat_all <- df$laktat_mmol_l |> na.omit()
 sw_res     <- shapiro.test(laktat_all)
 
 cat(sprintf("  n=%d, W=%.4f, p=%.4e\n", length(laktat_all), sw_res$statistic, sw_res$p.value))
-cat(sprintf("  Skewness (approx.) = %.2f\n",
-            (mean(laktat_all) - median(laktat_all)) / sd(laktat_all)))
+# Adjusted Fisher-Pearson skewness, the same estimator as pandas .skew()
+n_lac <- length(laktat_all)
+skew_lac <- n_lac / ((n_lac - 1) * (n_lac - 2)) *
+  sum(((laktat_all - mean(laktat_all)) / sd(laktat_all))^3)
+cat(sprintf("  Skewness=%.2f\n", skew_lac))
 cat(sprintf("  Normal distribution rejected (p<0.05): %s\n",
             ifelse(sw_res$p.value < 0.05, "TRUE", "FALSE")))
 cat("  NOTE: Shapiro-Wilk is a DESCRIPTIVE diagnostic, not a test-selection\n")
 cat("  rule (it over-rejects at large N). Choose the test from the estimand,\n")
-cat("  the shape seen in a plot, and robustness — see module 21. laktat is\n")
+cat("  the shape seen in a plot, and robustness – see module 21. laktat is\n")
 cat("  strongly right-skewed, so we report BOTH Welch-t and Mann-Whitney-U.\n")
 
 # ---------------------------------------------------------------------------
-# 1) Welch-t-test: laktat_mmol_l — Sepsis vs. nicht-Sepsis
+# 1) Welch-t-test: laktat_mmol_l – Sepsis vs. non-Sepsis
 # ---------------------------------------------------------------------------
 cat("\n============================================================\n")
-cat("1) Welch-t-test: laktat_mmol_l — Sepsis vs. nicht-Sepsis\n")
+cat("1) Welch-t-test: laktat_mmol_l – Sepsis vs. nicht-Sepsis\n")
 cat("============================================================\n")
 
 sepsis    <- df |> filter(aufnahmegrund == "Sepsis") |> pull(laktat_mmol_l) |> na.omit()
@@ -97,14 +100,14 @@ cat(sprintf("  95-%%-CI Sepsis:     [%.2f, %.2f]\n",
             t.test(sepsis)$conf.int[1], t.test(sepsis)$conf.int[2]))
 cat(sprintf("  Effect size Cohen's d = %.3f  (0.2 small, 0.5 medium, 0.8 large)\n", d))
 cat("\n  Correct interpretation:\n")
-cat("  p = P(data as extreme | H0 true) — NOT P(H0 true | data).\n")
+cat("  p = P(data as extreme | H0 true) – NOT P(H0 true | data).\n")
 cat("  Always report effect size + CI alongside p.\n")
 
 # ---------------------------------------------------------------------------
-# 2) Mann-Whitney-U (nonparametric — preferred for skewed laktat)
+# 2) Mann-Whitney-U (nonparametric – preferred for skewed laktat)
 # ---------------------------------------------------------------------------
 cat("\n============================================================\n")
-cat("2) Mann-Whitney-U: laktat_mmol_l — Sepsis vs. nicht-Sepsis\n")
+cat("2) Mann-Whitney-U: laktat_mmol_l – Sepsis vs. nicht-Sepsis\n")
 cat("   (nonparametric, robust against skew and outliers)\n")
 cat("============================================================\n")
 
@@ -152,7 +155,7 @@ cat(sprintf("  95-%%-CI OR: [%.2f, %.2f]\n", or_lo, or_hi))
 cat("  Note: OR != RR. At high event rates OR overestimates RR.\n")
 
 # ---------------------------------------------------------------------------
-# 4) Multiple testing — Bonferroni correction (5 lab markers)
+# 4) Multiple testing – Bonferroni correction (5 lab markers)
 # ---------------------------------------------------------------------------
 cat("\n============================================================\n")
 cat("4) Multiple testing: Bonferroni correction (5 lab markers)\n")

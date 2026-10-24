@@ -1,4 +1,4 @@
-"""Module 32 — Model persistence, drift monitoring, fairness and governance.
+"""Module 32 – Model persistence, drift monitoring, fairness and governance.
 
 Runs standalone from the project root:
     python module/32-einsatz-governance/code/python.py
@@ -31,7 +31,7 @@ from lib.helpers import SEED, load_cohort, load_notes  # noqa: E402
 TARGET = "verschlechterung"
 
 # Drift simulation: flip this fraction of test labels per monitoring step.
-# Represents concept drift — the text-outcome relationship has changed
+# Represents concept drift – the text-outcome relationship has changed
 # (e.g. new treatment protocols, different documentation practices).
 DRIFT_FLIP_RATES = [0.00, 0.05, 0.10, 0.15, 0.20]
 
@@ -44,7 +44,7 @@ N_BOOTSTRAP = 1000
 # ---------------------------------------------------------------------------
 
 def build_text_pipeline() -> Pipeline:
-    """TF-IDF + logistic regression — all preprocessing inside the pipeline."""
+    """TF-IDF + logistic regression – all preprocessing inside the pipeline."""
     return Pipeline([
         ("tfidf", TfidfVectorizer(
             ngram_range=(1, 2), min_df=2, max_df=0.95, sublinear_tf=True,
@@ -96,7 +96,7 @@ def simulate_concept_drift(y_test: pd.Series, flip_rate: float,
     Rationale: concept drift means the relationship between text and outcome
     has changed (e.g. new treatment protocols alter which phrases predict
     worsening). From the model's perspective this is indistinguishable from
-    label noise — it sees the same text but the 'correct' answer has shifted.
+    label noise – it sees the same text but the 'correct' answer has shifted.
     """
     y_noisy = y_test.copy()
     n_flip = int(flip_rate * len(y_test))
@@ -134,7 +134,7 @@ def bootstrap_auc_ci(y: np.ndarray, proba: np.ndarray, n_boot: int = N_BOOTSTRAP
                       seed: int = SEED) -> tuple[float, float]:
     """95%-bootstrap CI for AUC: resample (y, proba) pairs with replacement.
 
-    The module calls subgroup CIs "Pflicht" (mandatory) — a point-estimate AUC
+    The module calls subgroup CIs "Pflicht" (mandatory) – a point-estimate AUC
     gap between subgroups is often just sampling noise in a small test split.
     """
     rng = np.random.default_rng(seed)
@@ -160,7 +160,7 @@ def _report_subgroup_auc(test_data: pd.DataFrame, proba_all: np.ndarray,
     for group in groups:
         mask = (test_data[column] == group).values
         if mask.sum() < 5:
-            print(f"  {group}: too few samples (n={mask.sum()}) — skip")
+            print(f"  {group}: too few samples (n={mask.sum()}) – skip")
             continue
         y_g = test_data.loc[mask, TARGET].to_numpy()
         p_g = proba_all[mask]
@@ -205,8 +205,8 @@ def demo_fairness(pipe: Pipeline) -> None:
     _report_subgroup_auc(test_data, proba_all, "altersgruppe",
                           ["<65 Jahre", ">=65 Jahre"], "Nach Altersgruppe (Schwelle 65 Jahre)")
 
-    print("\n  A subgroup AUC difference is only worth investigating once its CI excludes")
-    print("  the other group's CI — otherwise it's likely small-sample noise, not a real gap.")
+    print("\n  Overlapping CIs do not prove equality, and non-overlap is a strict criterion.")
+    print("  For the gap itself, compute a CI of the AUC difference (e.g. bootstrap).")
 
 
 # ---------------------------------------------------------------------------
@@ -231,7 +231,7 @@ def main() -> None:
     print("  deterioration is Class III (serious deterioration → IIb). A 30-day-mortality")
     print("  CDSS is a IIb/III candidate. EU AI Act: high-risk. Not legal advice.")
     print("  Before deployment: clinical evaluation study, CE marking, PMS plan.")
-    print("  This model is for teaching purposes only — not for clinical use.")
+    print("  This model is for teaching purposes only – not for clinical use.")
 
 
 if __name__ == "__main__":

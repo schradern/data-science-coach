@@ -21,9 +21,10 @@ in Prosa, wie du denselben Vergleich mit Permutation Importance und PDP-Baseline
 annähern würdest.
 
 ## Aufgabe 4 – Korrelierte Merkmale
-Füge `gewicht_kg` als weiteres Merkmal hinzu (stark korreliert mit `bmi`).
-Beobachte, wie sich die Permutation Importance von `bmi` verändert. Erkläre
-dieses Phänomen in zwei Sätzen.
+`leukozyten_g_l` korreliert mit `sofa_score` (r ≈ 0,45). Entferne
+`leukozyten_g_l` aus den Merkmalen, trainiere das Modell neu und vergleiche die
+Permutation Importance von `sofa_score` vorher und nachher. Erkläre das Ergebnis
+in zwei Sätzen.
 
 ## Bonus – Globale Sicht vs. klinische Realität
 Wähle das aus der PI wichtigste Merkmal. Suche in der Literatur (oder begründe

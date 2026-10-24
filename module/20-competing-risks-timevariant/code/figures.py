@@ -6,32 +6,27 @@ Requires: lifelines, matplotlib.
 from __future__ import annotations
 
 import sys
-import warnings
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 import matplotlib.pyplot as plt  # noqa: E402
-from lifelines import AalenJohansenFitter, KaplanMeierFitter  # noqa: E402
+import pandas as pd  # noqa: E402
+from lifelines import KaplanMeierFitter  # noqa: E402
 
-from lib.helpers import SEED  # noqa: E402
 from lib.plotstyle import EVENT, PRIMARY, SECONDARY, apply_style, save  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from python import ADMIN_HORIZON, build_competing_risk_data  # noqa: E402
+from python import ADMIN_HORIZON, aalen_johansen_cif, build_competing_risk_data  # noqa: E402
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
 
 def fig_cif_vs_naive_km(df) -> None:
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        # Seeded so the tie-jitter is reproducible; clip the last jittered row
-        # (it can sit just past day 30 with a tiny risk set and spike the curve).
-        ajf = AalenJohansenFitter(seed=SEED)
-        ajf.fit(df["event_time"], df["event_state"], event_of_interest=1)
-    cif = ajf.cumulative_density_.loc[:ADMIN_HORIZON]
+    # Exact Aalen-Johansen (no tie-jitter), starting at 0 on day 0.
+    cif = aalen_johansen_cif(df["event_time"], df["event_state"], cause=1)
+    cif = pd.concat([pd.Series({0.0: 0.0}), cif]).loc[:ADMIN_HORIZON]
 
     kmf = KaplanMeierFitter()
     kmf.fit(df["event_time"], event_observed=(df["event_state"] == 1))
@@ -40,7 +35,7 @@ def fig_cif_vs_naive_km(df) -> None:
     fig, ax = plt.subplots(figsize=(7.5, 4.5))
     ax.step(naive_cif.index, naive_cif.values.ravel(), where="post", color=EVENT, lw=2,
             label="1 − Kaplan-Meier (ignoriert Entlassung als Konkurrenzrisiko)")
-    ax.step(cif.index, cif.values.ravel(),
+    ax.step(cif.index, cif.values,
             where="post", color=PRIMARY, lw=2.4,
             label="Cumulative Incidence Function (korrekt, Aalen-Johansen)")
     ax.set_xlabel("Tage seit Aufnahme")

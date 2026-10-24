@@ -3,7 +3,7 @@
 > **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~75 min · Voraussetzung: Modul 17 (Survival-Analyse)
 
 ## Lernziele
-- Verstehen, warum die **Kaplan-Meier-Methode** bei konkurrierenden Risiken das tatsächliche Risiko überschätzt.
+- Verstehen, warum **1 − Kaplan-Meier** bei konkurrierenden Risiken das tatsächliche Risiko überschätzt.
 - Den Unterschied zwischen **Cumulative Incidence Function (CIF)** und Kaplan-Meier erklären – und beide
   an echten Kohortendaten berechnen.
 - Das **Fine-Gray-Modell** von **ursachenspezifischen Hazard-Modellen (Cause-Specific Hazards)** abgrenzen
@@ -15,10 +15,10 @@
 
 Du untersuchst die 30-Tage-Mortalität auf der Intensivstation. Ein Problem tritt auf: Patient:innen, die
 lebend nach Hause entlassen werden, können im Krankenhaus nicht mehr versterben. Die Entlassung konkurriert
-direkt mit dem Endpunkt Tod. Wenn du Entlassene einfach als „zensiert" behandelst, tust du so, als könnten
+direkt mit dem Endpunkt Tod. Wenn du Entlassene einfach als „zensiert“ behandelst, tust du so, als könnten
 sie nach der Entlassung im Krankenhausbett versterben – Kaplan-Meier überschätzt dann die Sterblichkeit
 merklich (siehe Abschnitt 2). Zudem erhalten manche Patient:innen eine Intervention erst im
-Verlauf des Aufenthalts. Wenn du diese ab Tag 0 als „behandelt" klassifizierst, erzeugst du einen
+Verlauf des Aufenthalts. Wenn du diese ab Tag 0 als „behandelt“ klassifizierst, erzeugst du einen
 künstlichen Überlebensvorteil (Immortal Time Bias). Hier lernst du die korrekten Gegenmittel kennen.
 
 ## 1 Konkurrierende Risiken (Competing Risks)
@@ -36,7 +36,7 @@ Studie verbleiben. Bei Entlassung ist das Risiko, im Krankenhausbett zu versterb
   konkurrierenden Ereignisse.
 
 **Grundlage:** Denk an drei Türen, durch die eine Patientin die Beobachtung verlassen kann: **Tod**,
-**Entlassung**, oder **Studienende (Zensierung)**. Kaplan-Meier für „Tod" behandelt Tür 2 (Entlassung) so,
+**Entlassung**, oder **Studienende (Zensierung)**. Kaplan-Meier für „Tod“ behandelt Tür 2 (Entlassung) so,
 als könnte die Person jederzeit durch Tür 1 zurückkommen. Die CIF verschließt Tür 2 endgültig, sobald sie
 durchschritten wurde.
 
@@ -47,32 +47,36 @@ Für dieses Modul liegt ein eigener Datensatz bereit,
 Zufallsstrom, siehe `data/README.md`). Er enthält pro Patient:in:
 
 <!-- excerpt-note -->
-> **Hinweis — die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/20-competing-risks-timevariant/code/python.py` — siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+> **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/20-competing-risks-timevariant/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
 import pandas as pd
 
 df = pd.read_csv("{{DATEN}}konkurrenz_risiken.csv")
-# Spalten: patient_id, event_time, event_state, vasopressor_start_tag
+# Columns: patient_id, event_time, event_state, vasopressor_start_tag
 ```
 
 | Zustand | Bedeutung | Ereigniszeit |
 |---|---|---|
 | 1 = Tod (Zielereignis) | Versterben im Krankenhaus | `event_time` (Todestag ≤ 30) |
 | 2 = Entlassen (Konkurrenzereignis) | lebend nach Hause entlassen | `event_time` (Entlassungstag) |
-| 0 = Zensiert (kein Ereignis) | am Tag 30 noch im Krankenhaus | `event_time` = 30 |
+| 0 = Zensiert (kein Ereignis) | am Tag 30 noch im Krankenhaus oder vorher aus der Beobachtung verloren | `event_time` = 30 bzw. letzter beobachteter Tag |
 
-Die **Entlassung ist ein echtes Konkurrenzereignis** auf derselben Zeitachse wie
-der Tod: Ihre Hazard ist so erzeugt, dass sie **mit steigendem Schweregrad
+Die **Entlassung ist das Konkurrenzereignis** auf derselben Zeitachse wie
+der Tod: Wer lebend entlassen ist, kann nicht mehr im Krankenhaus sterben. Ihre Hazard ist so erzeugt, dass sie **mit steigendem Schweregrad
 fällt** (mittlere Zeit bis Entlassung = `15 + 1,4 · sofa_score` Tage) – Kränkere
 werden also später oder gar nicht entlassen. Die im Krankenhaus Verstorbenen sind
-exakt die Ereignisse aus der Kohorte (`status == 1`), sodass die *wahre* CIF des
-Todes exakt der 30-Tage-Mortalität der Kohorte entspricht (≈ 15,6 %) und die
-ursachenspezifischen Cox-Hazards mit Modul 17 übereinstimmen. Die administrative
+exakt die Ereignisse aus der Kohorte (`status == 1`), sodass die CIF des Todes
+nahe an der rohen 30-Tage-Mortalität der Kohorte liegt (78/500 = 15,6 %) und die
+ursachenspezifischen Cox-Hazards nahe an Modul 17 liegen. Das ist eine bewusste
+Vereinfachung: Der Generator legt die Todesfälle zuerst fest und entlässt dann nur
+Überlebende. Eine Entlassung verhindert hier also keinen Tod, der sonst eingetreten
+wäre. Für die Lektion reicht das, denn genau diese Entlassenen behandelt 1 − KM
+fälschlich so, als trügen sie weiter das Sterberisiko der Verbliebenen. Die administrative
 Zensierung bei Tag 30 bleibt erhalten; das Risikoset an Tag 30 ist **nicht
 entartet** (≈ 90 Patient:innen).
 
-**In unserer Kohorte:** 78 verstorben, 315 entlassen, 107 an Tag 30 zensiert.
+**In unserer Kohorte:** 78 verstorben, 315 entlassen, 107 zensiert (89 an Tag 30 noch im Krankenhaus, 18 vorher aus der Beobachtung verloren).
 (Kovariaten für die Modelle – `alter`, `sofa_score`, `diabetes` – kommen aus
 `kohorte.csv` und werden über `patient_id` angejoint.)
 
@@ -83,32 +87,47 @@ entartet** (≈ 90 Patient:innen).
 ## 2 CIF vs. naive 1-KM: der Unterschied an echten Daten
 
 ```python
-from lifelines import AalenJohansenFitter, KaplanMeierFitter
+import numpy as np
+from lifelines import KaplanMeierFitter
 
-# event_state: 0 = zensiert, 1 = Tod, 2 = Entlassung
-ajf = AalenJohansenFitter(seed=42)   # seed: gebundene Ereigniszeiten werden gejittert
-ajf.fit(df["event_time"], df["event_state"], event_of_interest=1)   # korrekte CIF
-cif_30 = ajf.cumulative_density_.loc[:30].iloc[-1, 0]
+def aalen_johansen_cif(time, state, cause=1):
+    """CIF des Ereignisses `cause` je Zeitpunkt; state 0 = zensiert."""
+    cif, surv, out = 0.0, 1.0, {}
+    for t in np.sort(time.unique()):
+        at_risk = (time >= t).sum()
+        cif += surv * ((time == t) & (state == cause)).sum() / at_risk
+        surv *= 1 - ((time == t) & (state != 0)).sum() / at_risk   # every event counts
+        out[t] = cif
+    return pd.Series(out)
+
+# event_state: 0 = censored, 1 = death, 2 = discharge
+cif_30 = aalen_johansen_cif(df["event_time"], df["event_state"]).loc[:30].iloc[-1]  # correct CIF
 
 kmf = KaplanMeierFitter()
-kmf.fit(df["event_time"], event_observed=(df["event_state"] == 1))  # Entlassung = "zensiert"
-naive_risk = 1 - kmf.survival_function_                              # klassischer Fehler
+kmf.fit(df["event_time"], event_observed=(df["event_state"] == 1))  # discharge = "censored"
+naive_risk = 1 - kmf.survival_function_                              # classic mistake
 ```
+
+**Stolperstein:** `lifelines` hat zwar einen `AalenJohansenFitter`, verschiebt aber gebundene
+Ereigniszeiten (hier: ganze Tage, also sehr viele Gleichstände) zufällig um winzige Beträge. Auf diesen
+Daten liefert er je nach Seed 15,6–15,8 % statt der exakten 16,0 %. Die Funktion oben rechnet die CIF
+deshalb direkt – nur Summen und Produkte, genau wie in Übung 3. In R liefert
+`survfit(Surv(event_time, event_state_f) ~ 1)` denselben Wert (siehe `code/r.R`).
 
 An Tag 30 unserer Kohorte:
 
 | Schätzer | Sterberisiko an Tag 30 |
 |---|---|
-| CIF (korrekt, Aalen-Johansen) | **15,6 %** |
+| CIF (korrekt, Aalen-Johansen) | **16,0 %** |
 | 1 − Kaplan-Meier (Entlassung als Zensierung) | **27,7 %** |
 
-Das naive 1-KM **überschätzt** das wahre Risiko deutlich (27,7 % statt 15,6 %,
-etwa das 1,8-Fache), weil Entlassene aus dem Risikoset herausfallen: Der Nenner
+Das naive 1-KM **überschätzt** das wahre Risiko deutlich (27,7 % statt 16,0 %,
+etwa das 1,7-Fache), weil Entlassene aus dem Risikoset herausfallen: Der Nenner
 schrumpft, und die verbleibenden Todesfälle werden von Kaplan-Meier auf die
 gesamte Population hochgerechnet. Die Überschätzung ist hier **sichtbar, aber
 begrenzt** – das Risikoset an Tag 30 umfasst noch ≈ 90 Patient:innen, sodass 1-KM
 *nicht* auf 100 % hochschießt. Genau so verhält sich der Fehler in echten
-Daten: bounded und tückisch, weil er plausibel aussieht. (Ein 1-KM nahe 100 %
+Daten: begrenzt und tückisch, weil er plausibel aussieht. (Ein 1-KM nahe 100 %
 wäre kein Lehrbuchverhalten, sondern das Artefakt eines kollabierten Risikosets.)
 
 ![Kumulative Inzidenz für Tod: korrekt (Aalen-Johansen-CIF) vs. naiv (1 − Kaplan-Meier, behandelt Entlassung als Zensierung). Die naive Kurve überschätzt das Sterberisiko sichtbar, aber begrenzt, weil entlassene Patient:innen fälschlich als weiterhin gefährdet gelten.](assets/cif_vs_naive_km.png)
@@ -135,7 +154,7 @@ Für Multivariaten-Analysen bei konkurrierenden Risiken gibt es zwei etablierte 
 from lifelines import CoxPHFitter
 
 cs_df = df[["event_time", "event_state", "alter", "sofa_score", "diabetes"]].copy()
-cs_df["death"] = (cs_df["event_state"] == 1).astype(int)   # Entlassung wird zensiert
+cs_df["death"] = (cs_df["event_state"] == 1).astype(int)   # discharge is censored
 cs_cox = CoxPHFitter()
 cs_cox.fit(cs_df[["event_time", "death", "alter", "sofa_score", "diabetes"]],
           duration_col="event_time", event_col="death")
@@ -181,7 +200,7 @@ denselben SHR (SOFA 1,51 vs. 1,50).
 > Schweregrad (mittlere Zeit bis Entlassung = `15 + 1,4 · sofa_score` Tage). Höhere SOFA-Werte senken
 > also *zusätzlich* die Chance auf eine (frühe) Entlassung – das Konkurrenzereignis – und lassen die
 > Patient:innen länger im Risikoset für den Tod. Fine-Gray schließt genau diesen Kanal mit ein,
-> Cause-Specific-Hazards ignorieren ihn per Definition. Beide Zahlen sind „richtig" – sie beantworten
+> Cause-Specific-Hazards ignorieren ihn per Definition. Beide Zahlen sind „richtig“ – sie beantworten
 > nur unterschiedliche Fragen.
 
 **Ehrlichkeit zur Power:** Insgesamt gibt es nur **78 Todesfälle**. Splittet man die Ereignisse auf zwei
@@ -194,7 +213,7 @@ interpretierbar, ein reich adjustiertes Konkurrenzrisiko-Modell wäre jedoch unt
 
 Wenn eine Exposition (z. B. eine Operation, eine Infektion oder eine neue Medikation) erst im *Verlauf*
 der Nachbeobachtung auftritt, darf sie nicht rückwirkend ab Tag 0 als vorhanden gewertet werden. Die Phase
-zwischen Eintritt in die Kohorte und Erhalt der Exposition ist „unsterblich" (Immortal Time) – wer in
+zwischen Eintritt in die Kohorte und Erhalt der Exposition ist „unsterblich“ (Immortal Time) – wer in
 dieser Zeit stirbt, wird automatisch der Kontrollgruppe zugeordnet.
 
 * **Die Lösung:** Umstrukturierung der Daten in das **Start-Stop-Format** (Long-Format), bei dem ein:e
@@ -202,10 +221,10 @@ dieser Zeit stirbt, wird automatisch der Kontrollgruppe zugeordnet.
   ausgeschaltet wird.
 
 ### Datenstruktur im Start-Stop-Format (Beispiel)
-| patient_id | start_tag | stop_tag | vasopressor | death |
-|------------|-----------|----------|-------------|-------|
-| 1          | 0         | 3        | 0           | 0     | (Tag 0 bis 3: unbehandelt)
-| 1          | 3         | 10       | 1           | 1     | (Tag 3 bis 10: behandelt, Event an Tag 10)
+| patient_id | start_tag | stop_tag | vasopressor | death | Bedeutung |
+|------------|-----------|----------|-------------|-------|-----------|
+| 1          | 0         | 3        | 0           | 0     | Tag 0 bis 3: unbehandelt |
+| 1          | 3         | 10       | 1           | 1     | Tag 3 bis 10: behandelt, Event an Tag 10 |
 
 ### Naiv (verzerrt) vs. zeitabhängig (korrekt)
 
@@ -223,11 +242,11 @@ from lifelines import CoxPHFitter, CoxTimeVaryingFitter
 
 # df: event_time, death, ever_vasopressor, sofa_score
 naiv = CoxPHFitter().fit(df[["event_time", "death", "ever_vasopressor", "sofa_score"]],
-                         duration_col="event_time", event_col="death")   # FALSCH
+                         duration_col="event_time", event_col="death")   # WRONG
 
-# tv: Start-Stop-Format aus vasopressor_start_tag (siehe code/python.py, build_time_varying_data())
+# tv: start-stop format from vasopressor_start_tag (see code/python.py, build_time_varying_data())
 ctv = CoxTimeVaryingFitter()
-ctv.fit(tv, id_col="patient_id", start_col="start", stop_col="stop", event_col="death")  # KORREKT
+ctv.fit(tv, id_col="patient_id", start_col="start", stop_col="stop", event_col="death")  # CORRECT
 ```
 
 | Modell | HR Vasopressor | p | Konvergenz |
@@ -252,7 +271,7 @@ Exposition tritt das hier nicht auf.
 
 ---
 
-> **Wann du Hilfe holst.** Ob du ursachenspezifisch (Cause-Specific Hazards) oder prognostisch (Fine-Gray/CIF) fragst, entscheidet über das richtige Modell, und zeitabhängige Expositionen bergen leicht Immortal Time Bias — bei realen Daten sollte eine Biostatistikerin die Wahl des Estimands und die Start-Stop-Datenstruktur prüfen.
+> **Wann du Hilfe holst.** Ob du ursachenspezifisch (Cause-Specific Hazards) oder prognostisch (Fine-Gray/CIF) fragst, entscheidet über das richtige Modell, und zeitabhängige Expositionen bergen leicht Immortal Time Bias – bei realen Daten sollte eine Biostatistikerin die Wahl des Estimands und die Start-Stop-Datenstruktur prüfen.
 
 ## Fallstricke und Merksätze
 
@@ -260,11 +279,11 @@ Exposition tritt das hier nicht auf.
 Studienende). Ein konkurrierendes Risiko verhindert das Eintreten des Zielereignisses endgültig.
 
 **Stolperstein:** Rückwirkendes Klassifizieren vermeiden. Wenn du im Methodenteil liest: „Patient:innen,
-die während des 30-tägigen Aufenthalts beatmet wurden, verglichen mit Nicht-Beatmeten...", suche sofort
+die während des 30-tägigen Aufenthalts beatmet wurden, verglichen mit Nicht-Beatmeten...“, suche sofort
 nach dem *Immortal Time Bias*.
 
 **Darüber hinaus:** „Nutze bei konkurrierenden Risiken niemals 1-KM-Kurven, sondern zeichne direkt die
-kumulativen Inzidenzkurven (CIF) für beide Events" – siehe Abbildung oben, in der genau dieser Unterschied
+kumulativen Inzidenzkurven (CIF) für beide Events“ – siehe Abbildung oben, in der genau dieser Unterschied
 an echten Daten sichtbar wird. Der Abstand zwischen den beiden Kurven wächst mit der Zeit, weil das
 Risikoset unter 1-KM zunehmend unrepräsentativ wird.
 
@@ -273,16 +292,17 @@ Risikoset unter 1-KM zunehmend unrepräsentativ wird.
 Fine-Gray.
 
 ## Selbstcheck
-1. **Warum überschätzt Kaplan-Meier das Risiko, wenn es konkurrierende Ereignisse gibt?**, Weil
+1. **Warum überschätzt Kaplan-Meier das Risiko, wenn es konkurrierende Ereignisse gibt?** – Weil
    Kaplan-Meier die Patient:innen, die das Konkurrenzereignis (z. B. Entlassung) erlitten haben, als
    zensiert behandelt. Dadurch wird angenommen, dass sie weiterhin dem Risiko ausgesetzt sind, das
    Primärereignis (z. B. Tod im Krankenhaus) zu erleiden, was faktisch unmöglich ist. In unserer Kohorte
-   führt das zu einer Überschätzung von 15,6 % (CIF) auf 27,7 % (naives 1-KM) – sichtbar, aber begrenzt.
-2. **Was ist der Unterschied in der Interpretation zwischen Fine-Gray (SHR) und CSHR?**, Das
-   Fine-Gray-Modell (SHR) schätzt den Effekt einer Kovariaten auf das absolute Auftreten des Ereignisses in
-   der Population (ideal für Prognosen). Das cause-specific Modell (CSHR) schätzt den Effekt auf die
+   führt das zu einer Überschätzung von 16,0 % (CIF) auf 27,7 % (naives 1-KM) – sichtbar, aber begrenzt.
+2. **Was ist der Unterschied in der Interpretation zwischen Fine-Gray (SHR) und CSHR?** – Das
+   Fine-Gray-Modell (SHR) beschreibt, in welche Richtung eine Kovariate die kumulative Inzidenz (CIF) des
+   Ereignisses in der Population verschiebt (geeignet für Prognosen); die SHR selbst ist aber kein
+   Risikoverhältnis und lässt sich nicht als „x-fach höheres Risiko“ lesen. Das cause-specific Modell (CSHR) schätzt den Effekt auf die
    biologische Rate unter denjenigen, die bisher verschont geblieben sind (ideal für Ätiologie-Forschung).
-3. **Warum konvergiert ein zeitabhängiges Cox-Modell manchmal nicht?**, Häufigste Ursache: komplette
+3. **Warum konvergiert ein zeitabhängiges Cox-Modell manchmal nicht?** – Häufigste Ursache: komplette
    Separation, meist bei kleinen Kohorten, in denen eine Kovariate (fast) perfekt mit dem Outcome
    übereinstimmt. Abhilfe: größere Stichprobe, weniger deterministische Exposition, oder Penalisierung
    (Ridge-Cox).

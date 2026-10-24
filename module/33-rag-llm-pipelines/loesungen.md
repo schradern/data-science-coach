@@ -55,20 +55,20 @@ Folge diesen Regeln penibel:
 
     (Die maximale `precision@3` ist hier `1/3 ≈ 0,33`, weil je Frage nur ein Chunk relevant ist – genau der Wert aus dem README.)
 
-3. **Grounding:** Bei **F3** liegt der Gold-Chunk (C11) nicht im übergebenen Kontext. Das LLM bekommt die belegende Textstelle nie zu sehen; jede inhaltliche Antwort wäre entweder eine Halluzination oder aus Vorwissen geraten – **nicht grounded**. Korrekt wäre hier die Ausgabe „Information nicht im Kontext enthalten". Das ist ein reiner **Retrieval-Fehler** (vgl. Übung 1): Der beste Prompt kann eine fehlende Quelle nicht retten.
+3. **Grounding:** Bei **F3** liegt der Gold-Chunk (C11) nicht im übergebenen Kontext. Das LLM bekommt die belegende Textstelle nie zu sehen; jede inhaltliche Antwort wäre entweder eine Halluzination oder aus Vorwissen geraten – **nicht grounded**. Korrekt wäre hier die Ausgabe „Information nicht im Kontext enthalten“. Das ist ein reiner **Retrieval-Fehler** (vgl. Übung 1): Der beste Prompt kann eine fehlende Quelle nicht retten.
 
 ---
 
-## Übung 4: Konfidenz-Schwelle als Sicherheitsnetz — Konfusionsmatrix von Hand
+## Übung 4: Konfidenz-Schwelle als Sicherheitsnetz – Konfusionsmatrix von Hand
 
 1. **Klassifikation** (System *antwortet*, wenn Score ≥ 0,20):
 
-    - Q1 (0,35, in-context): antwortet, korrekt → **TP**
-    - Q2 (0,22, in-context): antwortet, korrekt → **TP**
-    - Q3 (0,14, in-context): verweigert, obwohl beantwortbar → **FN**
-    - Q4 (0,28, außer-context): antwortet, obwohl keine Quelle → **FP**
-    - Q5 (0,10, außer-context): verweigert, korrekt → **TN**
-    - Q6 (0,05, außer-context): verweigert, korrekt → **TN**
+    - Q1 (0,35, In-Kontext): antwortet, korrekt → **TP**
+    - Q2 (0,22, In-Kontext): antwortet, korrekt → **TP**
+    - Q3 (0,14, In-Kontext): verweigert, obwohl beantwortbar → **FN**
+    - Q4 (0,28, Außer-Kontext): antwortet, obwohl keine Quelle → **FP**
+    - Q5 (0,10, Außer-Kontext): verweigert, korrekt → **TN**
+    - Q6 (0,05, Außer-Kontext): verweigert, korrekt → **TN**
 
     Also `TP = 2`, `FP = 1`, `FN = 1`, `TN = 2`.
 
@@ -78,4 +78,4 @@ Folge diesen Regeln penibel:
     - `Recall = TP / (TP + FN) = 2 / 3 ≈ 0,67`
     - `F1 = 2 · P · R / (P + R) = 2 · (2/3) · (2/3) / (4/3) = 2/3 ≈ 0,67`
 
-3. **Gefährlichere Fehlklassifikation:** Der **False Positive Q4**. Das System übergibt einen außer-context-Chunk als vermeintliche Quelle an das LLM, das darauf eine scheinbar belegte, in Wahrheit ungegroundete Antwort formulieren kann. Um FP zu senken, müsste man τ **anheben** (z. B. auf 0,30) – dann fällt Q4 unter die Schwelle. Der Preis: Q2 (Score 0,22, echt beantwortbar) würde ebenfalls verweigert – ein zusätzlicher FN. Precision (Sicherheit) und Recall (Abdeckung) stehen im Zielkonflikt; die Schwelle muss **out-of-sample** kalibriert werden, nicht auf denselben Fragen, an denen man sie bewertet (Stolperstein „Zirkuläre Kalibrierung", README Abschnitt 4).
+3. **Gefährlichere Fehlklassifikation:** Der **False Positive Q4**. Das System übergibt einen Außer-Kontext-Chunk als vermeintliche Quelle an das LLM, das darauf eine scheinbar belegte, in Wahrheit ungegroundete Antwort formulieren kann. Um FP zu senken, müsste man τ **anheben** (z. B. auf 0,30) – dann fällt Q4 unter die Schwelle. Der Preis: Q2 (Score 0,22, echt beantwortbar) würde ebenfalls verweigert – ein zusätzlicher FN. Precision (Sicherheit) und Recall (Abdeckung) stehen im Zielkonflikt; die Schwelle muss **out-of-sample** kalibriert werden, nicht auf denselben Fragen, an denen man sie bewertet (Stolperstein „Zirkuläre Kalibrierung“, README Abschnitt 4).

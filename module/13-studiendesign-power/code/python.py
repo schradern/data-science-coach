@@ -30,7 +30,7 @@ def main() -> None:
     n_no = len(df) - n_diabetes
     ratio = n_no / n_diabetes
     # NOTE: this is power for an *a-priori* planning effect (d=0.5) at the
-    # observed sample sizes — NOT "observed/post-hoc power" computed from the
+    # observed sample sizes – NOT "observed/post-hoc power" computed from the
     # measured effect, which is a deterministic function of the p-value and
     # therefore uninformative (Hoenig & Heisey 2001; see module's Fallstricke).
     power_at_observed_n = power.power(effect_size=0.5, nobs1=n_diabetes, ratio=ratio, alpha=0.05)

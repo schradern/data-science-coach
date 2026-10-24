@@ -6,7 +6,8 @@ other course number):
 
     patient_id
     event_time             day of the exit event (death day, discharge day, or 30)
-    event_state            0 = administratively censored at day 30
+    event_state            0 = censored (still in hospital at day 30, or lost
+                               to follow-up earlier)
                            1 = in-hospital death (event of interest)
                            2 = discharge alive (competing event)
     vasopressor_start_tag  day a time-varying vasopressor exposure begins, or
@@ -15,9 +16,10 @@ other course number):
 Discharge is a GENUINE competing event on the same day axis as death, drawn
 with a hazard that FALLS with severity (higher sofa_score -> later, or no,
 discharge), and administrative censoring at day 30 is preserved (the day-30
-risk set stays non-degenerate at ~90 patients). Because in-hospital deaths are
-kept exactly as observed in the cohort, the true death CIF equals the cohort's
-30-day mortality (~15.6 %) and the cause-specific Cox hazards match Module 17.
+risk set stays non-degenerate at ~90 patients). In-hospital deaths are kept
+exactly as observed in the cohort (78 of 500 = 15.6 %); the Aalen-Johansen CIF
+is slightly higher (16.0 %) because 18 patients are lost to follow-up before
+day 30. The cause-specific Cox hazards land close to Module 17.
 
 Baseline covariates (alter, sofa_score, diabetes) come from kohorte.csv. No
 files under data/ are edited by this script.
@@ -36,9 +38,9 @@ sys.path.insert(0, str(ROOT))
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from lifelines import AalenJohansenFitter, CoxPHFitter, CoxTimeVaryingFitter, KaplanMeierFitter  # noqa: E402
+from lifelines import CoxPHFitter, CoxTimeVaryingFitter, KaplanMeierFitter  # noqa: E402
 
-from lib.helpers import SEED, _load, load_cohort  # noqa: E402
+from lib.helpers import _load, load_cohort  # noqa: E402
 
 ADMIN_HORIZON = 30  # administrative censoring day
 
@@ -54,6 +56,25 @@ def build_competing_risk_data() -> pd.DataFrame:
     df = cr.merge(cov, on="patient_id")
     df["event_time"] = df["event_time"].astype(float)
     return df
+
+
+def aalen_johansen_cif(time: pd.Series, state: pd.Series, cause: int = 1) -> pd.Series:
+    """Aalen-Johansen cumulative incidence of `cause` at each distinct time.
+
+    state: 0 = censored, any other value = an event of that type. Tied days are
+    handled exactly. lifelines' AalenJohansenFitter instead jitters tied times
+    at random; with day-resolution data (many ties) that shifts the day-30
+    estimate (15.6 % instead of the exact 16.0 % here, seed-dependent).
+    """
+    cif, surv, out = 0.0, 1.0, {}
+    for t in np.sort(time.unique()):
+        at_risk = (time >= t).sum()
+        d_cause = ((time == t) & (state == cause)).sum()
+        d_any = ((time == t) & (state != 0)).sum()
+        cif += surv * d_cause / at_risk   # S(t-) * cause-specific hazard at t
+        surv *= 1 - d_any / at_risk       # all-cause survival (any event counts)
+        out[t] = cif
+    return pd.Series(out, name=f"cif_{cause}")
 
 
 def build_time_varying_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -93,13 +114,8 @@ def main() -> None:
 
     # --- 1) Cumulative Incidence Function (CIF) vs. naive 1-KM ---------------
     print("\n=== 1) CIF (correct) vs. naive 1-KM (treats discharge as censoring) ===")
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")  # AalenJohansen jitters tied event times
-        # Seeded so the jitter is reproducible; query at t <= 30 because the
-        # last jittered row can sit just past 30 with a tiny risk set.
-        ajf = AalenJohansenFitter(seed=SEED)
-        ajf.fit(df["event_time"], df["event_state"], event_of_interest=1)
-    cif_30 = float(ajf.cumulative_density_.loc[:ADMIN_HORIZON].iloc[-1, 0])
+    cif = aalen_johansen_cif(df["event_time"], df["event_state"], cause=1)
+    cif_30 = float(cif.loc[:ADMIN_HORIZON].iloc[-1])
 
     kmf = KaplanMeierFitter()
     kmf.fit(df["event_time"], event_observed=(df["event_state"] == 1))

@@ -1,9 +1,9 @@
-"""Figures for module 30 — deep learning intro.
+"""Figures for module 30 – deep learning intro.
 
 Run: python module/30-deep-learning/code/figures.py
 
 Writes PNGs to assets/. German labels (display layer), English code.
-torch is NOT imported — all code is runnable with sklearn only.
+torch is NOT imported – all code is runnable with sklearn only.
 """
 from __future__ import annotations
 
@@ -153,7 +153,7 @@ def fig_auc_vergleich(X, y) -> None:
     ax.set_ylim(0, 1)
     ax.set_ylabel("Kreuzvalidierte ROC-AUC (5-fach, stratifiziert)")
 
-    # Data-driven verdict — NEVER hardcode who "wins": derive it from the
+    # Data-driven verdict – NEVER hardcode who "wins": derive it from the
     # computed aucs so the title can't drift out of sync with the bars.
     order = sorted(zip(names, aucs), key=lambda t: -t[1])
     best_name, best_auc = order[0]
@@ -165,7 +165,7 @@ def fig_auc_vergleich(X, y) -> None:
                else f"{best_flat} und {runner_up_flat} liegen gleichauf")
 
     ax.set_title("AUC-Vergleich: Logistische Regression vs. Gradient Boosting vs. MLP\n"
-                 f"(synthetische Kohorte, n≈{len(X)} — {verdict})")
+                 f"(synthetische Kohorte, n≈{len(X)} – {verdict})")
 
     save(fig, ASSETS / "auc_vergleich.png")
 
@@ -185,7 +185,7 @@ def main() -> None:
     print("Erzeuge AUC-Vergleich …")
     fig_auc_vergleich(X, y)
 
-    print("Fertig — alle Abbildungen in", ASSETS)
+    print("Fertig – alle Abbildungen in", ASSETS)
 
 
 if __name__ == "__main__":

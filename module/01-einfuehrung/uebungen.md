@@ -3,7 +3,7 @@
 Code in Englisch, Prosa/Antworten Deutsch. Lösungen: [`loesungen.md`](loesungen.md).
 
 ## Aufgabe 1 – Datensatz erkunden
-Lade `kohorte.csv` mit `load_cohort()`. Wie viele Patient:innen enthält der
+Lade `kohorte.csv` wie in der Mini-Demo (Abschnitt 5 bzw. 6). Wie viele Patient:innen enthält der
 Datensatz? Wie viele Spalten? Gib die Spaltenübersicht aus.
 
 ## Aufgabe 2 – Mortalität nach Aufnahmegrund
@@ -15,7 +15,7 @@ Berechne Mittelwert und Median des Alters in der Kohorte. Was sagt der Unterschi
 zwischen Mittelwert und Median über die Verteilung aus?
 
 ## Aufgabe 4 – Lernpfad wählen
-Lies Abschnitt 3 „Kursüberblick und Lernpfade" oben in diesem Modul. Welcher
+Lies Abschnitt 3 „Kursüberblick und Lernpfade“ oben in diesem Modul. Welcher
 der sieben Lernpfade passt am besten zu deinem aktuellen Ziel? Notiere kurz,
 warum.
 

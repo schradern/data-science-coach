@@ -28,7 +28,7 @@ def fig_fhir_omop_flow() -> None:
     ax.set_ylim(0, 3.1)
     ax.axis("off")
 
-    # Row 1: FHIR REST -> JSON Bundle -> flache Tabelle
+    # Row 1: FHIR REST -> JSON Bundle -> flat table
     boxes_top = [
         (1.1, "KAS / FHIR-\nServer", "REST-API,\nz. B. Observation?code=...", "#6B7178"),
         (3.8, "JSON-Bundle", "entry[] mit Patient- und\nObservation-Ressourcen", PRIMARY),
@@ -53,7 +53,7 @@ def fig_fhir_omop_flow() -> None:
                                  color="#9AA0A8", zorder=2)
         ax.add_patch(arrow)
 
-    # Der entscheidende Schritt zwischen Tabelle und OMOP.
+    # The key step between the table and OMOP.
     ax.annotate("", xy=(9.2, y_top - box_h / 2 - 0.18), xytext=(6.5, y_top - box_h / 2 - 0.18),
                 arrowprops=dict(arrowstyle="-|>", color=EVENT, lw=1.4,
                                 connectionstyle="arc3,rad=-0.3"))

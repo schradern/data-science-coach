@@ -40,9 +40,9 @@ Die Wahl des statistischen Tests hängt entscheidend von der Form und Struktur d
 > [!IMPORTANT]
 > **Der Median-Mythos des Mann-Whitney-U-Tests**  
 > Oft wird gelehrt, der Mann-Whitney-U-Test sei ein reiner „Median-Vergleich“. Das stimmt nur unter der extrem starken (und klinisch seltenen) Annahme, dass die Verteilungen beider Gruppen exakt dieselbe Form haben (gleiche Varianz und Schiefe).  
-> Haben die Gruppen unterschiedliche Formen, vergleicht der Test die **stochastische Dominanz** (die Wahrscheinlichkeit, dass ein zufälliger Wert aus Gruppe B größer ist als einer aus Gruppe A). Das führt dazu, dass der Test hochsignifikant (`p < 0,001`) ausfallen kann, obwohl die Mediane beider Gruppen **exakt identisch** sind!
+> Haben die Gruppen unterschiedliche Formen, vergleicht der Test die **stochastische Überlegenheit** (die Wahrscheinlichkeit, dass ein zufälliger Wert aus Gruppe B größer ist als einer aus Gruppe A). Das führt dazu, dass der Test hochsignifikant (`p < 0,001`) ausfallen kann, obwohl die Mediane beider Gruppen **exakt identisch** sind.
 >
-> ![Abbildung: Der Median-Mythos des Mann-Whitney-U-Tests. Beide Gruppen haben den exakt identischen Median von 3,50, aber die unterschiedliche Streuung und Form führt zu einem hochsignifikanten Mann-Whitney-U-Test (p < 0.001).](assets/mann_whitney_median_myth.png)
+> ![Abbildung: Der Median-Mythos des Mann-Whitney-U-Tests. Beide Gruppen haben den exakt identischen Median von 3,50, aber die unterschiedliche Streuung und Form führt zu einem hochsignifikanten Mann-Whitney-U-Test (p < 0,001).](assets/mann_whitney_median_myth.png)
 
 ### 2. Gepaarter Vergleich (Vorher/Nachher): Gepaarter t-Test vs. Wilcoxon-Vorzeichen-Rang-Test
 - **Gepaarter t-Test:** Wenn die Verteilung der *Differenzen* (Wert B - Wert A) symmetrisch und annähernd normalverteilt ist.
@@ -51,16 +51,16 @@ Die Wahl des statistischen Tests hängt entscheidend von der Form und Struktur d
 ![Abbildung: Vergleich der Differenzverteilungen für den gepaarten t-Test (symmetrisch) und den Wilcoxon-Vorzeichen-Rang-Test (schief mit Ausreißern).](assets/dist_paired_t_vs_wilcoxon.png)
 
 ### 3. Mehrgruppeneffekt (≥ 3 Gruppen): ANOVA vs. Kruskal-Wallis-Test
-- **ANOVA:** Vergleicht die Mittelwerte von drei oder mehr unabhängigen Gruppen. Voraussetzung: Alle Gruppen sind normalverteilt und haben ähnliche Varianzen.
+- **ANOVA:** Vergleicht die Mittelwerte von drei oder mehr unabhängigen Gruppen. Voraussetzung: annähernd normalverteilte Werte je Gruppe und ähnliche Varianzen; bei ungleichen Varianzen die Welch-ANOVA (analog zum Welch-t-Test).
 - **Kruskal-Wallis-Test:** Die nicht-parametrische Alternative bei schiefen Gruppenverteilungen oder ordinalen Scores (z. B. SOFA-Score in 3 Patientengruppen).
 
 ![Abbildung: Verteilungen für ANOVA (symmetrische Gruppen) und Kruskal-Wallis (schiefe Gruppen).](assets/dist_anova_vs_kruskal.png)
 
-### 4. Kategorialer Vergleich (Häufigkeiten): Chi-Quadrat vs. Fisher's exakter Test
+### 4. Kategorialer Vergleich (Häufigkeiten): Chi-Quadrat vs. exakter Fisher-Test
 - **Chi-Quadrat-Test:** Geeignet für den Vergleich von Häufigkeiten (2x2-Tabellen) bei großen Fallzahlen. Faustregel: Jede Zelle der Kreuztabelle enthält mindestens 5 erwartete Fälle.
-- **Fisher's exakter Test:** Exakte Berechnung der Wahrscheinlichkeiten bei kleinen Fallzahlen oder sehr seltenen Ereignissen (z. B. anaphylaktischer Schock in einer kleinen Studie).
+- **Exakter Fisher-Test:** Exakte Berechnung der Wahrscheinlichkeiten bei kleinen Fallzahlen oder sehr seltenen Ereignissen (z. B. anaphylaktischer Schock in einer kleinen Studie).
 
-![Abbildung: Kontingenztabellen für den Chi-Quadrat-Test (große Fallzahlen in allen Zellen) und Fisher's exakten Test (sehr kleine Fallzahlen in den Ereigniszellen).](assets/dist_chi2_vs_fisher.png)
+![Abbildung: Kontingenztabellen für den Chi-Quadrat-Test (große Fallzahlen in allen Zellen) und den exakten Fisher-Test (sehr kleine Fallzahlen in den Ereigniszellen).](assets/dist_chi2_vs_fisher.png)
 
 ### 5. Zeit-bis-Ereignis (Überleben): Kaplan-Meier vs. Cox-Regression
 - **Kaplan-Meier-Schätzer / Log-Rank-Test:** Reine unadjustierte Beschreibung der Überlebenszeit zweier Gruppen.
@@ -74,19 +74,19 @@ Die Wahl des statistischen Tests hängt entscheidend von der Form und Struktur d
 
 | Frage | Typische Daten | Standard | Robuste Alternative | Berichten |
 |---|---|---|---|---|
-| Mittelwert zweier unabhängiger Gruppen | stetig, zwei Gruppen | Welch-t-Test | Mann-Whitney-U | Differenz, 95-%-KI, Cohen's d oder Rang-r |
-| Vorher/Nachher bei denselben Patient:innen | gepaart stetig | gepaarter t-Test | Wilcoxon Signed-Rank | mittlere/mediane Differenz, 95-%-KI |
+| Mittelwert zweier unabhängiger Gruppen | stetig, zwei Gruppen | Welch-t-Test | Mann-Whitney-U | Differenz, 95-%-KI, Cohens d oder Rang-r |
+| Vorher/Nachher bei denselben Patient:innen | gepaart stetig | gepaarter t-Test | Wilcoxon-Vorzeichen-Rang | mittlere/mediane Differenz, 95-%-KI |
 | Mehr als zwei Gruppen | stetig, >2 Gruppen | ANOVA | Kruskal-Wallis | Gruppenmittel, η² oder ε², Post-hoc geplant |
-| Zwei kategoriale Variablen | 2x2 oder RxC | Chi-Quadrat | Fisher exakt bei kleinen Zellen | OR/RR, Cramér's V, 95-%-KI |
+| Zwei kategoriale Variablen | 2x2 oder RxC | Chi-Quadrat | Fisher exakt bei kleinen Zellen | OR/RR, Cramérs V, 95-%-KI |
 | Stetiger Outcome mit Adjustierung | stetig | lineare Regression | robuste SE / Transformation | β, 95-%-KI, Residuencheck |
 | Binärer Outcome mit Adjustierung | ja/nein | logistische Regression | penalisiert bei seltenen Events | OR, 95-%-KI, Kalibrierung |
 | Zeit bis Ereignis | Tage + Ereignisindikator | Kaplan-Meier, Cox | stratifiziert / zeitabhängig | HR, absolute Risiken, PH-Prüfung |
 
 **Praxis:** Bei klinischen Daten ist Welch-t meist die bessere t-Test-Voreinstellung als Student-t, weil gleiche Varianzen selten garantiert sind.
 
-**Stolperstein:** Mann-Whitney ist nicht automatisch ein „Median-Test”. Er testet stochastische Überlegenheit. Nur bei ähnlich geformten Verteilungen lässt er sich grob als Medianvergleich lesen.
+**Stolperstein:** Mann-Whitney ist nicht automatisch ein „Median-Test“. Er testet stochastische Überlegenheit. Nur bei ähnlich geformten Verteilungen lässt er sich grob als Medianvergleich lesen.
 
-**Post-hoc nach dem Mehrgruppenvergleich:** Ein signifikanter Gesamttest sagt nur, dass sich *irgendwelche* Gruppen unterscheiden, nicht welche. Nach signifikanter **ANOVA** ist **Tukey HSD** der Standard-Post-hoc-Test für paarweise Gruppenvergleiche. Nach signifikantem **Kruskal-Wallis** ist **Dunn's Test mit Bonferroni- oder Holm-Korrektur** die robuste Alternative. Paarweise Tests ohne Korrektur für multiples Testen inflationieren die familienweise Fehlerrate (Modul 10 zeigt Bonferroni und Benjamini-Hochberg im Detail).
+**Post-hoc nach dem Mehrgruppenvergleich:** Ein signifikanter Gesamttest sagt nur, dass sich *irgendwelche* Gruppen unterscheiden, nicht welche. Nach signifikanter **ANOVA** ist **Tukey HSD** der Standard-Post-hoc-Test für paarweise Gruppenvergleiche. Nach signifikantem **Kruskal-Wallis** ist der **Dunn-Test mit Bonferroni- oder Holm-Korrektur** die robuste Alternative. Paarweise Tests ohne Korrektur für multiples Testen inflationieren die familienweise Fehlerrate (Modul 10 zeigt Bonferroni und Benjamini-Hochberg im Detail).
 
 ## 4 Annahmen pragmatisch prüfen
 
@@ -115,18 +115,18 @@ labs = pd.read_csv("{{DATEN}}labor.csv")
 vitals = pd.read_csv("{{DATEN}}vitalwerte.csv")
 df = cohort.merge(labs, on="patient_id", how="left")
 
-# Unabhängige Gruppen: Laktat bei Sepsis vs. nicht Sepsis
+# Independent groups: lactate in Sepsis vs. non-Sepsis
 sepsis = df.loc[df["aufnahmegrund"] == "Sepsis", "laktat_mmol_l"].dropna()
 other = df.loc[df["aufnahmegrund"] != "Sepsis", "laktat_mmol_l"].dropna()
 print(stats.ttest_ind(sepsis, other, equal_var=False))
 print(stats.mannwhitneyu(sepsis, other, alternative="two-sided"))
 
-# Gepaarte Messung: MAP Tag 0 vs. Tag 3 bei denselben Patient:innen
+# Paired measurement: MAP on day 0 vs. day 3 in the same patients
 wide = vitals.pivot(index="patient_id", columns="tag", values="map_mmhg").dropna(subset=[0, 3])
 print(stats.ttest_rel(wide[3], wide[0]))
 print(stats.wilcoxon(wide[3], wide[0]))
 
-# Kategorial: aktives Rauchen und 30-Tage-Mortalität
+# Categorical: active smoking and 30-day mortality
 tab = pd.crosstab(df["raucherstatus"].eq("aktiv"), df["verstorben_30d"])
 print(stats.chi2_contingency(tab, correction=False))
 print(stats.fisher_exact(tab))
@@ -166,7 +166,7 @@ Schreibe kurz, testbar und klinisch lesbar:
 - „Die MAP-Veränderung von Tag 0 zu Tag 3 wurde gepaart analysiert, da dieselben Patient:innen zweimal gemessen wurden.“
 - „Für Mortalität nutzen wir logistische Regression, weil Adjustierung für Confounder wie Alter klinisch zwingend ist (Mediatoren wie SOFA nur adjustieren, wenn der direkte statt der totale Effekt interessiert, siehe Modul 15).“
 
-> **Wann du Hilfe holst.** Wenn dein Design aus der Entscheidungstabelle herausfällt — etwa mehrfach genestete oder wiederholte Messungen, mehrere korrelierte Endpunkte oder ein gemischtes Outcome — dann ist die Tabelle am Ende und eine Statistikerin am Anfang: kläre die Methode, bevor du die Analyse rechnest.
+> **Wann du Hilfe holst.** Wenn dein Design aus der Entscheidungstabelle herausfällt – etwa mehrfach genestete oder wiederholte Messungen, mehrere korrelierte Endpunkte oder ein gemischtes Outcome – dann ist die Tabelle am Ende und eine Statistikerin am Anfang: kläre die Methode, bevor du die Analyse rechnest.
 
 ## Fallstricke und Merksätze
 
@@ -177,6 +177,6 @@ Schreibe kurz, testbar und klinisch lesbar:
 
 ## Selbstcheck
 
-1. **Welcher Test passt für Laktat bei Sepsis vs. Nicht-Sepsis, wenn Laktat stark schief ist?**, Mann-Whitney-U ist robust; Welch-t kann zusätzlich als Sensitivität dienen, wenn Mittelwertunterschiede klinisch interessieren.
-2. **Warum ist Tag 0 vs. Tag 3 MAP ein gepaarter Vergleich?**, Weil dieselben Patient:innen wiederholt gemessen wurden; die Messungen sind nicht unabhängig.
-3. **Wann ist Regression besser als ein einzelner Test?**, Wenn der klinische Vergleich durch Alter, Schweregrad oder andere Confounder verzerrt sein kann.
+1. **Welcher Test passt für Laktat bei Sepsis vs. Nicht-Sepsis, wenn Laktat stark schief ist?** – Mann-Whitney-U ist robust; Welch-t kann zusätzlich als Sensitivität dienen, wenn Mittelwertunterschiede klinisch interessieren.
+2. **Warum ist Tag 0 vs. Tag 3 MAP ein gepaarter Vergleich?** – Weil dieselben Patient:innen wiederholt gemessen wurden; die Messungen sind nicht unabhängig.
+3. **Wann ist Regression besser als ein einzelner Test?** – Wenn der klinische Vergleich durch Alter, Schweregrad oder andere Confounder verzerrt sein kann.

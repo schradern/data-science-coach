@@ -1,4 +1,4 @@
-# Module 28 — Survival ML with R (parallel to Python).
+# Module 28 – Survival ML with R (parallel to Python).
 #   Rscript module/28-survival-ml/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -17,7 +17,7 @@ set.seed(SEED)
 
 # ---- Data -------------------------------------------------------------------
 # Median-impute all numeric predictors with missingness (incl. bmi) instead of
-# listwise-dropping rows — mirrors python.py's SimpleImputer(strategy="median").
+# listwise-dropping rows – mirrors python.py's SimpleImputer(strategy="median").
 data <- load_cohort() |>
   left_join(load_labs(), by = "patient_id") |>
   mutate(across(c(bmi, leukozyten_g_l, haemoglobin_g_dl, kreatinin_mg_dl,
@@ -43,7 +43,7 @@ cat("Concordance (C-statistic, TRAIN, for reference only):",
 # Risk scores on test set
 cox_lp <- predict(cox_fit, newdata = test, type = "lp")  # linear predictor
 
-# Test-set concordance — summary(cox_fit)$concordance above is computed on the
+# Test-set concordance – summary(cox_fit)$concordance above is computed on the
 # TRAINING data the model was fit on and is optimistic; the number that matters
 # for model comparison is out-of-sample, on the held-out test set.
 cox_test_conc <- survival::concordance(cox_fit, newdata = test)
@@ -60,9 +60,10 @@ if (requireNamespace("randomForestSRC", quietly = TRUE)) {
   print(head(vi, 5))
   rsf_pred <- predict(rsf_fit, newdata = test)
   rsf_scores <- rsf_pred$predicted  # higher = higher risk
-  cat("\nRSF test C-statistic:",
-      rcorr.cens(-rsf_scores, Surv(test$fu_zeit_tage, test$status))["C Index"],
-      "\n")
+  # reverse = TRUE: a higher score means higher risk, i.e. shorter survival.
+  rsf_conc <- survival::concordance(Surv(fu_zeit_tage, status) ~ rsf_scores,
+                                    data = test, reverse = TRUE)
+  cat("\nRSF test C-statistic:", rsf_conc$concordance, "\n")
   have_rsf <- TRUE
 } else {
   cat("randomForestSRC not installed. Install: install.packages('randomForestSRC')\n")
@@ -75,7 +76,7 @@ if (requireNamespace("randomForestSRC", quietly = TRUE)) {
 # python.py teaches cumulative_dynamic_auc; the R track must teach the SAME
 # estimand, not only Harrell's C-index (a single time-averaged number). timeROC
 # gives the cumulative/dynamic AUC at each horizon WITH a confidence interval
-# (iid = TRUE), so — as in python.py — we can judge whether an apparent
+# (iid = TRUE), so – as in python.py – we can judge whether an apparent
 # Cox-vs-RSF gap is real or just sampling noise on a small test set.
 require_pkgs("timeROC")   # aborts loudly (exit 1) if timeROC is not installed
 cat("\n=== 2b) Time-dependent AUC (timeROC, with 95% CI) ===\n")
@@ -89,7 +90,7 @@ td_auc_with_ci <- function(marker, label) {
                          times = eval_times, iid = TRUE)
   ci <- confint(td, level = 0.95)$CI_AUC  # S3 method confint.ipcwsurvivalROC; percent scale
   # The normal-approximation CI can spill past [0, 1] with few events; clip it,
-  # since an AUC is bounded — the width still shows how uncertain it is.
+  # since an AUC is bounded – the width still shows how uncertain it is.
   ci <- pmin(pmax(ci / 100, 0), 1)
   for (i in seq_along(eval_times)) {
     cat(sprintf("  %-4s %2dd: AUC %.3f  (95%%-KI %.3f-%.3f)\n",
@@ -108,7 +109,7 @@ if (have_rsf) {
 
 # ---- 3) Kaplan-Meier by risk tertile ----------------------------------------
 cat("\n=== 3) Kaplan-Meier curves by risk group ===\n")
-# Tertile cut by score (not by outcome — that would be leakage).
+# Tertile cut by score (not by outcome – that would be leakage).
 breaks <- unique(quantile(rsf_scores, c(0, 1/3, 2/3, 1), na.rm = TRUE))
 if (length(breaks) == 4) {
   test$risikogruppe <- cut(rsf_scores, breaks = breaks,
@@ -129,7 +130,7 @@ lr_test <- survdiff(Surv(fu_zeit_tage, status) ~ risikogruppe, data = test)
 cat("\nLog-rank test p-value:", 1 - pchisq(lr_test$chisq, df = 2), "\n")
 
 # ---- 4) Competing risks (concept) -------------------------------------------
-cat("\n=== 4) Competing risks — concept ===\n")
+cat("\n=== 4) Competing risks – concept ===\n")
 if (requireNamespace("cmprsk", quietly = TRUE)) {
   library(cmprsk)
   cat("cmprsk available. Example:\n")

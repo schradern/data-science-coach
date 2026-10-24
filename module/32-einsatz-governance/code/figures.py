@@ -130,7 +130,7 @@ def fig_subgruppen_auc(pipe: Pipeline) -> None:
     proba_all = pipe.predict_proba(test_data["notiz"])[:, 1]
     overall_auc = roc_auc_score(test_data[TARGET], proba_all)
 
-    # Display labels with correct German umlauts — "maennlich" is only the
+    # Display labels with correct German umlauts – "maennlich" is only the
     # internal data-encoding value, not what should appear on the chart.
     display_name = {"weiblich": "Weiblich", "maennlich": "Männlich"}
 
@@ -149,7 +149,7 @@ def fig_subgruppen_auc(pipe: Pipeline) -> None:
         err_hi.append(hi - auc_g)
         cis.append((lo, hi))
 
-    # Flag a bar only if its CI does NOT overlap the overall AUC — a point
+    # Flag a bar only if its CI does NOT overlap the overall AUC – a point
     # estimate more than 0.05 away from the mean can still be pure noise if
     # the CI is wide, so colour-coding must be based on the interval, not
     # the point estimate alone.

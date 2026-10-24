@@ -2,7 +2,7 @@
 
 Writes PNGs to ../assets/. German labels (display), English code.
 Requires: scikit-learn, lifelines, matplotlib.
-Optional: scikit-survival (sksurv) — falls back gracefully.
+Optional: scikit-survival (sksurv) – falls back gracefully.
 """
 from __future__ import annotations
 
@@ -112,7 +112,7 @@ def fig_rsf_vs_cox(X_tr_np, X_te_np, events_train, events_test,
         ax.set_title("Zeitabhängige AUC: RSF vs. Cox-Baseline")
 
     except ImportError as exc:
-        # scikit-survival is a required dependency for this figure — the
+        # scikit-survival is a required dependency for this figure – the
         # RSF-vs-Cox time-dependent AUC comparison is the whole point of the
         # chart, so silently degrading to a different chart (with a mismatched
         # caption) is worse than failing loudly. Install scikit-survival and
@@ -120,7 +120,7 @@ def fig_rsf_vs_cox(X_tr_np, X_te_np, events_train, events_test,
         plt.close(fig)
         raise SystemExit(
             "scikit-survival (sksurv) is required to generate rsf_vs_cox.png "
-            "— install it with `pip install scikit-survival` and re-run. "
+            "– install it with `pip install scikit-survival` and re-run. "
             "This figure specifically compares RSF vs. Cox time-dependent AUC; "
             "there is no meaningful fallback chart for that comparison."
         ) from exc
@@ -137,7 +137,7 @@ def fig_rsf_vs_cox(X_tr_np, X_te_np, events_train, events_test,
 
 def fig_risikogruppen_km(risk_scores, events_test, times_test) -> None:
     """Kaplan-Meier curves stratified by model-predicted risk tertile."""
-    # Split by tertiles of the risk score (not by outcome — that would be leakage).
+    # Split by tertiles of the risk score (not by outcome – that would be leakage).
     tertile_low = np.percentile(risk_scores, 33)
     tertile_high = np.percentile(risk_scores, 67)
 

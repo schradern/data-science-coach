@@ -125,7 +125,7 @@ def fig_partial_dependence(model, X_test: pd.DataFrame) -> None:
         ax.set_ylabel("Vorhergesagtes Sterberisiko (Wahrsch.)")
         ax.set_xlabel(titles[i])
 
-    fig.suptitle("Partial Dependence & ICE — globaler vs. individueller Effekt",
+    fig.suptitle("Partial Dependence & ICE – globaler vs. individueller Effekt",
                  fontsize=12, fontweight="bold", y=1.02)
     fig.tight_layout()
     save(fig, ASSETS / "partial_dependence.png")

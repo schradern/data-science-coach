@@ -59,7 +59,7 @@ Die CIF-Beiträge fallen nur an Todes-Tagen an, gewichtet mit `S` des *Vortags* 
 
 `CIF_Tod(5) = 0,10 + 0,10 + 0,05 = 0,25` (**25,0 %**).
 
-**Teil 3 – Vergleich:** Naiv **35,7 %** vs. korrekt **25,0 %** – das naive 1−KM überschätzt um rund das 1,4-Fache. Grund: Kaplan-Meier behandelt die 10 Entlassenen als zensiert, also so, als blieben sie weiter todesgefährdet. Dadurch schrumpft der Nenner (das Risikoset), und die späten Todesfälle (z. B. Tag 5 mit nur noch `n = 6`) werden auf die gesamte Ausgangspopulation hochgerechnet. Die CIF verschließt die „Tür Entlassung" endgültig und rechnet die späten Todesfälle nur den tatsächlich noch Gefährdeten zu. Genau dieser Effekt tritt auch in der Kurskohorte auf (27,7 % naiv vs. 15,6 % CIF, README Abschnitt 2).
+**Teil 3 – Vergleich:** Naiv **35,7 %** vs. korrekt **25,0 %** – das naive 1−KM überschätzt um rund das 1,4-Fache. Grund: Kaplan-Meier behandelt die 10 Entlassenen als zensiert, also so, als blieben sie weiter todesgefährdet. Dadurch schrumpft der Nenner (das Risikoset), und die späten Todesfälle (z. B. Tag 5 mit nur noch `n = 6`) werden auf die gesamte Ausgangspopulation hochgerechnet. Die CIF verschließt die „Tür Entlassung“ endgültig und rechnet die späten Todesfälle nur den tatsächlich noch Gefährdeten zu. Genau dieser Effekt tritt auch in der Kurskohorte auf (27,7 % naiv vs. 16,0 % CIF, README Abschnitt 2).
 
 ---
 
@@ -73,5 +73,8 @@ Die CIF-Beiträge fallen nur an Todes-Tagen an, gewichtet mit `S` des *Vortags* 
 
     Summe: `0,156 + 0,630 + 0,214 = 1,000`. Die drei Zustände partitionieren die Kohorte vollständig.
 
+    Mit der echten Zensierung (18 Patient:innen vor Tag 30 verloren) liefert Aalen-Johansen etwas andere
+    Werte – `0,160 + 0,647 + 0,193 = 1,000` –, die Summe bleibt aber exakt 1.
+
 2. **Warum 1−KM die Grenze sprengen kann:** Die CIFs teilen sich per Konstruktion **dieselbe** Überlebensfunktion `S(t)` – jeder Beitrag wird mit `S(tⱼ₋₁)` gewichtet, sodass `CIF_Tod + CIF_Entlassung + S(t) = 1` immer exakt gilt. Das naive 1−KM für ein Ereignis behandelt dagegen das *andere* Ereignis als Zensierung und benutzt so eine eigene, überhöhte Überlebenskurve: Die Todes-Kurve rechnet die Entlassenen fälschlich als weiter todesgefährdet mit, die Entlassungs-Kurve die Verstorbenen als weiter entlassungsfähig. Jede Kurve überschätzt für sich, und ihre Summe unterliegt keiner gemeinsamen Nebenbedingung – sie kann 100 % übersteigen.
-3. **Antwort an die/den Ärzt:in:** `CIF_Tod = 15,6 %`. Das ist die tatsächliche Wahrscheinlichkeit, binnen 30 Tagen im Krankenhaus zu versterben, unter korrekter Berücksichtigung der konkurrierenden Entlassung. Die 27,7 % aus dem naiven 1−KM überschätzen dieses Risiko und beantworten in Wahrheit eine hypothetische Frage („Sterberisiko, wenn eine Entlassung unmöglich wäre"), die klinisch nicht gestellt ist.
+3. **Antwort an die/den Ärzt:in:** `CIF_Tod ≈ 16 %` (15,6 % unter der vereinfachenden Annahme, 16,0 % mit Aalen-Johansen auf den echten Daten). Das ist die tatsächliche Wahrscheinlichkeit, binnen 30 Tagen im Krankenhaus zu versterben, unter korrekter Berücksichtigung der konkurrierenden Entlassung. Die 27,7 % aus dem naiven 1−KM überschätzen dieses Risiko und beantworten in Wahrheit eine hypothetische Frage („Sterberisiko, wenn eine Entlassung unmöglich wäre“), die klinisch nicht gestellt ist.

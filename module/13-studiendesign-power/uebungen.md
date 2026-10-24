@@ -9,9 +9,10 @@ Lege Population, Exposure, Comparator und Outcome fest.
 
 ## Aufgabe 2 – Fallzahl für Gruppenvergleich
 
-Berechne die notwendige Fallzahl je Gruppe für einen Welch-t-Test bei:
+Berechne die notwendige Fallzahl je Gruppe für einen Zwei-Stichproben-t-Test
+(gleich große Gruppen, gleiche Streuung) bei:
 
-- Cohen's d = 0,3
+- Cohens d = 0,3
 - α = 0,05
 - Power = 0,8
 - zweiseitig

@@ -9,15 +9,15 @@
 import pandas as pd
 cohort = pd.read_csv("{{DATEN}}kohorte.csv")
 
-# Mit Seed: immer dieselbe Stichprobe
+# With a seed: always the same sample
 sample_a = cohort.sample(n=30, random_state=42)
 sample_b = cohort.sample(n=30, random_state=42)
 print(sample_a["patient_id"].tolist() == sample_b["patient_id"].tolist())  # True
 
-# Ohne Seed: bei jedem Lauf anders
+# Without a seed: different on every run
 sample_c = cohort.sample(n=30)
 sample_d = cohort.sample(n=30)
-print(sample_c["patient_id"].tolist() == sample_d["patient_id"].tolist())  # wahrscheinlich False
+print(sample_c["patient_id"].tolist() == sample_d["patient_id"].tolist())  # probably False
 ```
 
 ```r
@@ -34,10 +34,12 @@ eine publizierte Analyse bedeutet das: Die Zahlen im Paper lassen sich nie mehr 
 reproduzieren, ein ernsthaftes wissenschaftliches Problem, das Peer Review und
 Replikation untergräbt.
 
-**Antwort b)** `numpy.random.seed()` und `random_state=` in pandas/scikit-learn sind
-unabhängig voneinander. `random_state=42` in `.sample()` nutzt einen eigenen
-internen Generator; `np.random.seed()` beeinflusst diesen nicht. Beide müssen
-separat gesetzt werden, wenn beide genutzt werden.
+**Antwort b)** Mit `random_state=42` ändert `np.random.seed(42)` nichts: `.sample()`
+nutzt dann einen eigenen, mit 42 initialisierten Generator, der globale
+NumPy-Zustand spielt keine Rolle. Ohne `random_state` zieht `.sample()` dagegen aus
+dem globalen NumPy-Generator. Dann macht `np.random.seed(42)` die Stichprobe zwar
+reproduzierbar, aber nur, solange davor im Skript keine anderen Zufallsaufrufe
+stehen oder hinzukommen. Deshalb `random_state` bei jedem Aufruf explizit setzen.
 
 ## Aufgabe 2 – Paketversionen dokumentieren
 
@@ -79,8 +81,9 @@ gehören ins Repository).
 **Das Problem:** Die pauschale Regel `*.csv` ignoriert **jede** CSV, also auch die
 aufbereiteten Ergebnisse in `data/aufbereitet/`, die laut Projektstruktur bewusst
 versioniert werden sollen. Genau davor warnt das README (§3): Ein späteres
-`!data/aufbereitet/*.csv` hilft nicht zuverlässig, wenn ein übergeordneter Ordner
-bereits ignoriert ist, greifen Negationen nicht mehr.
+`!data/aufbereitet/*.csv` würde das hier zwar reparieren, aber solche
+Ausnahmeketten werden schnell unübersichtlich; ist ein übergeordneter Ordner selbst
+ignoriert (etwa `data/`), greifen Negationen gar nicht mehr.
 
 **b)** Korrigierte `.gitignore` – gezielt nur den Rohdaten-Ordner ausschließen,
 nicht pauschal nach Dateityp:
@@ -142,21 +145,23 @@ analyse-sept-2024/
 nach dem Import der Hilfsfunktionen. `SEED` ist als Konstante `42` in
 `lib/helpers.py` definiert.
 
-**b)** `echo: true` im YAML-Header sorgt dafür, dass der Code im gerenderten
+**b)** `echo: true` im YAML-Header (hier unter `format: html:`) sorgt dafür, dass der Code im gerenderten
 Bericht sichtbar ist. `code-fold: true` ist ein guter Kompromiss: Code ist vorhanden
 und anzeigbar, aber standardmäßig eingeklappt.
 
 **c)** Für einen anderen Rechner braucht man:
 
 - Python mit denselben Paketversionen (ideal: virtuelle Umgebung + `anforderungen.txt`)
-- Quarto installiert (`quarto.org`)
+- Quarto installiert (`quarto.org`) und `jupyter` in der Python-Umgebung (README Abschnitt 6)
 - Den Datensatz erzeugt: `python data/generate_data.py`
 - Den Bericht aus der Projektwurzel rendern:
  `quarto render module/22-reproduzierbare-berichte/code/bericht_beispiel.qmd`
 
 ## Bonus – Erweiterte Tabelle in Quarto
 
-Füge diesen Chunk in `bericht_beispiel.qmd` ein:
+Füge diesen Chunk in `bericht_beispiel.qmd` ein. Im `.qmd` öffnet der Code-Zaun mit
+`{python}` in geschweiften Klammern (wie die übrigen Chunks dort), sonst führt Quarto
+den Code nicht aus:
 
 ```python
 #| label: tbl-stay-duration

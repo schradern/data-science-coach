@@ -1,11 +1,11 @@
-# Module 12 — Regression models (R / stats + survival)
+# Module 12 – Regression models (R / stats + survival)
 #
 # Runs standalone from the project root:
 #   Rscript module/12-regression/code/r.R
 #
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
-# Packages: tidyverse, survival (standard CRAN — no extra install needed)
+# Packages: tidyverse, survival (standard CRAN – no extra install needed)
 
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(survival))
@@ -27,13 +27,13 @@ df <- load_cohort() |>
 
 cat("Cohort:", nrow(df), "patients\n")
 cat("30-day mortality:", round(mean(df$verstorben_30d) * 100, 1), "%\n")
-cat("This dataset has a KNOWN ground truth — we compare estimates directly.\n\n")
+cat("This dataset has a KNOWN ground truth – we compare estimates directly.\n\n")
 
 # ---------------------------------------------------------------------------
-# Section 1 — Logistic regression: 30-day mortality
+# Section 1 – Logistic regression: 30-day mortality
 # ---------------------------------------------------------------------------
 cat("=================================================================\n")
-cat("SECTION 1 — LOGISTIC REGRESSION: 30-day mortality\n")
+cat("SECTION 1 – LOGISTIC REGRESSION: 30-day mortality\n")
 cat("=================================================================\n")
 
 fit_logistic <- glm(
@@ -57,7 +57,7 @@ cat("\nOdds ratios with 95 % CI:\n")
 print(or_table)
 
 # ------------------------------------------------------------------
-# Truth comparison — against the true ODDS ratios.
+# Truth comparison – against the true ODDS ratios.
 #
 # data/generate_data.py draws survival times from a Weibull proportional-hazards
 # process, so its coefficients are log-HAZARDS: exp(beta) is a true hazard
@@ -89,7 +89,7 @@ for (p in preds) {
 cat(sprintf("\nThe 95%% CI covers the true OR for %d/%d predictors.\n", covered, length(preds)))
 cat("Remaining deviations are sampling variance (N=500, 78 events), not bias.\n\n")
 cat("Why two 'true' columns? exp(beta) from the generating model is a HAZARD\n")
-cat("ratio — compare it against Module 17's Cox model. A logistic model\n")
+cat("ratio – compare it against Module 17's Cox model. A logistic model\n")
 cat("estimates an ODDS ratio, which at a 15.6 % event rate sits further from 1.\n")
 
 # Pseudo-R² (McFadden)
@@ -103,16 +103,16 @@ n_pred   <- length(preds)
 epv      <- n_events / n_pred
 cat(sprintf("\nEvents per variable (EPV): %d / %d = %.1f\n", n_events, n_pred, epv))
 if (epv < 10) {
-  cat("  WARNING: EPV < 10 — model may be over-parametrised.\n")
+  cat("  WARNING: EPV < 10 – model may be over-parametrised.\n")
 } else {
-  cat("  EPV >= 10 — model complexity is defensible.\n")
+  cat("  EPV >= 10 – model complexity is defensible.\n")
 }
 
 # ---------------------------------------------------------------------------
-# Section 2 — OLS: length of stay
+# Section 2 – OLS: length of stay
 # ---------------------------------------------------------------------------
 cat("\n=================================================================\n")
-cat("SECTION 2 — LINEAR REGRESSION: length of stay (days)\n")
+cat("SECTION 2 – LINEAR REGRESSION: length of stay (days)\n")
 cat("=================================================================\n")
 cat("Note: verweildauer_tage is right-skewed; OLS is illustrative here.\n\n")
 
@@ -133,14 +133,14 @@ cat(sprintf(
 ))
 
 # ---------------------------------------------------------------------------
-# Section 3 — Cox regression: time-to-event analysis
+# Section 3 – Cox regression: time-to-event analysis
 # ---------------------------------------------------------------------------
 cat("\n=================================================================\n")
-cat("SECTION 3 — COX REGRESSION: time-to-event analysis\n")
+cat("SECTION 3 – COX REGRESSION: time-to-event analysis\n")
 cat("=================================================================\n")
 cat("Duration: fu_zeit_tage | Event: status (1 = died, 0 = censored)\n")
 cat("Patients without the event are right-censored (not a data loss).\n")
-cat("Note: verweildauer_tage (length of stay) is NOT used here — it is not\n")
+cat("Note: verweildauer_tage (length of stay) is NOT used here – it is not\n")
 cat("a time-to-event variable (see data/README.md).\n\n")
 
 fit_cox <- coxph(

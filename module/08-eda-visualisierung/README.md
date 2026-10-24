@@ -39,8 +39,6 @@ umgesetzt in ggplot2 und als Vorbild in seaborn):
 
 ```python
 import pandas as pd
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 labs   = pd.read_csv("{{DATEN}}labor.csv")
@@ -57,10 +55,13 @@ labs   <- read_csv("{{DATEN}}labor.csv", show_col_types = FALSE)
 df <- left_join(cohort, labs, by = "patient_id")
 ```
 
-**Stolperstein:** `matplotlib.use("Agg")` muss **vor** dem ersten
-`import matplotlib.pyplot` stehen, nicht danach. Bei vertauschter Reihenfolge
-erhältst du auf Servern einen `cannot connect to X server`-Fehler, der schwer zu
-debuggen ist.
+**Stolperstein:** In Jupyter oder Colab erscheinen Grafiken von selbst unter der
+Zelle. In einem Skript brauchst du `plt.show()` (öffnet ein Fenster) oder
+`fig.savefig(...)` (schreibt eine Datei), sonst siehst du nichts. Die Skripte unter
+`code/` setzen zusätzlich `matplotlib.use("Agg")` vor dem ersten
+`import matplotlib.pyplot`: Damit zeichnet matplotlib ohne Bildschirm, etwa auf
+einem Server. In ein Notebook gehört diese Zeile nicht, dort unterdrückt sie die
+Anzeige.
 **Darüber hinaus:** Die Grammatik-Schichten lassen sich beliebig kombinieren, ein Histogramm mit überlagertem Dichteplot (`geom_histogram() + geom_density()`)
 oder ein Streudiagramm mit Regressionslinie (`geom_smooth()`) kostet in ggplot2
 nur eine weitere Zeile.
@@ -69,16 +70,16 @@ nur eine weitere Zeile.
 
 `describe()` (pandas) und `summary()` (R) sind der erste Blick. Wonach du suchst:
 
-- **Minimum / Maximum**, plausibel? Ein Alter von 180 ist ein Datenfehler.
-- **Median vs. Mittelwert**, weit auseinander? Hinweis auf Schiefe oder Ausreißer.
-- **Fehlende Werte**, `describe()` zeigt `count`, nicht den NaN-Anteil; extra prüfen!
+- **Minimum / Maximum**: plausibel? Ein Alter von 180 ist ein Datenfehler.
+- **Median vs. Mittelwert**: weit auseinander? Hinweis auf Schiefe oder Ausreißer.
+- **Fehlende Werte**: `describe()` zeigt `count`, nicht den NaN-Anteil; extra prüfen!
 
 ```python
 numeric_cols = ["alter", "bmi", "sofa_score", "crp_mg_l",
                 "verweildauer_tage", "laktat_mmol_l", "kreatinin_mg_dl"]
 print(df[numeric_cols].describe().round(2))
 
-# Missing values separately — describe() hides them
+# Missing values separately – describe() hides them
 print(df[numeric_cols].isna().sum())
 
 # Frequencies for categorical variables
@@ -131,7 +132,7 @@ mehr. Nie blind entfernen: Werte immer anschauen und klinisch einordnen.
 **Darüber hinaus:** Für eine schnelle Übersicht über viele Variablen gleichzeitig:
 `df[numeric_cols].boxplot()` (pandas) oder `facet_wrap` mit `geom_boxplot` in R, Ausreißerpunkte springen sofort ins Auge.
 
-## 4 Zusammenhänge, Korrelationsmatrix
+## 4 Zusammenhänge: Korrelationsmatrix
 
 ```python
 relevant = ["alter", "sofa_score", "crp_mg_l", "laktat_mmol_l",
@@ -157,7 +158,7 @@ einen U-förmigen Zusammenhang nicht aus.
 cmap="coolwarm", center=0)` macht Muster in der Korrelationsmatrix auf einen
 Blick sichtbar, besonders hilfreich bei mehr als sechs Variablen.
 
-## 5 Histogramm, Verteilung einer Variablen
+## 5 Histogramm: Verteilung einer Variablen
 
 Das Histogramm teilt den Wertebereich in gleich breite Klassen (*bins*) und zählt,
 wie viele Beobachtungen hineinfallen. Die Anzahl der bins prägt das Bild:
@@ -176,7 +177,7 @@ ax.set_ylabel("Anzahl Patient:innen")
 ax.set_title("Altersverteilung nach 30-Tage-Mortalität")
 ax.legend()
 fig.tight_layout()
-fig.savefig("verteilung_alter.png", dpi=120)   # ohne savefig()/show() bleibt die Grafik unsichtbar!
+fig.savefig("verteilung_alter.png", dpi=120)   # without savefig()/show() the plot stays invisible!
 ```
 
 ```r
@@ -193,7 +194,7 @@ ggsave("verteilung_alter_r.png", p_hist, width = 7, height = 4, dpi = 120)
 
 Erzeugte Grafik:
 
-![Abbildung: Altersverteilung nach 30-Tage-Mortalität. Überlebende (blau) und Verstorbene (orange) überlappen sich stark, aber der Median der Verstorbenen liegt höher, ein erster Hinweis auf den Alterseffekt, der erst in der multivariablen Analyse quantifiziert wird.](assets/verteilung_alter.png)
+![Abbildung: Altersverteilung nach 30-Tage-Mortalität. Überlebende (blau) und Verstorbene (rot) überlappen sich stark, aber der Median der Verstorbenen liegt höher, ein erster Hinweis auf den Alterseffekt, der erst in der multivariablen Analyse quantifiziert wird.](assets/verteilung_alter.png)
 
 **Stolperstein:** `position="identity"` in ggplot2 (und `alpha < 1` in matplotlib)
 ist nötig, damit beide Histogramme übereinander sichtbar bleiben. Sonst entsteht ein
@@ -202,7 +203,7 @@ gestapeltes Histogramm, das Gruppenunterschiede verzerrt darstellt.
 `sharey=True` (matplotlib) sind leichter zu lesen, wenn sich die Gruppen stark
 unterscheiden, kein Überlappungsproblem, dafür direkter Vergleich nebeneinander.
 
-## 6 Boxplot, Gruppenvergleich
+## 6 Boxplot: Gruppenvergleich
 
 Der Boxplot zeigt kompakt Median (Linie), IQR (Box) und Ausreißer (Punkte), ideal für **Gruppenvergleiche**, z. B. Laktat nach Aufnahmegrund.
 
@@ -217,7 +218,7 @@ order = (
 )
 fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(data=df, x="aufnahmegrund", y="laktat_mmol_l",
-            order=order, palette="Set2", ax=ax)
+            order=order, hue="aufnahmegrund", palette="Set2", legend=False, ax=ax)
 ax.set_xlabel("Aufnahmegrund")
 ax.set_ylabel("Laktat (mmol/l)")
 ax.set_title("Laktat nach Aufnahmegrund")
@@ -254,7 +255,7 @@ Beschriftung oder prüfe es vorab mit `value_counts()`.
 zeigt zusätzlich zur Box die vollständige Verteilungsform, bei bimodalen oder
 stark schiefen Daten informativer als der Boxplot allein.
 
-## 7 Streudiagramm, Zusammenhang zweier Variablen
+## 7 Streudiagramm: Zusammenhang zweier Variablen
 
 Das Streudiagramm (*scatter plot*) zeigt jede Beobachtung als Punkt; eine dritte
 Variable lässt sich als Farbe kodieren. Das folgende Beispiel: CRP vs. Verweildauer,
@@ -271,7 +272,7 @@ for outcome, label in [(0, "Überlebt"), (1, "Verstorben")]:
                c=colors[outcome], label=label,
                alpha=0.42, s=22, edgecolors="none")
 
-# Gesamt-Trendgerade (lineare Anpassung über alle Punkte)
+# Overall trend line (linear fit across all points)
 mask = df["crp_mg_l"].notna() & df["verweildauer_tage"].notna()
 coef = np.polyfit(df.loc[mask, "crp_mg_l"], df.loc[mask, "verweildauer_tage"], 1)
 x_range = np.linspace(df.loc[mask, "crp_mg_l"].min(), df.loc[mask, "crp_mg_l"].max(), 200)
@@ -315,14 +316,14 @@ Trend wird sichtbar, ohne selbst zu rechnen.
 - **EDA vor dem Test.** Wer direkt mit p-Werten anfängt, übersieht Datenfehler,
  Ausreißer und Verteilungsannahmen.
 
-- **Bin-Anzahl matters.** 10 vs. 50 bins können zu gegensätzlichen Interpretationen
+- **Die Bin-Anzahl prägt das Bild.** 10 vs. 50 bins können zu gegensätzlichen Interpretationen
  führen. Immer mehrere Varianten prüfen.
 
 - **Korrelation ≠ Kausalität.** Pearson misst nur *lineare* Zusammenhänge.
-- **`matplotlib.use("Agg")` vor dem pyplot-Import** auf Servern ohne Anzeige.
+- **`matplotlib.use("Agg")` vor dem pyplot-Import** auf Servern ohne Anzeige, nicht in Jupyter/Colab.
 - **Ausreißer zuerst verstehen.** Ein CRP von 400 kann ein echter Befund sein.
 
 ## Selbstcheck
-1. **Was verrät ein großer Abstand zwischen Median und Mittelwert in `describe()`?**, Hinweis auf eine schiefe Verteilung oder Ausreißer; der Mittelwert wird in Richtung der Extremwerte gezogen.
-2. **Warum ist ein statistischer Ausreißer per IQR-Methode nicht automatisch ein Datenfehler?**, Klinisch extreme Werte (z. B. CRP 320 mg/l bei Sepsis) können biologisch real sein; immer klinisch einordnen, bevor du ihn entfernst.
-3. **Was misst Pearson-r, und wann ist Spearmans ρ robuster?**, Pearson misst lineare Zusammenhänge; Spearman (Rangkorrelation) ist robuster bei schiefen Verteilungen, Ausreißern oder ordinalen Variablen.
+1. **Was verrät ein großer Abstand zwischen Median und Mittelwert in `describe()`?** – Hinweis auf eine schiefe Verteilung oder Ausreißer; der Mittelwert wird in Richtung der Extremwerte gezogen.
+2. **Warum ist ein statistischer Ausreißer per IQR-Methode nicht automatisch ein Datenfehler?** – Klinisch extreme Werte (z. B. CRP 320 mg/l bei Sepsis) können biologisch real sein; immer klinisch einordnen, bevor du ihn entfernst.
+3. **Was misst Pearson-r, und wann ist Spearmans ρ robuster?** – Pearson misst lineare Zusammenhänge; Spearman (Rangkorrelation) ist robuster bei schiefen Verteilungen, Ausreißern oder ordinalen Variablen.

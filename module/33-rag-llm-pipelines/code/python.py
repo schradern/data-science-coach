@@ -10,7 +10,7 @@ on the same data used to pick the threshold would be circular.
 There is deliberately NO generation step here: the module demonstrates
 retrieval and grounding (finding and returning the relevant passage), not the
 LLM answer-writing that would sit on top of it. So it cannot and does not claim
-to "prevent hallucinations" — only a grounded generator could, and evaluating
+to "prevent hallucinations" – only a grounded generator could, and evaluating
 that is out of scope.
 
 Run: python module/33-rag-llm-pipelines/code/python.py
@@ -26,7 +26,7 @@ TOP_K = 3  # retriever returns the top-3 chunks (loesungen.md inspects "Top 3")
 # A short synthetic sepsis guideline excerpt (six recommendations). Deliberately
 # does NOT state an exact antibiotic dose, so the out-of-context questions below
 # have no correct answer in the corpus -- this is what the guard must catch.
-GUIDELINE = """Bei Sepsis-induzierter Hypotension oder einem Laktatwert von mindestens 2 mmol/L sollen innerhalb der ersten 3 Stunden mindestens 30 ml/kg Koerpergewicht einer balancierten kristalloiden Infusionsloesung verabreicht werden. Der Effekt der Volumengabe soll ueber dynamische Parameter wie die Pulsdruckvariation oder ein passives Beinheben ueberprueft werden, um eine Fluessigkeitsueberladung zu vermeiden.
+GUIDELINE = """Bei Sepsis-induzierter Hypotension oder einem Laktatwert von mindestens 4 mmol/L sollen innerhalb der ersten 3 Stunden mindestens 30 ml/kg Koerpergewicht einer balancierten kristalloiden Infusionsloesung verabreicht werden. Der Effekt der Volumengabe soll ueber dynamische Parameter wie die Pulsdruckvariation oder ein passives Beinheben ueberprueft werden, um eine Fluessigkeitsueberladung zu vermeiden.
 
 Als Vasopressor der ersten Wahl bei septischem Schock soll Noradrenalin eingesetzt werden, mit dem Ziel, einen mittleren arteriellen Druck (MAP) von mindestens 65 mmHg zu erreichen. Reicht Noradrenalin allein nicht aus, kann Vasopressin als zweiter Vasopressor ergaenzt werden, um die Noradrenalin-Dosis zu senken. Adrenalin gilt als Reservemedikament bei therapierefraktaerem Schock.
 
@@ -261,9 +261,9 @@ def evaluate_guard_loocv(chunks: list[str], vectorizer, store) -> None:
           f"(tp={tp}, fp={fp}, fn={fn}):")
     print(f"  Precision={precision:.3f}  Recall={recall:.3f}  F1={f1:.3f}")
     if f1 < 1.0:
-        print("  Nicht perfekt -- das ist das ehrliche Ergebnis. Die vorherige In-Sample-Zahl")
-        print("  (Precision=Recall=F1=1.00, auf denselben Daten berichtet, die die Schwelle")
-        print("  festgelegt haben) war zirkulaer und sagte nichts ueber neue Fragen aus.")
+        print("  Nicht perfekt -- das ist das ehrliche Ergebnis. Die In-Sample-Zahl")
+        print("  (hier Precision=Recall=F1=1.00, auf denselben Daten berechnet, die die Schwelle")
+        print("  festgelegt haben) waere zirkulaer und sagt nichts ueber neue Fragen aus.")
     else:
         print("  Auch out-of-sample perfekt auf diesem winzigen Set -- bei n=8 Fragen ist das")
         print("  ein einzelner guenstiger Datenpunkt, kein Beleg fuer Generalisierung.")

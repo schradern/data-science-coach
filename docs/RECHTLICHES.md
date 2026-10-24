@@ -32,9 +32,11 @@ Entscheidungen oder reale klinische Studien dar.
 * **Eigenverantwortung:** Die Auswahl statistischer Methoden, das Design realer
   klinischer Studien sowie die Auswertung echter Patientendaten liegen in der
   alleinigen Verantwortung der behandelnden Ärztinnen und Ärzte,
-  Wissenschaftler:innen und Statistiker:innen. Jegliche Haftung für Schäden,
-  die durch die Nutzung oder Fehlinterpretation der hier gezeigten Techniken
-  entstehen, ist ausgeschlossen.
+  Wissenschaftler:innen und Statistiker:innen. Die Haftung für Schäden, die
+  durch die Nutzung oder Fehlinterpretation der hier gezeigten Techniken
+  entstehen, ist ausgeschlossen, soweit sie nicht auf Vorsatz oder grober
+  Fahrlässigkeit beruht oder eine Verletzung von Leben, Körper oder Gesundheit
+  betrifft.
 * **Externe Links:** Für die Inhalte verlinkter externer Seiten ist stets deren
   jeweiliger Anbieter verantwortlich.
 
@@ -61,22 +63,21 @@ ist nicht bestellt; eine Bestellpflicht nach Art. 37 DSGVO in Verbindung mit
 
 Diese Seite wird über **GitHub Pages** (GitHub, Inc., 88 Colin P. Kelly Jr.
 Street, San Francisco, CA 94107, USA) ausgeliefert. Wie bei jedem Aufruf einer
-Website überträgt dein Browser dabei technisch notwendige Daten an den Server —
+Website überträgt dein Browser dabei technisch notwendige Daten an den Server –
 insbesondere deine **IP-Adresse**, Datum und Uhrzeit des Zugriffs, die
 angeforderte Adresse, Referrer und User-Agent. GitHub verarbeitet diese Daten
 serverseitig in Logdateien, um die Auslieferung zu ermöglichen und Missbrauch
 abzuwehren.
 
-Damit gilt ausdrücklich: **Die Aussage „es werden keinerlei IP-Adressen an
-einen Server übertragen" wäre unzutreffend.** Wer eine Website aufruft,
-überträgt zwangsläufig seine IP-Adresse an den ausliefernden Server. Was diese
-Seite leistet, ist etwas anderes und Nachprüfbares: sie überträgt darüber hinaus
-**nichts** — an niemanden sonst.
+Ganz ohne IP-Adresse geht es also nicht: Wer eine Website aufruft, überträgt
+sie zwangsläufig an den ausliefernden Server. Darüber hinaus überträgt diese
+Seite **nichts**, an niemanden sonst. Das lässt sich in den Entwicklerwerkzeugen
+jedes Browsers (Reiter „Netzwerk“) nachprüfen.
 
 * **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der
   technisch fehlerfreien Bereitstellung der Website).
 * **Drittlandübermittlung:** Die Verarbeitung findet auch in den USA statt.
-  GitHub gehört zu Microsoft; das Unternehmen ist unter dem
+  GitHub, Inc. (ein Tochterunternehmen von Microsoft) ist unter dem
   [EU-US Data Privacy Framework](https://www.dataprivacyframework.gov/) zertifiziert,
   für das die EU-Kommission mit Beschluss vom 10. Juli 2023 ein angemessenes
   Schutzniveau festgestellt hat (Art. 45 DSGVO).
@@ -87,15 +88,16 @@ Seite leistet, ist etwas anderes und Nachprüfbares: sie überträgt darüber hi
 
 ### 4.4 Lokale Speicherung im Browser (`localStorage`)
 
-Dein Lesestatus (als „erledigt“ markierte Module), die bevorzugte
-Programmiersprache (Python/R), die gewählte Lerntiefe, der gewählte Lernpfad und
-das Farbschema werden **ausschließlich lokal in deinem Browser**
+Dein Lesestatus (als „erledigt“ markierte Module und das zuletzt geöffnete
+Modul), die bevorzugte Programmiersprache (Python/R), die gewählte Lerntiefe,
+der gewählte Lernpfad, das Farbschema, abgehakte Punkte der Publikations-Checkliste und
+weggeklickte Hinweise werden **ausschließlich lokal in deinem Browser**
 (`localStorage`) gespeichert. Diese Daten verlassen dein Gerät nicht, werden
 nicht an einen Server übertragen und nicht ausgewertet. Löschst du die
 Website-Daten in deinem Browser, werden auch diese Einstellungen zurückgesetzt.
 
 Da diese Speicherung für die von dir ausdrücklich gewünschte Funktion
-(Fortschrittsanzeige, Sprachwahl) unbedingt erforderlich ist, ist sie nach § 25
+(Fortschrittsanzeige, Sprachwahl, Ansichtseinstellungen) unbedingt erforderlich ist, ist sie nach § 25
 Abs. 2 Nr. 2 TDDG einwilligungsfrei.
 
 ### 4.5 Deine Rechte
@@ -110,7 +112,7 @@ beschweren (Art. 77 DSGVO). Zuständig ist die Behörde deines Aufenthaltsorts
 oder die des Verantwortlichen:
 
 > Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)
-> Promenade 18, 91522 Ansbach — Postfach 1349, 91504 Ansbach
+> Promenade 18, 91522 Ansbach – Postfach 1349, 91504 Ansbach
 > [lda.bayern.de](https://www.lda.bayern.de/)
 
 ## 5. Synthetische Daten

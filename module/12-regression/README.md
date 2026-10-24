@@ -5,7 +5,7 @@
 > **Wegweiser.** Dieses Modul führt vom Modell zum korrekt interpretierten Effekt.
 >
 > **Grundpfad (§1–§4, §6–§7).** Die drei Modelltypen (linear, logistisch, Cox),
-> wie man Koeffizienten liest, warum man für Confounder adjustiert — und die
+> wie man Koeffizienten liest, warum man für Confounder adjustiert – und die
 > wichtigste Falle: einen **Mediator** nicht mitadjustieren (Overadjustment).
 > Danach kannst du eine Regression rechnen und ihr Ergebnis sauber berichten.
 >
@@ -63,8 +63,9 @@ der Residuen; VIF-Werte (> 10: Warnsignal) messen Multikollinearität.
 > ![Abbildung: Gegenüberstellung von residuendiagnostischen Plots zur Prüfung auf Homoskedastizität und Heteroskedastizität. Ein Trichter deutet auf eine verletzte Varianzannahme hin.](assets/residual_diagnostics.png)
 
 **Stolperstein:** Verweildauer ist rechtsschief, wenige Patient:innen liegen
-extrem lange auf der Intensivstation. OLS ist dann illustrativ, aber verzerrt.
-Abhilfe: log-transformierter Outcome oder ein Gamma-GLM, das die Schiefe explizit
+extrem lange. Die OLS-Koeffizienten bleiben dabei unverzerrt, aber die Residuen
+sind schief und meist heteroskedastisch; KI und p-Werte werden unzuverlässig, und
+der Mittelwert beschreibt die typische Verweildauer schlecht. Abhilfe: log-transformierter Outcome oder ein Gamma-GLM, das die Schiefe explizit
 modelliert.
 
 **Darüber hinaus:** Bei zählwertartigen Outcomes (z. B. Anzahl Komplikationen)
@@ -98,8 +99,8 @@ RR annähernd gleich. Bei häufigeren Ereignissen überschätzt die OR das RR
 erheblich. In unserer Kohorte liegt die 30-Tage-Mortalität bei ~15,6 %, also
 bereits über der 10-%-Schwelle: OR und RR laufen hier spürbar auseinander, und
 die OR überschätzt das tatsächliche relative Risiko. Genau deshalb in
-Publikationen immer explizit „Odds Ratio" schreiben, nie „Risiko" oder
-„Wahrscheinlichkeit".
+Publikationen immer explizit „Odds Ratio“ schreiben, nie „Risiko“ oder
+„Wahrscheinlichkeit“.
 
 ### Kalibrierung
 
@@ -134,14 +135,15 @@ h(t) = h₀(t) · exp(β₁·x₁ + … + βₖ·xₖ)
 ```
 
 - **h₀(t)**: Baseline-Hazard, wird nicht parametrisch spezifiziert (daher
- „semiparametrisches" Modell).
+ „semiparametrisches“ Modell).
 
 - **Hazard Ratio (HR)**: `exp(βⱼ)`, interpretiert wie die OR, aber bezogen
  auf das momentane Ereignisrisiko zu *jedem* Zeitpunkt.
 
 - **Zensierung:** Patient:innen ohne Ereignis bis Studienende gehen zensiert
  ein. Das ist kein Datenverlust, sondern Information: „mindestens so lange
- überlebt". Ignorieren führt zu verzerrten Schätzungen.
+ überlebt“. Ignorieren führt zu verzerrten Schätzungen. Voraussetzung: Die
+ Zensierung hängt nicht mit dem Sterberisiko zusammen (nicht-informative Zensierung).
 
 **Proportionale Hazards-Annahme:** Die HR zwischen zwei Gruppen bleibt über die
 gesamte Beobachtungszeit konstant. Prüfung: Schoenfeld-Residuen (`cox.zph()` in
@@ -175,8 +177,10 @@ eine echte verdeckt.
 Mortalität. Wer den Diabetes-Effekt ohne Altersjustierung schätzt, überschätzt
 ihn. In unserem synthetischen Datensatz kennen wir den wahren Effekt: `β = 0,45`
 auf der **Log-Hazard**-Skala, also eine wahre direkte HR von 1,55 und eine wahre
-adjustierte **OR von 1,71** (§5). Der rohe, unadjustierte Schätzer liegt
-systematisch höher.
+adjustierte **OR von 1,71** (§5), beide bei festem SOFA-Score. Der rohe,
+unadjustierte Schätzer liegt systematisch höher (wahre rohe OR 2,90, nur für das
+Alter adjustiert 2,12; `code/python.py`, Abschnitt 2b): Er enthält das
+Confounding durch das Alter *und* den über SOFA vermittelten Anteil (siehe unten).
 
 Die Strategie: alle bekannten und gemessenen Confounder ins Modell aufnehmen. Was
 nicht gemessen wurde, bleibt unkontrolliert, die fundamentale Grenze jeder
@@ -185,7 +189,7 @@ Beobachtungsstudie, die kein Regressionsmodell überwindet.
 **Stolperstein:** Nicht alles, was mit dem Outcome korreliert, ist ein
 Confounder. Ein **Mediator** liegt auf dem kausalen Pfad zwischen Prädiktor und
 Outcome (z. B. Sepsis → Organversagen → Mortalität): ihn zu adjustieren würde
-den interessierenden Effekt wegsperren. Ein **Kollider** öffnet durch
+den interessierenden Effekt teilweise herausrechnen. Ein **Kollider** öffnet durch
 Adjustierung erst einen Scheinzusammenhang. Ob eine Variable Confounder,
 Mediator oder Kollider ist, folgt aus einem kausalen Modell (DAG), nicht aus der
 Korrelationsmatrix.
@@ -197,7 +201,7 @@ Sepsis schätzen, darfst du `sofa_score` *nicht* zusätzlich adjustieren, sonst
 kontrollierst du einen Teil des interessierenden Effekts fälschlich weg
 (Overadjustment-Bias).
 
-Direkter und totaler Effekt sind **zwei verschiedene Zahlen** — verwechsle sie
+Direkter und totaler Effekt sind **zwei verschiedene Zahlen** – verwechsle sie
 nicht. Für Sepsis (wahre Hazard Ratios, aus der Datengenerierung berechnet):
 
 | | wahre HR | was das Modell dafür enthalten muss |
@@ -207,18 +211,18 @@ nicht. Für Sepsis (wahre Hazard Ratios, aus der Datengenerierung berechnet):
 
 Sepsis erhöht den SOFA-Score um ~3 Punkte, und jeder Punkt erhöht die Hazard.
 Deshalb ist der totale Effekt gut doppelt so groß wie der direkte. Wer bei der
-Frage „Wie viel gefährlicher ist eine Sepsis?" für den SOFA-Score adjustiert,
+Frage „Wie viel gefährlicher ist eine Sepsis?“ für den SOFA-Score adjustiert,
 berichtet 1,84 statt 3,93.
 
 Am Beispiel der Verweildauer druckt [`code/python.py`](code/python.py) beides
-nebeneinander: Sepsis verlängert den Aufenthalt um **+1,21 Tage** (p = 0,002) —
+nebeneinander: Sepsis verlängert den Aufenthalt um **+1,21 Tage** (p = 0,002) –
 adjustiert man für den SOFA-Score, bleiben **+0,38 Tage** (p = 0,42) übrig, und
 der Effekt sieht aus, als gäbe es ihn nicht.
 
 **Stolperstein:** Beim **Diabetes** ist derselbe Kontrast in dieser Kohorte
 statistisch *nicht* auflösbar: die geschätzte OR hat ein 95-%-KI von
 [0,57; 2,10]. Man kann Overadjustment-Bias hier zwar herleiten, aber nicht an
-78 Ereignissen *zeigen*. Nutze Sepsis für die Demonstration — und misstraue
+78 Ereignissen *zeigen*. Nutze Sepsis für die Demonstration – und misstraue
 jeder Lehrbuchgrafik, deren Effekt kleiner ist als ihr Konfidenzintervall.
 
 **Darüber hinaus:** Propensity-Score-Methoden (Matching, Gewichtung) sind eine
@@ -226,14 +230,14 @@ Alternative zur direkten Adjustierung bei vielen Confoundern und ungleichen
 Gruppengrößen. Sie erfordern jedoch dieselbe Datengrundlage, ungemessene
 Confounder bleiben auch hier unkontrolliert.
 
-<!-- vertiefung: Vertiefung §5 — Wahrheitsvergleich: OR ≠ HR, die wahren Effekte, Varianz vs. Verzerrung (~20 min) -->
+<!-- vertiefung: Vertiefung §5 – Wahrheitsvergleich: OR ≠ HR, die wahren Effekte, Varianz vs. Verzerrung (~20 min) -->
 
 ## 5 Wahrheitsvergleich
 
 Die Kohorte wird von einem **Weibull-Hazard-Modell** erzeugt
 (`data/generate_data.py`). Dessen Koeffizienten (0,045 Alter; 0,28 SOFA; 0,45
 Diabetes; 0,60 Sepsis; 0,40 aktives Rauchen) liegen damit auf der
-**Log-Hazard-Skala**. `exp(β)` ist eine wahre **Hazard Ratio** — keine Odds
+**Log-Hazard-Skala**. `exp(β)` ist eine wahre **Hazard Ratio** – keine Odds
 Ratio.
 
 > **Merksatz:** OR ≠ HR. Bei seltenen Ereignissen liegen sie nahe beieinander,
@@ -244,7 +248,7 @@ Ratio.
 N = 2 000 000 nach und schätzt dort dasselbe logistische Modell. Das liefert die
 wahren Odds Ratios (relativer Monte-Carlo-Fehler < 0,5 %):
 
-| Prädiktor | wahre HR (`exp β`) | **wahre OR** |
+| Prädiktor | HR im erzeugenden Prozess (Cox, Monte-Carlo) | **wahre OR** |
 |-----------|-------------------:|-------------:|
 | alter (pro Jahr, zentriert auf 64) | 1,046 | 1,053 |
 | sofa_score | 1,320 | 1,387 |
@@ -253,14 +257,17 @@ wahren Odds Ratios (relativer Monte-Carlo-Fehler < 0,5 %):
 | sepsis (Aufnahmegrund) | 1,835 | 2,046 |
 | aktiv_raucher | 1,506 | 1,601 |
 
-Die wahren ORs liegen durchweg **weiter von 1 entfernt** als die HRs. Wer die
-HR-Spalte als „wahre OR" in einen Forest Plot zeichnet, verschiebt jede rote
+Die HR-Spalte stammt aus einem Cox-Fit auf denselben nachgespielten Daten. Sie
+liegt etwas neben `exp(β)` des Generators (Sepsis 1,835 statt exp(0,6) = 1,822),
+weil die Überlebenszeiten auf ganze Tage gerundet sind und viele Ereignisse am
+selben Tag zusammenfallen. Die wahren ORs liegen durchweg **weiter von 1 entfernt** als die HRs. Wer die
+HR-Spalte als „wahre OR“ in einen Forest Plot zeichnet, verschiebt jede rote
 Raute in dieselbe Richtung.
 
 Der Forest Plot zeigt geschätzte Odds Ratios (blaue Punkte mit 95-%-KI) und die
 wahren Odds Ratios (rote Rauten) nebeneinander:
 
-![Forest Plot der Odds Ratios für 30-Tage-Mortalität (logistische Regression, adjustiert). Blaue Punkte: geschätzte OR mit 95-%-KI. Rote Rauten: wahre OR, aus dem Datengenerierungsprozess bei N = 2 000 000 berechnet. Alle geschätzten Punktwerte liegen bei OR ≥ 1 (Risikoerhöhung); Sepsis und SOFA-Score haben die größten Effekte, sind aber bei N = 500 nicht immer statistisch signifikant (KI schließt teils die 1 ein).](assets/forest_odds_ratios.png)
+![Forest Plot der Odds Ratios für 30-Tage-Mortalität (logistische Regression, adjustiert). Blaue Punkte: geschätzte OR mit 95-%-KI. Rote Rauten: wahre OR, aus dem Datengenerierungsprozess bei N = 2 000 000 berechnet. Alle geschätzten Punktwerte liegen bei OR ≥ 1 (Risikoerhöhung); Sepsis und SOFA-Score haben die größten Effekte; das KI von Sepsis schließt bei N = 500 die 1 knapp ein.](assets/forest_odds_ratios.png)
 
 `code/python.py` druckt für jeden Lauf, ob das 95-%-KI die wahre OR überdeckt
 (nicht raten, nachrechnen!). Abweichungen sind **Stichprobenvarianz**, nicht
@@ -274,8 +281,8 @@ wahren Werte (Konsistenz des MLE).
 
 **Stolperstein:** Stichprobenvarianz und Verzerrung sind verschiedene Dinge.
 Eine Stichprobe kann zufällig weit vom wahren Wert liegen (hohe Varianz) oder
-systematisch zu hoch/niedrig schätzen (Bias). Letzteres ist das Problem der
-Confounder-Unadjustiertheit, nicht der Stichprobengröße.
+systematisch zu hoch/niedrig schätzen (Bias). Letzteres entsteht etwa durch fehlende
+Confounder-Adjustierung und verschwindet nicht mit wachsender Stichprobe.
 
 **Darüber hinaus:** Bootstrap-Resampling illustriert die Variabilität von
 OR-Schätzungen empirisch: 1 000 Stichproben aus denselben Daten zeigen, wie breit
@@ -285,7 +292,7 @@ die Verteilung der OR-Schätzer ist, eine intuitive Ergänzung zur analytischen
 **Stolperstein:** Python und R rechnen die Koeffizienten-KI mit **verschiedenen
 Methoden** und drucken deshalb leicht abweichende Grenzen. `result.conf_int()`
 (statsmodels) liefert **Wald-Intervalle** (aus dem Standardfehler, symmetrisch auf
-der Log-Odds-Skala); R's `confint(fit)` liefert **Profile-Likelihood-Intervalle**.
+der Log-Odds-Skala); `confint(fit)` in R liefert **Profile-Likelihood-Intervalle**.
 Bei seltenen Ereignissen ist die Profile-Likelihood-Variante vorzuziehen, weil sie
 die Asymmetrie der Likelihood berücksichtigt und nicht auf der Normalapproximation
 beruht. Die Punktschätzer (`exp(β)`) sind identisch; nur die Intervallränder
@@ -306,20 +313,20 @@ from lifelines import CoxPHFitter
 df = pd.read_csv("{{DATEN}}kohorte.csv")
 df["aktiv_raucher"] = (df["raucherstatus"] == "aktiv").astype(int)
 df["sepsis"]        = (df["aufnahmegrund"] == "Sepsis").astype(int)
-df["alter_z"]       = df["alter"] - 64        # zentrierung wie im Generator
+df["alter_z"]       = df["alter"] - 64        # centring as in the generator
 
-# Logistische Regression — Odds Ratios mit 95-%-KI
+# Logistic regression – odds ratios with 95% CI
 formula = ("verstorben_30d ~ alter_z + sofa_score + crp_mg_l "
            "+ diabetes + sepsis + aktiv_raucher")
 result = smf.logit(formula, data=df).fit(disp=False)
 ci = result.conf_int()
 print(np.exp(result.params))          # OR
-print(np.exp(ci))                     # 95-%-KI
+print(np.exp(ci))                     # 95% CI
 
-# Cox-Regression — fu_zeit_tage/status sind die echte Ereigniszeit,
-# NICHT verweildauer_tage (das ist nur die deskriptive Verweildauer).
+# Cox regression – fu_zeit_tage/status are the true event time,
+# NOT verweildauer_tage (that is only the descriptive length of stay).
 cox_df = df[["fu_zeit_tage", "status",
-             "sofa_score", "alter_z", "sepsis"]].copy()
+             "sofa_score", "alter_z", "sepsis", "aktiv_raucher"]].copy()
 cph = CoxPHFitter()
 cph.fit(cox_df, duration_col="fu_zeit_tage", event_col="status")
 print(cph.summary[["exp(coef)", "exp(coef) lower 95%", "exp(coef) upper 95%"]])
@@ -336,22 +343,22 @@ df <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE) |>
          sepsis        = as.integer(aufnahmegrund == "Sepsis"),
          alter_z       = alter - 64)
 
-# Logistische Regression — Odds Ratios mit 95-%-KI
+# Logistic regression – odds ratios with 95% CI
 fit <- glm(verstorben_30d ~ alter_z + sofa_score + crp_mg_l +
              diabetes + sepsis + aktiv_raucher,
            data = df, family = binomial)
 exp(coef(fit))
 exp(suppressMessages(confint(fit)))
 
-# Cox-Regression — fu_zeit_tage/status sind die echte Ereigniszeit,
-# NICHT verweildauer_tage (das ist nur die deskriptive Verweildauer).
+# Cox regression – fu_zeit_tage/status are the true event time,
+# NOT verweildauer_tage (that is only the descriptive length of stay).
 cox_fit <- coxph(Surv(fu_zeit_tage, status) ~
                    sofa_score + alter_z + sepsis + aktiv_raucher,
                  data = df)
 summary(cox_fit)$conf.int
 ```
 
-> **Wann du Hilfe holst.** Sobald dein Modell mehr Prädiktoren aufnehmen soll, als du Ereignisse pro Variable hast (EPV < 10), du Interaktionen oder nicht-lineare Terme brauchst, oder unklar ist, ob eine Variable Confounder oder Mediator ist, zieh eine Statistikerin hinzu — über das Ergebnis entscheidet die Modellspezifikation, nicht der Code.
+> **Wann du Hilfe holst.** Sobald dein Modell mehr Prädiktoren aufnehmen soll, als du Ereignisse pro Variable hast (EPV < 10), du Interaktionen oder nicht-lineare Terme brauchst, oder unklar ist, ob eine Variable Confounder oder Mediator ist, zieh eine Statistikerin hinzu – über das Ergebnis entscheidet die Modellspezifikation, nicht der Code.
 
 ## Fallstricke und Merksätze
 
@@ -370,12 +377,12 @@ summary(cox_fit)$conf.int
  Lösung: Firth-Regression oder regularisierte Regression.
 
 - **OR bei häufigen Ereignissen überschätzt das RR.** Immer explizit „Odds
- Ratio" formulieren, nie „Risiko" oder „Wahrscheinlichkeit".
+ Ratio“ formulieren, nie „Risiko“ oder „Wahrscheinlichkeit“.
 
 - **Kalibrierung nicht vergessen.** Hohe AUC und gute Kalibrierung sind
  unabhängige Qualitätsmerkmale, beide sind klinisch relevant.
 
 ## Selbstcheck
-1. **Was bedeutet die geschätzte Odds Ratio von 1,98 für den Prädiktor „Sepsis"?**, Septische Patient:innen haben, adjustiert für alle anderen Variablen im Modell, eine rund 98 % höhere Chance (Odds) auf 30-Tage-Mortalität als Patient:innen ohne Sepsis als Aufnahmegrund. (Achtung: das ist die **Odds** Ratio des logistischen Modells; die wahre **Hazard** Ratio aus dem generierenden Prozess liegt mit 1,84 tiefer — genau der OR≠HR-Unterschied aus §5.)
-2. **Warum überschätzt die OR das relative Risiko bei häufigen Ereignissen?**, OR und RR sind nur bei seltenen Ereignissen (< ~10 %) annähernd gleich; bei höherer Ereignisrate steigt die OR schneller als das RR, weil Odds und Wahrscheinlichkeit dann stark auseinanderlaufen.
-3. **Was ist ein Confounder, und warum ist ein Mediator kein Confounder?**, Ein Confounder ist mit Prädiktor und Outcome assoziiert, liegt aber nicht auf dem kausalen Pfad zwischen beiden; ein Mediator liegt auf diesem Pfad und würde bei Adjustierung den interessierenden Effekt fälschlicherweise abschwächen.
+1. **Was bedeutet die geschätzte Odds Ratio von 1,98 für den Prädiktor „Sepsis“?** – Septische Patient:innen haben, adjustiert für alle anderen Variablen im Modell, eine rund 98 % höhere Chance (Odds) auf 30-Tage-Mortalität als Patient:innen ohne Sepsis als Aufnahmegrund. (Achtung: das ist die **Odds** Ratio des logistischen Modells; die wahre **Hazard** Ratio aus dem generierenden Prozess liegt mit 1,84 tiefer – genau der OR≠HR-Unterschied aus §5.)
+2. **Warum überschätzt die OR das relative Risiko bei häufigen Ereignissen?** – OR und RR sind nur bei seltenen Ereignissen (< ~10 %) annähernd gleich; bei höherer Ereignisrate steigt die OR schneller als das RR, weil Odds und Wahrscheinlichkeit dann stark auseinanderlaufen.
+3. **Was ist ein Confounder, und warum ist ein Mediator kein Confounder?** – Ein Confounder ist mit Prädiktor und Outcome assoziiert, liegt aber nicht auf dem kausalen Pfad zwischen beiden; ein Mediator liegt auf diesem Pfad und würde bei Adjustierung den interessierenden Effekt fälschlicherweise abschwächen.

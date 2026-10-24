@@ -66,7 +66,7 @@ cat(sprintf("AUC=%.3f\n", auc_val))
 cat(sprintf("Youden threshold=%.2f, sensitivity=%.3f, specificity=%.3f\n",
             youden, sens_y, spec_y))
 cat("NOTE: the Youden threshold here is chosen AND evaluated on the same data\n")
-cat("(in-sample) — optimistic. Validate on held-out data (see modules 24/25).\n")
+cat("(in-sample) – optimistic. Validate on held-out data (see modules 24/25).\n")
 
 # ---------------------------------------------------------------------------
 # 2) Metrics at clinically simple thresholds

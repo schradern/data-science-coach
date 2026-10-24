@@ -13,11 +13,11 @@
 Du hast eine Aufnahmekohorte und separat die Laborwerte. Bevor du eine
 Frage beantworten kannst – *„Haben septische Patient:innen ein höheres Laktat?“* –
 müssen die Daten **sauber** und **zusammengeführt** sein. Genau dieser Schritt
-kostet in der Praxis 80 % der Zeit. Wir machen ihn hier transparent.
+kostet in der Praxis oft den größten Teil der Zeit. Wir machen ihn hier transparent.
 
 ## 1 Konzept: Tidy Data
 
-Daten sind „tidy”, wenn
+Daten sind „tidy“, wenn
 
 1. **jede Variable eine Spalte** ist,
 2. **jede Beobachtung eine Zeile** ist,
@@ -25,39 +25,39 @@ Daten sind „tidy”, wenn
 
 `kohorte.csv` ist bereits tidy (eine Zeile je Patient:in). `vitalwerte.csv` ist
 tidy im *long format* (eine Zeile je Messung). Tidy Data ist die Grundlage, auf
-der alle folgenden Module aufbauen, sauberer Input, verlässlicher Output.
+der alle folgenden Module aufbauen: sauberer Input, verlässlicher Output.
 
 **Stolperstein:** Viele klinische Exporte kommen im wide-Format (eine Spalte je
 Messzeitpunkt). Frage dich vor jeder Berechnung: *Ist das wirklich eine
-Variable pro Spalte?* Eine Spalte „Laktat_Tag1” ist keine Variable, sie vermischt
+Variable pro Spalte?* Eine Spalte „Laktat_Tag1“ ist keine Variable, sie vermischt
 Merkmal und Zeitpunkt.
-**Darüber hinaus:** Im long-Format berechnet `vitalwerte.csv` Verläufe über alle
-Tage mit einer einzigen `groupby`-Zeile, im wide-Format bräuchte es eine
-manuelle Schleife über alle Tag-Spalten.
+**Darüber hinaus:** Im long-Format berechnest du Verläufe aus `vitalwerte.csv`
+über alle Tage mit einer einzigen `groupby`-Zeile; im wide-Format müsstest du
+jede Tag-Spalte einzeln ansprechen.
 
 ## 2 Fehlende Werte zuerst ansehen
 
-Fehlende Werte nie „wegmachen”, bevor du sie verstanden hast. Erst zählen,
+Fehlende Werte nie „wegmachen“, bevor du sie verstanden hast. Erst zählen,
 dann entscheiden (löschen vs. behalten vs. imputieren). In unseren Daten fehlen
-**drei** Größen, aus drei verschiedenen Gründen:
+Werte in vier Spalten, aus **drei** verschiedenen Gründen:
 
 | Spalte | fehlend | warum |
 |---|---|---|
-| `bmi`, `gewicht_kg` | ~6 % | rein zufällig (MCAR) — kostet nur Power |
+| `bmi`, `gewicht_kg` | ~6 % | rein zufällig (MCAR) – kostet nur Power |
 | `laktat_mmol_l` | ~17 % | hängt vom **`sofa_score`** ab: Schwerkranke bekommen häufiger eine BGA |
 | `bga_ph` | ~20 % | hängt vom **Outcome** ab: bei früh Verstorbenen fehlt die Kontroll-BGA |
 
 Die letzten beiden sehen gleich aus („nicht zufällig“) und haben völlig
 verschiedene Konsequenzen. Beim Laktat hängt das Fehlen von einer *beobachteten
 Kovariate* ab, nicht vom unbeobachteten Laktatwert selbst. Beim pH hängt es am
-*Outcome* — und genau das entscheidet, ob `dropna()` unschädlich oder ein
+*Outcome* – und genau das entscheidet, ob `dropna()` unschädlich oder ein
 Kunstfehler ist. **Modul 14** rechnet beides vor.
 
-![Abbildung: Anteil fehlender Werte je Spalte. Der arterielle pH fehlt mit ~20 % am häufigsten, gefolgt von Laktat mit ~17 % — beide klinisch informativ, aber aus verschiedenen Gründen. BMI und Gewicht fehlen bei ~6 % rein zufällig.](assets/fehlende_werte.png)
+![Abbildung: Anteil fehlender Werte je Spalte. Der arterielle pH fehlt mit ~20 % am häufigsten, gefolgt von Laktat mit ~17 % – beide klinisch informativ, aber aus verschiedenen Gründen. BMI und Gewicht fehlen bei ~6 % rein zufällig.](assets/fehlende_werte.png)
 
 **Stolperstein:** `dropna()` ohne Argument löscht jede Zeile mit *irgendeinem*
 fehlenden Wert. Auf unserem zusammengeführten Datensatz sind das **192 von 500
-Patient:innen (38,4 %)** — obwohl keine einzelne Spalte mehr als 20 % vermisst.
+Patient:innen (38,4 %)** – obwohl keine einzelne Spalte mehr als 20 % vermisst.
 Die Verluste addieren sich über die Spalten. Gib stets explizit `subset=` an
 oder prüfe vorher den Anteil fehlender Werte.
 
@@ -66,7 +66,7 @@ Information. Weil die Laktat-Messwahrscheinlichkeit vom *beobachteten*
 SOFA-Score abhängt, ist das **Missing At Random (MAR)**, nicht MCAR (rein
 zufällig wie bei `bmi`) und auch nicht MNAR (das würde bedeuten, die
 Messwahrscheinlichkeit hinge vom Laktatwert selbst ab, den wir ja gerade nicht
-kennen, wenn er fehlt). Beim `bga_ph` ist es ebenfalls MAR — aber abhängig vom
+kennen, wenn er fehlt). Beim `bga_ph` ist es ebenfalls MAR – aber abhängig vom
 **Outcome** statt von einer Kovariate.
 
 **Stolperstein:** Das Etikett „MAR“ sagt für sich genommen **nicht**, ob eine
@@ -99,7 +99,7 @@ labs   = pd.read_csv("{{DATEN}}labor.csv")
 # 1) Standardise gender encoding ('w' -> 'weiblich')
 cohort["geschlecht"] = cohort["geschlecht"].replace({"w": "weiblich"})
 
-# 2) Count missing values — understand before acting
+# 2) Count missing values – understand before acting
 print(cohort.isna().sum())
 
 # 3) Join: cohort + labs via patient_id
@@ -130,6 +130,13 @@ df |>
   arrange(desc(laktat_median))
 ```
 
+Und die Antwort auf die Eingangsfrage? Der Median-Laktatwert liegt bei Sepsis
+mit 2,0 mmol/l nur knapp unter Herzinsuffizienz (2,1) und über Pneumonie (1,5).
+Ein deutlich höheres Laktat bei Sepsis zeigen diese Daten also nicht. Belastbar
+ist auch das noch nicht: Laktat fehlt bei rund 17 % der Patient:innen, und zwar
+gehäuft bei den weniger Kranken (Abschnitt 2). Ob ein Unterschied statistisch
+trägt, klärt Modul 10, wie man mit den Lücken umgeht, Modul 14.
+
 **Stolperstein:** `groupby().agg()` ignoriert `NaN` standardmäßig, meist
 gewünscht, aber bei kleinen Gruppen kann es still zu falschen n führen.
 Gib `value_counts()` oder `.size()` parallel mit aus, um die tatsächliche
@@ -142,7 +149,7 @@ Zudem lässt sich `query()` direkt in eine Methodenkette integrieren.
 
 `vitalwerte.csv` liegt long vor (eine Zeile je Messung). Manche Auswertungen
 brauchen wide (eine Spalte je Tag). In pandas: `pivot_table`; in tidyr:
-`pivot_wider`. Der umgekehrte Weg (`melt` / `pivot_longer`) ist genauso wichtig, die meisten Funktionen für Grafik und Statistik erwarten **long**.
+`pivot_wider`. Der umgekehrte Weg (`melt` / `pivot_longer`) ist genauso wichtig: Die meisten Funktionen für Grafik und Statistik erwarten **long**.
 
 ![Abbildung: Dieselben Laktatverläufe im Wide-Format (eine Spalte pro Tag) und im Long-Format (eine Zeile pro Messung); pivot_longer/melt und pivot_wider wandeln ineinander um.](assets/tidy_long_wide.svg)
 
@@ -180,9 +187,9 @@ map_long <- map_wide |>
 ```
 
 **Stolperstein:** `pivot_table` mit `aggfunc="mean"` (Standard) aggregiert
-stillschweigend, wenn mehrere Zeilen pro Kombination existieren. Prüfen Sie,
-ob tatsächlich nur eine Messung pro Patient:in und Tag vorliegt, sonst wählen Sie
-`aggfunc` explizit und wissen, was zusammengefasst wird.
+stillschweigend, wenn mehrere Zeilen pro Kombination existieren. Prüfe, ob
+tatsächlich nur eine Messung pro Patient:in und Tag vorliegt; sonst wähle
+`aggfunc` explizit, damit du weißt, was zusammengefasst wird.
 **Darüber hinaus:** Bei mehreren Messvariablen (MAP, Herzfrequenz, Temperatur) lässt
 sich `pivot_wider(names_from = variable, values_from = wert)` direkt auf ein
 vollständiges long-Format anwenden, das ersetzt drei separate `pivot`-Aufrufe.
@@ -193,9 +200,10 @@ vollständiges long-Format anwenden, das ersetzt drei separate `pivot`-Aufrufe.
 - Ein `left_join`/`merge(how="left")` darf die Zeilenzahl der linken Tabelle **nicht**
  erhöhen. Immer vorher/nachher die Form prüfen (`df.shape`).
 
-- **Tidy zuerst.** Jede Stunde Aufräumen spart drei Stunden Analyse.
+- **Tidy zuerst.** Was beim Aufräumen geklärt und dokumentiert ist, muss keine
+ spätere Analyse neu klären.
 
 ## Selbstcheck
-1. **Was bedeutet „informativ fehlend" am Beispiel Laktat?**, Laktat wird nur bei klinischem Verdacht auf Hypoperfusion gemessen; sein Fehlen ist selbst eine klinische Information, kein zufälliger Datenverlust.
-2. **Warum darf ein `left_join` die Zeilenzahl der linken Tabelle nicht erhöhen, und wann passiert das doch?**, Bei 1:N-Beziehungen (mehrere Laborwerte je Patient:in) multipliziert sich die linke Tabelle; daher `df.shape` vorher und nachher prüfen.
-3. **Wann braucht man das long-Format, wann das wide-Format?**, Long (eine Zeile je Messung) für Visualisierungen und Statistikfunktionen; wide (eine Spalte je Zeitpunkt) für matrixbasierte Berechnungen oder bestimmte Modellformate.
+1. **Was bedeutet „informativ fehlend“ am Beispiel Laktat?** – Laktat wird nur bei klinischem Verdacht auf Hypoperfusion gemessen; sein Fehlen ist selbst eine klinische Information, kein zufälliger Datenverlust.
+2. **Warum darf ein `left_join` die Zeilenzahl der linken Tabelle nicht erhöhen, und wann passiert das doch?** – Bei 1:N-Beziehungen (mehrere Laborwerte je Patient:in) multipliziert sich die linke Tabelle; daher `df.shape` vorher und nachher prüfen.
+3. **Wann braucht man das long-Format, wann das wide-Format?** – Long (eine Zeile je Messung) für Visualisierungen und Statistikfunktionen; wide (eine Spalte je Zeitpunkt) für matrixbasierte Berechnungen oder bestimmte Modellformate.

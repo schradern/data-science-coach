@@ -1,4 +1,4 @@
-"""Module 06 — Data cleaning and transformation (Python / pandas).
+"""Module 06 – Data cleaning and transformation (Python / pandas).
 
 Runs standalone from the project root:
     python module/06-transformation/code/python.py
@@ -38,15 +38,15 @@ def main() -> None:
     print("after: ", sorted(cohort["geschlecht"].unique()))
 
     # ------------------------------------------------------------------
-    # 2) Count missing values — understand before acting
+    # 2) Count missing values – understand before acting
     # ------------------------------------------------------------------
-    # Three columns, three different mechanisms. Naming all three here keeps the
+    # Four columns, three different mechanisms. Naming all of them here keeps the
     # printed output, the figure and the README's table in agreement.
-    print("\n=== 2) Missing values — understand first ===")
+    print("\n=== 2) Missing values – understand first ===")
     print(f"{'column':16s}{'missing':>9}{'share':>9}   mechanism")
     mechanisms = {
-        "bmi": "MCAR — random",
-        "gewicht_kg": "MCAR — random",
+        "bmi": "MCAR – random",
+        "gewicht_kg": "MCAR – random",
         "laktat_mmol_l": "depends on sofa_score (a covariate)",
         "bga_ph": "depends on verstorben_30d (the OUTCOME)",
     }
@@ -54,7 +54,7 @@ def main() -> None:
     for col, mechanism in mechanisms.items():
         n_missing = int(merged[col].isna().sum())
         print(f"{col:16s}{n_missing:>9d}{n_missing / len(merged):>9.1%}   {mechanism}")
-    print("Only the mechanism decides whether dropna() is harmless — see Module 14.")
+    print("Only the mechanism decides whether dropna() is harmless – see Module 14.")
 
     # ------------------------------------------------------------------
     # 3) Join: cohort + labs (LEFT JOIN keeps all patients)
@@ -62,7 +62,7 @@ def main() -> None:
     print("\n=== 3) Join: cohort + labs ===")
     df = cohort.merge(labs, on="patient_id", how="left")
     # A left-join on a 1:1 key must not increase the row count.
-    assert len(df) == len(cohort), "JOIN multiplied rows — check for duplicate keys!"
+    assert len(df) == len(cohort), "JOIN multiplied rows – check for duplicate keys!"
     print("Shape after join:", df.shape)
 
     # ------------------------------------------------------------------

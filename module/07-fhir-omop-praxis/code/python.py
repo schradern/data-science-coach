@@ -34,10 +34,10 @@ def load_fhir_bundle() -> dict:
 def main() -> None:
     bundle = load_fhir_bundle()
 
-    # 1. FHIR-Bundle in eine flache Tabelle entpacken (ein JSON-Objekt pro Ressource).
+    # 1. Unpack the FHIR Bundle into a flat table (one JSON object per resource).
     flat = pd.json_normalize(bundle["entry"], sep="_")
 
-    # 2. Patient- und Observation-Ressourcen trennen (unterschiedliche Felder).
+    # 2. Separate Patient and Observation resources (different fields).
     patients = (
         flat[flat["resource_resourceType"] == "Patient"]
         [["resource_id", "resource_gender", "resource_birthDate"]]
@@ -48,9 +48,9 @@ def main() -> None:
     observations = flat[flat["resource_resourceType"] == "Observation"].copy()
     observations["patient_id"] = observations["resource_subject_reference"].str.split("/").str[-1]
 
-    # 3. Observations von long (eine Zeile pro Messung) nach wide (eine Spalte pro
-    #    Konzept) drehen -- das ist der Schritt, der aus verschachteltem FHIR-JSON
-    #    eine analysierbare Tabelle macht.
+    # 3. Pivot observations from long (one row per measurement) to wide (one column
+    #    per concept) -- this is the step that turns nested FHIR JSON into an
+    #    analysable table.
     obs_wide = observations.pivot(index="patient_id", columns="resource_code_text",
                                   values="resource_valueQuantity_value")
     obs_wide = obs_wide.rename(columns={"SOFA score": "sofa_score", "C-reactive protein": "crp_mg_l"})

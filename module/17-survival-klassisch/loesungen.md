@@ -5,14 +5,15 @@
 - Zeitvariable: `fu_zeit_tage` (Beobachtungs-/Follow-up-Zeit)
 - Ereignisvariable: `status` (1 = Tod beobachtet, 0 = zensiert)
 - Zensierung: Patient:innen ohne Tod im Beobachtungsfenster gelten bis zur
-  beobachteten Zeit als ereignisfrei.
+  beobachteten Zeit als ereignisfrei. Annahme dabei: Die Zensierung ist nicht
+  informativ, Zensierte haben also dasselbe Risiko wie weiter Beobachtete.
 
 `verweildauer_tage` ist **nicht** geeignet: Es ist die Verweildauer im
 Krankenhaus (Länge des Aufenthalts), unabhängig davon erhoben, ob und wann
 ein Todesereignis eintrat. Es gibt keinen definierten Zusammenhang zwischen
 Verweildauer und Sterbezeitpunkt, eine Person kann z. B. lange nach
 Entlassung versterben oder am Todestag entlassen (verstorben) werden. Eine
-Survival-Analyse auf `verstorben_30d` braucht eine echte Zeit-bis-Ereignis-
+Survival-Analyse der Mortalität braucht eine echte Zeit-bis-Ereignis-
 Spalte, das ist `fu_zeit_tage`.
 
 ## Aufgabe 2 – Kaplan-Meier
@@ -65,8 +66,8 @@ print(cph.summary[["exp(coef)", "exp(coef) lower 95%", "exp(coef) upper 95%", "p
 ```
 
 Auf den Kursdaten: HR(Sepsis) ≈ 1,52 (95%-KI [0,86; 2,71], p ≈ 0,15, hier
-nicht signifikant, weil Alter und SOFA einen Teil der rohen Assoziation
-erklären), HR(Alter) ≈ 1,04/Jahr (p < 0,001), HR(SOFA) ≈ 1,42 pro Punkt
+nicht signifikant; SOFA ist laut DAG ein Mediator von Sepsis, das Modell
+schätzt also nur den nicht über SOFA vermittelten Teil), HR(Alter) ≈ 1,04/Jahr (p < 0,001), HR(SOFA) ≈ 1,42 pro Punkt
 (p < 0,001). Die HR für `sepsis` ist adjustiert für Alter und SOFA. Sie
 beschreibt das Verhältnis der momentanen Hazards, nicht direkt das
 kumulative Risiko.

@@ -1,4 +1,4 @@
-# Module 29 — Unsupervised learning and clinical phenotyping (R, parallel to Python).
+# Module 29 – Unsupervised learning and clinical phenotyping (R, parallel to Python).
 #   Rscript module/29-unueberwacht-phenotyping/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -93,7 +93,7 @@ adjusted_rand_index <- function(a, b) {
 }
 
 tab <- table(km = df$cluster_km, hier = df$cluster_hier)
-cat("  k-Means vs hierarchical — contingency table:\n")
+cat("  k-Means vs hierarchical – contingency table:\n")
 print(tab)
 ari <- adjusted_rand_index(df$cluster_km, df$cluster_hier)
 cat(sprintf("  Agreement (Adjusted Rand Index): %.3f  (0 = random, 1 = perfect)\n", ari))
@@ -111,7 +111,7 @@ tryCatch({
   umap_res <- umap(X_scaled, random_state = SEED)
   cat("  UMAP: erfolgreich (umap-Paket verfügbar)\n")
 }, error = function(e) {
-  cat("  UMAP nicht verfügbar — PCA-2D als Fallback\n")
+  cat("  UMAP nicht verfügbar – PCA-2D als Fallback\n")
 })
 
 # ── 6) Phenotype profiles ──────────────────────────────────────────────────────
@@ -123,5 +123,5 @@ profile <- df |>
   mutate(across(where(is.numeric), \(x) round(x, 2)))
 print(as.data.frame(profile))
 
-cat("\nHinweis: Cluster sind explorative Gruppen — keine Diagnosen.\n")
+cat("\nHinweis: Cluster sind explorative Gruppen – keine Diagnosen.\n")
 cat("Externe Validierung vor klinischem Einsatz erforderlich.\n")

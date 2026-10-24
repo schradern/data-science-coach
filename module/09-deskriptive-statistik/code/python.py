@@ -1,4 +1,4 @@
-"""Module 09 — Descriptive statistics and 'Table 1' (Python / pandas + tableone).
+"""Module 09 – Descriptive statistics and 'Table 1' (Python / pandas + tableone).
 
 Runs standalone from the project root:
     python module/09-deskriptive-statistik/code/python.py
@@ -25,7 +25,7 @@ from lib.plotstyle import apply_style, save, PRIMARY, EVENT, SECONDARY  # noqa: 
 apply_style()
 pd.set_option("display.width", 120)
 pd.set_option("display.max_columns", 20)
-# Figures belong next to the lesson, in assets/ — never in code/.
+# Figures belong next to the lesson, in assets/ – never in code/.
 FIGURE_DIR = Path(__file__).resolve().parent.parent / "assets"
 FIGURE_DIR.mkdir(exist_ok=True)
 
@@ -36,7 +36,7 @@ def main() -> None:
 
     # Merge cohort + labs (left join keeps all patients).
     df = cohort.merge(labs, on="patient_id", how="left")
-    assert len(df) == len(cohort), "JOIN multiplied rows — check for duplicate keys!"
+    assert len(df) == len(cohort), "JOIN multiplied rows – check for duplicate keys!"
 
     # Standardise gender encoding (learned in module 06).
     df["geschlecht"] = df["geschlecht"].replace({"w": "weiblich"})
@@ -46,14 +46,14 @@ def main() -> None:
     # ------------------------------------------------------------------
     print("=== 1) Location measures: mean vs. median ===")
 
-    # Length of stay is right-skewed — outliers pull the mean upward.
+    # Length of stay is right-skewed – outliers pull the mean upward.
     los = df["verweildauer_tage"]
     print(f"Verweildauer – mean:   {los.mean():.1f} days  ← pulled by long-stay outliers")
     print(f"Verweildauer – median: {los.median():.0f} days  ← typical value")
     print(f"Verweildauer – SD:     {los.std():.1f}")
     print(f"Verweildauer – IQR:    {los.quantile(0.25):.0f} – {los.quantile(0.75):.0f}")
 
-    # Age is approximately normal — mean makes sense here.
+    # Age is approximately normal – mean makes sense here.
     age = df["alter"]
     print(f"\nAlter – mean ± SD:     {age.mean():.1f} ± {age.std():.1f} years")
     print(f"Alter – median [IQR]:   {age.median():.0f}"
@@ -64,9 +64,9 @@ def main() -> None:
     # ------------------------------------------------------------------
     print("\n=== 2) Spread measures and percentiles ===")
 
-    # CRP is right-skewed — report median [IQR], not mean ± SD.
+    # CRP is right-skewed – report median [IQR], not mean ± SD.
     crp = df["crp_mg_l"]
-    print("CRP mg/l — descriptive summary:")
+    print("CRP mg/l – descriptive summary:")
     print(crp.describe().round(1))
     print(f"Percentiles 10/50/90: "
           f"{crp.quantile(0.10):.1f} / {crp.quantile(0.50):.1f} / {crp.quantile(0.90):.1f} mg/l")
@@ -79,7 +79,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     # 3) Frequencies for categorical variables
     # ------------------------------------------------------------------
-    print("\n=== 3) Frequencies — categorical variables ===")
+    print("\n=== 3) Frequencies – categorical variables ===")
 
     print("Aufnahmegrund (absolute and relative):")
     freq = df["aufnahmegrund"].value_counts()
@@ -126,15 +126,20 @@ def main() -> None:
         "kreatinin_mg_dl", "laktat_mmol_l",
     ]
     categorical = ["geschlecht", "aufnahmegrund", "diabetes", "hypertonie", "raucherstatus"]
+    # Skewed/ordinal variables: median [Q1,Q3] and Kruskal-Wallis instead of
+    # tableone's default mean (SD) and t-test/ANOVA (matches gtsummary in r.R).
+    nonnormal = ["sofa_score", "crp_mg_l", "verweildauer_tage",
+                 "kreatinin_mg_dl", "laktat_mmol_l"]
 
     # groupby splits columns by 30-day mortality; p-value is descriptive, not a goal.
     table1 = TableOne(
         df,
         columns=columns,
         categorical=categorical,
+        nonnormal=nonnormal,
         groupby="verstorben_30d",
         pval=True,    # descriptive group comparison
-        missing=True, # always show missing — never hide them
+        missing=True, # always show missing – never hide them
         rename={
             "verstorben_30d":    "Verstorben (30d)",
             "alter":             "Alter (Jahre)",
@@ -179,7 +184,7 @@ def main() -> None:
 
     print(f"Max consecutive points below median: {max_consecutive} (Shift if >= 6)")
 
-    import matplotlib.pyplot as plt  # noqa: E402  (local import — headless-safe)
+    import matplotlib.pyplot as plt  # noqa: E402  (local import – headless-safe)
 
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.plot(months, wait_times, "o-", color=PRIMARY, label="Messwert")

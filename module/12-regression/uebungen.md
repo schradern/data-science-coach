@@ -15,28 +15,28 @@ Erweitere das Modell um `alter` (zentriert auf 64), `diabetes` und `sepsis`
 als weitere Prädiktoren. Vergleiche die geschätzten **Odds Ratios** mit den
 wahren ORs aus `lib/ground_truth.py`.
 
-**Achtung:** Vergleiche nicht mit `exp(0,45)` & Co. — das sind die wahren
+**Achtung:** Vergleiche nicht mit `exp(0,45)` & Co. – das sind die wahren
 **Hazard** Ratios der Datengenerierung. Warum ist der Unterschied hier relevant,
 und in welche Richtung liegt die wahre OR immer?
 
 ## Aufgabe 3 – Confounder und Mediator unterscheiden
 
-Nimm als Exposition zunächst **`sepsis`** (nicht Diabetes — warum, siehe unten).
+Nimm als Exposition zunächst **`sepsis`** (nicht Diabetes – warum, siehe unten).
 
 1. Berechne den **rohen** Effekt von `sepsis` auf `verstorben_30d` (nur `sepsis`).
 2. Adjustiere für `alter` (zentriert). Wie verändert sich die OR? Ist `alter`
-   ein Confounder, ein Mediator oder keines von beidem — und wie begründest du
+   ein Confounder, ein Mediator oder keines von beidem – und wie begründest du
    das aus der DAG, nicht aus der Zahl?
 3. Adjustiere **zusätzlich** für `sofa_score`. Was passiert mit der OR, und
    warum? Welche Rolle spielt `sofa_score` laut DAG in `data/README.md`?
 4. Welche der drei Schätzungen ist der **totale** Effekt von Sepsis, welche der
    **direkte**? Welche würdest du berichten, wenn eine Klinikleitung fragt: „Wie
-   viel gefährlicher ist eine Sepsis?"
+   viel gefährlicher ist eine Sepsis?“
 
 **Und nun zu Diabetes:** Wiederhole Schritt 1–3 mit `diabetes`. Die
 Punktschätzer zeigen dasselbe Muster. Sieh dir aber die 95-%-Konfidenzintervalle
 an. Was kannst du bei N = 500 und 78 Ereignissen über den Overadjustment-Bias
-bei Diabetes **belegen** — und was nur *herleiten*?
+bei Diabetes **belegen** – und was nur *herleiten*?
 
 ## Aufgabe 4 – Lineare Regression und Residuenplot
 

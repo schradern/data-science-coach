@@ -16,7 +16,8 @@ k <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 sum(is.na(k$bmi)); mean(is.na(k$bmi))
 ```
 **Ergebnis:** 30 von 500 (6,0 %) fehlen.
-**Entscheidung:** ~6 % fehlen, zufällig (MCAR). Für deskriptive Statistik
+**Entscheidung:** ~6 % fehlen, laut Konstruktion des Datensatzes rein zufällig
+(MCAR; aus den Daten allein ließe sich das nicht beweisen). Für deskriptive Statistik
 behalten und Fehlen ausweisen; für ein Modell, das `bmi` braucht, entweder
 imputieren oder die Fälle dokumentiert ausschließen, nie stillschweigend.
 
@@ -39,9 +40,9 @@ hoch <- k |> filter(sofa_score >= 6) |>
 ```python
 import pandas as pd
 k = pd.read_csv("{{DATEN}}kohorte.csv")
-k.groupby("raucherstatus").agg(
+print(k.groupby("raucherstatus").agg(
     verweildauer=("verweildauer_tage","mean"),
-    mortalitaet=("verstorben_30d","mean")).round(3)
+    mortalitaet=("verstorben_30d","mean")).round(3))
 ```
 ```r
 library(dplyr)
@@ -62,7 +63,7 @@ import pandas as pd
 k = pd.read_csv("{{DATEN}}kohorte.csv")
 labs = pd.read_csv("{{DATEN}}labor.csv")
 df = k.merge(labs, on="patient_id", how="left")
-df.groupby("diabetes")["kreatinin_mg_dl"].median()
+print(df.groupby("diabetes")["kreatinin_mg_dl"].median())
 ```
 ```r
 library(dplyr)
@@ -73,15 +74,18 @@ df <- left_join(k, labs, by="patient_id")
 df |> group_by(diabetes) |> summarise(krea = median(kreatinin_mg_dl, na.rm=TRUE))
 ```
 **Ergebnis:** medianes Kreatinin ohne Diabetes ~1,0 mg/dl, mit Diabetes
-1,1 mg/dl, minimal höher, konsistent mit diabetischer Nephropathie als
-Risikofaktor, bei diesen kleinen Gruppengrößen aber nicht überinterpretieren.
+1,1 mg/dl. Der kleine Unterschied ist hier Zufall: Im synthetischen Datensatz
+wird Kreatinin unabhängig vom Diabetes erzeugt (`data/generate_data.py`).
+Klinisch würde man über die diabetische Nephropathie einen Zusammenhang
+erwarten; dass er in den Zahlen „passt“, beweist ohne Test und Konfidenzintervall
+nichts.
 
 ## Aufgabe 5 – Long ↔ Wide
 ```python
 import pandas as pd
 v = pd.read_csv("{{DATEN}}vitalwerte.csv")
 map_wide = v.pivot_table(index="patient_id", columns="tag", values="map_mmhg")
-map_wide[3].notna().sum()   # Patient:innen mit Wert an Tag 3
+print(map_wide[3].notna().sum())   # patients with a value on day 3
 ```
 ```r
 library(dplyr)
@@ -92,9 +96,9 @@ map_wide <- v |> select(patient_id, tag, map_mmhg) |>
   pivot_wider(names_from = tag, values_from = map_mmhg, names_prefix = "tag")
 sum(!is.na(map_wide$tag3))
 ```
-**Ergebnis:** 408 von 500 Patient:innen haben einen MAP-Wert an Tag 3 (die
-übrigen wurden vorher entlassen oder verstarben, `vitalwerte.csv` hat pro
-Patient:in nicht zwingend vier Messtage).
+**Ergebnis:** 408 von 500 Patient:innen haben einen MAP-Wert an Tag 3. Die
+übrigen waren vorher schon entlassen: Die Zahl der Messtage in
+`vitalwerte.csv` folgt der Verweildauer (höchstens vier).
 
 ## Bonus
 ```python

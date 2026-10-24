@@ -20,7 +20,7 @@ load_fhir_bundle <- function() {
 
 bundle <- load_fhir_bundle()
 
-# 1. Ressourcen aus dem Bundle in zwei Listen trennen (Patient / Observation).
+# 1. Split the Bundle's resources into two lists (Patient / Observation).
 patient_rows <- list()
 obs_rows <- list()
 for (entry in bundle$entry) {
@@ -44,9 +44,9 @@ for (entry in bundle$entry) {
 patients <- do.call(rbind, patient_rows)
 observations <- do.call(rbind, obs_rows)
 
-# 2. Observations von long (eine Zeile pro Messung) nach wide (eine Spalte pro
-#    Konzept) drehen -- der Schritt, der aus verschachteltem FHIR-JSON eine
-#    analysierbare Tabelle macht.
+# 2. Pivot observations from long (one row per measurement) to wide (one column
+#    per concept) -- the step that turns nested FHIR JSON into an
+#    analysable table.
 obs_wide <- reshape(observations, idvar = "patient_id", timevar = "concept",
                      direction = "wide")
 names(obs_wide) <- sub("^value\\.", "", names(obs_wide))

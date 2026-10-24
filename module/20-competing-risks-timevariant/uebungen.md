@@ -36,8 +36,8 @@ In einer kleinen Intensivkohorte von 20 Patient:innen konkurrieren zwei Ereignis
 3. Vergleiche beide Werte. Warum überschätzt das naive 1−KM?
 
 ## Übung 4: Warum sich konkurrierende CIFs korrekt zu 1 addieren
-Am Ende der 30-tägigen Beobachtung teilt sich die Kurskohorte (500 Patient:innen) in drei sich ausschließende Endzustände: **78 verstorben**, **315 lebend entlassen**, **107 an Tag 30 noch im Krankenhaus** (administrativ zensiert). Da vor Tag 30 keine Zensierung auftritt, sind die CIF-Werte an Tag 30 einfach die beobachteten Anteile.
+Am Ende der 30-tägigen Beobachtung teilt sich die Kurskohorte (500 Patient:innen) in drei sich ausschließende Endzustände: **78 verstorben**, **315 lebend entlassen**, **107 zensiert**. Nimm vereinfachend an, alle 107 seien an Tag 30 noch im Krankenhaus (in Wahrheit fallen 18 von ihnen schon vorher aus der Beobachtung). Ohne Zensierung vor Tag 30 sind die CIF-Werte an Tag 30 einfach die beobachteten Anteile.
 
 1. Berechne `CIF_Tod(30)`, `CIF_Entlassung(30)` und den Anteil noch im Krankenhaus (`S(30)`). Zeige, dass sie sich zu 1 addieren.
 2. Ein:e Kolleg:in berechnet stattdessen 1−KM getrennt für Tod (27,7 %) und für Entlassung (jeweils das andere Ereignis als Zensierung). Warum können diese beiden Zahlen zusammen die Grenze von 100 % sprengen, während die CIFs es nie tun?
-3. Welche Zahl gibst du einer/einem Ärzt:in auf die Frage „Wie hoch ist die Wahrscheinlichkeit, dass diese Patientin binnen 30 Tagen im Krankenhaus verstirbt?"
+3. Welche Zahl gibst du einer/einem Ärzt:in auf die Frage „Wie hoch ist die Wahrscheinlichkeit, dass diese Patientin binnen 30 Tagen im Krankenhaus verstirbt?“

@@ -1,4 +1,4 @@
-# Module 09 — Descriptive statistics and 'Table 1' (R / gtsummary)
+# Module 09 – Descriptive statistics and 'Table 1' (R / gtsummary)
 #
 # Runs standalone from the project root:
 #   Rscript module/09-deskriptive-statistik/code/r.R
@@ -32,14 +32,14 @@ df <- df |> mutate(geschlecht = if_else(geschlecht == "w", "weiblich", geschlech
 # ------------------------------------------------------------------
 cat("=== 1) Location measures: mean vs. median ===\n")
 
-# Length of stay is right-skewed — outliers pull the mean upward.
+# Length of stay is right-skewed – outliers pull the mean upward.
 cat(sprintf("Verweildauer – mean:   %.1f days  <- pulled by outliers\n", mean(df$verweildauer_tage)))
 cat(sprintf("Verweildauer – median: %.0f days  <- typical value\n",      median(df$verweildauer_tage)))
 cat(sprintf("Verweildauer – SD:     %.1f\n",                             sd(df$verweildauer_tage)))
 q_los <- quantile(df$verweildauer_tage, c(0.25, 0.75))
 cat(sprintf("Verweildauer – IQR:    %.0f – %.0f\n", q_los[1], q_los[2]))
 
-# Age is approximately normal — mean is appropriate.
+# Age is approximately normal – mean is appropriate.
 cat(sprintf("\nAlter – mean +/- SD:    %.1f +/- %.1f years\n", mean(df$alter), sd(df$alter)))
 q_age <- quantile(df$alter, c(0.25, 0.75))
 cat(sprintf("Alter – median [IQR]:   %.0f [%.0f; %.0f] years\n",
@@ -50,8 +50,8 @@ cat(sprintf("Alter – median [IQR]:   %.0f [%.0f; %.0f] years\n",
 # ------------------------------------------------------------------
 cat("\n=== 2) Spread measures and percentiles ===\n")
 
-# CRP is right-skewed — report median [IQR].
-cat("CRP mg/l — descriptive summary:\n")
+# CRP is right-skewed – report median [IQR].
+cat("CRP mg/l – descriptive summary:\n")
 print(summary(df$crp_mg_l))
 pct <- quantile(df$crp_mg_l, c(0.10, 0.50, 0.90), na.rm = TRUE)
 cat(sprintf("Percentiles 10/50/90: %.1f / %.1f / %.1f mg/l\n", pct[1], pct[2], pct[3]))
@@ -61,9 +61,9 @@ cat(sprintf("\nSOFA-Score – mean +/- SD:   %.1f +/- %.1f\n",  mean(df$sofa_sco
 cat(sprintf("SOFA-Score – median [IQR]:  %.0f [%.0f; %.0f]\n", median(df$sofa_score), qs[1], qs[2]))
 
 # ------------------------------------------------------------------
-# 3) Frequencies — categorical variables
+# 3) Frequencies – categorical variables
 # ------------------------------------------------------------------
-cat("\n=== 3) Frequencies — categorical variables ===\n")
+cat("\n=== 3) Frequencies – categorical variables ===\n")
 
 cat("Aufnahmegrund (absolute and relative):\n")
 tbl_abs <- table(df$aufnahmegrund)
@@ -124,7 +124,7 @@ table1 <- df_table |>
          kreatinin_mg_dl, laktat_mmol_l, verstorben_30d) |>
   tbl_summary(
     by      = verstorben_30d,
-    missing = "ifany",          # always show missing — never hide them
+    missing = "ifany",          # always show missing – never hide them
     label   = list(
       alter              ~ "Alter (Jahre)",
       geschlecht         ~ "Geschlecht",
@@ -146,7 +146,9 @@ table1 <- df_table |>
   add_p() |>       # group comparison (chi-squared / Wilcoxon)
   add_overall()    # add overall "Gesamt" column
 
-print(table1)
+# as_kable() prints a plain-text table; print(table1) would dump HTML/CSS
+# into the console when run via Rscript.
+print(as_kable(table1))
 
 # ------------------------------------------------------------------
 # 6) Statistical Process Control (SPC) Run Chart
@@ -178,7 +180,7 @@ p_spc <- ggplot(df_spc, aes(x = monat, y = wartezeit)) +
   labs(x = "Monat", y = "Wartezeit (Minuten)", title = "SPC Run Chart: Wartezeit Notaufnahme") +
   theme_minimal()
 
-# Figures belong next to the lesson, in assets/ — never in code/.
+# Figures belong next to the lesson, in assets/ – never in code/.
 assets_dir <- file.path(dirname(dirname(.script)), "assets")
 dir.create(assets_dir, showWarnings = FALSE)
 path_spc <- file.path(assets_dir, "spc_run_chart_demo_r.png")

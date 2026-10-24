@@ -53,18 +53,18 @@ Nachsehen, wenn ein Wort stört.
 | Kollider | Variable, die gemeinsame Folge zweier Ursachen ist; Adjustierung kann Scheinzusammenhänge erzeugen. |
 | Adjustierung | Ein Modell berücksichtigt zusätzliche Variablen, um Verzerrung zu reduzieren. |
 | Overadjustment | Adjustierung für einen Mediator oder Kollider; kontrolliert einen Teil des echten Effekts fälschlich weg oder öffnet einen Scheinpfad. |
-| DAG | Gerichteter Graph für Annahmen über Ursachen, Confounder, Mediatoren und Collider. |
+| DAG | Gerichteter Graph für Annahmen über Ursachen, Confounder, Mediatoren und Kollider. |
 | Propensity Score | Geschätzte Wahrscheinlichkeit, eine Behandlung/Exposition zu erhalten, gegeben Kovariaten. |
 | Standardized Mean Difference | Maß für Gruppenbalance; häufiges Ziel nach Gewichtung oder Matching: Betrag < 0,1. |
 | MICE | Multiple Imputation by Chained Equations; Verfahren für mehrere plausible Ergänzungen fehlender Werte. |
-| Regressionsverdünnung | Klassisch (englisch *regression dilution*, auch *regression attenuation*): nicht-differenzieller Messfehler in einem Prädiktor schwächt dessen geschätzten Koeffizienten Richtung Null. Der Kurs verwendet denselben Begriff für einen strukturell gleichartigen Effekt der Median-Imputation (Modul 14: OR 2,76 → 1,78) — hier ersetzt der imputierte Wert den unbekannten wahren Wert und wirkt wie ein Messfehler. Multiple Imputation vermeidet diese Verzerrung, weil sie plausible Streuung statt eines einzelnen Werts einsetzt. |
-| Rubin's Rules | Regeln, um Schätzer und Standardfehler aus mehreren imputierten Datensätzen zu einem Gesamtergebnis mit korrekter Unsicherheit zusammenzuführen. |
-| λ (Lambda) | Anteil der Gesamtvarianz `T`, der bei Rubin's Rules auf das Fehlen von Werten zurückgeht: `(1+1/m)·B / T`. Nicht dasselbe wie `fmi` (Modul 14). |
+| Regressionsverdünnung | Klassisch (englisch *regression dilution*, auch *regression attenuation*): nicht-differenzieller Messfehler in einem Prädiktor schwächt dessen geschätzten Koeffizienten Richtung Null. Der Kurs verwendet denselben Begriff für einen strukturell gleichartigen Effekt der Median-Imputation (Modul 14: OR 2,76 → 1,78) – hier ersetzt der imputierte Wert den unbekannten wahren Wert und wirkt wie ein Messfehler. Multiple Imputation vermeidet diese Verzerrung, weil sie plausible Streuung statt eines einzelnen Werts einsetzt. |
+| Rubins Regeln (engl. *Rubin's rules*) | Regeln, um Schätzer und Standardfehler aus mehreren imputierten Datensätzen zu einem Gesamtergebnis mit korrekter Unsicherheit zusammenzuführen. |
+| λ (Lambda) | Anteil der Gesamtvarianz `T`, der bei Rubins Regeln auf das Fehlen von Werten zurückgeht: `(1+1/m)·B / T`. Nicht dasselbe wie `fmi` (Modul 14). |
 | FMI | Fraktion fehlender Information; `mice::pool()` berichtet die endlich-`m`-korrigierte Form `(r + 2/(ν+3))/(r+1)`. Zahlenmäßig verschieden von λ, auch wenn beide dieselbe Idee messen (Modul 14). |
 | Barnard–Rubin | Korrektur der Freiheitsgrade von Rubins (1987) `ν_alt`, die für endliches `n` realistischere, kleinere Werte liefert; von `mice::pool()` standardmäßig verwendet (Modul 14). |
 | SE-Ratio | Verhältnis aus berichtetem Standardfehler und tatsächlicher Streuung der Schätzer über Wiederholungen. Werte unter 1 zeigen, dass eine Methode ihre eigene Unsicherheit unterschätzt (Modul 14). |
 | Überdeckung | Anteil nominaler 95-%-Konfidenzintervalle, die über viele Wiederholungen tatsächlich den wahren Wert enthalten; Sollwert 95 % (Modul 14). |
-| PMM | Predictive Mean Matching; Imputationsverfahren, das fehlende Werte durch beobachtete „Spenderwerte" ähnlicher Fälle ersetzt und dadurch garantiert im plausiblen Wertebereich bleibt (Modul 14). |
+| PMM | Predictive Mean Matching; Imputationsverfahren, das fehlende Werte durch beobachtete „Spenderwerte“ ähnlicher Fälle ersetzt und dadurch garantiert im plausiblen Wertebereich bleibt (Modul 14). |
 | Passive Imputation | Eine abgeleitete Variable (z. B. BMI aus Größe und Gewicht) wird bei jeder Imputation aus den imputierten Ausgangsvariablen neu berechnet statt unabhängig imputiert, damit die Definitionsgleichung erhalten bleibt (Modul 14). |
 | Gelman–Rubin (R-hat) | Konvergenzdiagnostik für iterative Sampling-Verfahren wie MICE: vergleicht die Streuung zwischen mehreren parallelen Ketten mit der Streuung innerhalb der Ketten. Werte nahe 1 (Faustregel < 1,1) zeigen, dass sich die Ketten durchmischt haben und kein systematischer Trend mehr besteht (Modul 14). |
 | Delta-Adjustment | Sensitivitätsanalyse für MNAR: imputierte Werte werden systematisch um einen Betrag δ verschoben, um zu prüfen, wie stark eine unbeobachtbare Abweichung von MAR das Ergebnis verändert (Modul 14). |
@@ -88,7 +88,7 @@ Nachsehen, wenn ein Wort stört.
 | Net Benefit | Kennzahl der Decision-Curve-Analyse; wägt richtig-positive gegen falsch-positive Entscheidungen bei einer klinischen Risikoschwelle ab. |
 | Bootstrap | Wiederholtes Ziehen mit Zurücklegen aus den Daten, um Unsicherheit oder Optimismus einer Schätzung ohne Formelannahmen abzuschätzen. |
 | Optimismus | Überschätzung der Modellgüte, weil dieselben Daten Training und Bewertung dienen; per Bootstrap korrigierbar. |
-| TRIPOD | Reporting-Leitlinie für Entwicklung und Validierung klinischer Vorhersagemodelle (Variante TRIPOD-AI für KI-Modelle). |
+| TRIPOD | Reporting-Leitlinie für Entwicklung und Validierung klinischer Vorhersagemodelle; die aktuelle Fassung TRIPOD+AI gilt für Regressions- und Machine-Learning-Modelle gleichermaßen. |
 | Statistical Process Control | Zeitreihenmethode, um Prozessänderungen von Zufallsschwankung zu trennen. |
 
 ## Machine Learning und AI
@@ -104,8 +104,13 @@ Nachsehen, wenn ein Wort stört.
 | Schwellenwert | Grenze, ab der ein Risiko als positiv klassifiziert wird. Klinische Entscheidung, nicht nur Mathematik. |
 | Overfitting | Modell lernt Details des Trainingsdatensatzes statt robuste Muster. |
 | SHAP | Methode, um Modellvorhersagen einzelnen Merkmalen zuzuschreiben. Hilfreich, aber erklärungsbedürftig. |
+| TF-IDF | Gewichtung von Wörtern in Texten: häufig im Dokument, aber selten im gesamten Korpus ergibt ein hohes Gewicht. Grundlage einfacher Textklassifikation und Suche (Module 31, 33). |
+| Embedding | Darstellung eines Wortes, Satzes oder Dokuments als Zahlenvektor, in dem bedeutungsähnliche Texte nahe beieinander liegen (Modul 31). |
+| Halluzination | Plausibel klingende, aber falsche oder nicht belegte Ausgabe eines Sprachmodells (Module 31, 33). |
 | RAG | Retrieval-Augmented Generation: Sprachmodell antwortet mit Hilfe gefundener Dokumentstellen. |
 | Drift | Daten oder Zusammenhang ändern sich nach Deployment; Modellgüte kann fallen. |
-| Kalibrierungsdrift | Vorhergesagte Risiken passen nach Deployment schrittweise immer schlechter zur beobachteten Ereignisrate, weil sich der Casemix innerhalb derselben Population über die Zeit verändert. Eine stabile AUC schließt Kalibrierungsdrift nicht aus — beides muss getrennt geprüft werden (Modul 32). |
-| Spektrum-Bias | Ein Modell wird an einer Population trainiert (z. B. Intensivstation), aber in einer anderen mit anderem Schweregrad-Spektrum eingesetzt (z. B. Normalstation). Die Falsch-Positiv-Rate steigt, weil sich die Populationszusammensetzung verschoben hat — anders als bei Kalibrierungsdrift bleibt die Zielpopulation dabei nicht dieselbe (Modul 34). |
+| Kalibrierungsdrift | Vorhergesagte Risiken passen nach Deployment schrittweise immer schlechter zur beobachteten Ereignisrate, weil sich das Grundrisiko oder nicht erfasste Einflussgrößen innerhalb derselben Einsatzumgebung über die Zeit verändern. Eine stabile AUC schließt Kalibrierungsdrift nicht aus – beides muss getrennt geprüft werden (Module 32, 34). |
+| Spektrum-Bias | Ein Modell wird an einer Population trainiert (z. B. Intensivstation), aber in einer anderen mit anderem Schweregrad-Spektrum eingesetzt (z. B. Normalstation). Sensitivität und Spezifität können sich dabei verschieben, und schon die andere Prävalenz ändert den Anteil der Fehlalarme (PPV) – anders als bei Kalibrierungsdrift bleibt die Zielpopulation dabei nicht dieselbe (Modul 34). |
 | Model Card | Kurzes Dokument zu Zweck, Daten, Leistung, Grenzen, Fairness und Monitoring eines Modells. |
+| Schattenbetrieb (Silent Deployment) | Das Modell läuft auf Live-Daten mit, seine Ausgaben sieht aber niemand; so lassen sich Technik, Diskriminierung und Kalibrierung prospektiv prüfen, ohne Patient:innen zu beeinflussen (Modul 34). |
+| Automation Bias | Neigung, Modellausgaben unkritisch zu übernehmen und eigene klinische Warnsignale zu übergehen (Module 32, 34). |

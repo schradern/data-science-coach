@@ -23,7 +23,9 @@ for d in [0.3, 0.5]:
     print(d, n)
 ```
 
-Kleinere Effekte brauchen deutlich mehr Patient:innen. Das ist der Kern von
+Ergebnis (aufgerundet): 176 Patient:innen je Gruppe für d = 0,3, aber nur 64 für
+d = 0,5. Kleinere Effekte brauchen deutlich mehr Patient:innen, grob mit dem
+Kehrwert des Quadrats der Effektgröße: (0,5 / 0,3)² ≈ 2,8. Das ist der Kern von
 Powerplanung: klinisch relevante Mini-Effekte sind statistisch teuer.
 
 ## Aufgabe 3 – Präzision
@@ -44,8 +46,8 @@ library(tidyverse)
 df <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 events <- sum(df$verstorben_30d)
 n <- nrow(df)
-# correct = FALSE liefert das reine Wilson-Score-Intervall wie Python;
-# der Default correct = TRUE wäre ein stetigkeitskorrigiertes, breiteres Intervall.
+# correct = FALSE gives the plain Wilson score interval, as in Python;
+# the default correct = TRUE would give a wider, continuity-corrected interval.
 ci <- prop.test(events, n, correct = FALSE)$conf.int
 cat(sprintf("events=%d/%d rate=%.4f Wilson-KI [%.4f, %.4f]\n",
             events, n, events / n, ci[1], ci[2]))

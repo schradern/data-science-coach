@@ -10,14 +10,14 @@ import pandas as pd
 FHIR_URL = "https://hapi.fhir.org/baseR4"
 LOINC_BP = "85354-9"
 
-# 1. API-Abfrage für Blutdruck-Observations absenden
+# 1. Send the API query for blood pressure observations
 response = requests.get(
     f"{FHIR_URL}/Observation?code={LOINC_BP}&_count=5",
     headers={"Accept": "application/json"}
 )
 bundle = response.json()
 
-# 2. Relevante Felder extrahieren
+# 2. Extract the relevant fields
 records = []
 for entry in bundle.get("entry", []):
     resource = entry["resource"]
@@ -32,6 +32,7 @@ print(df_bp)
 
 ### R-Lösung
 ```r
+# install.packages("fhircrackr")  # once; not in the course package list
 library(fhircrackr)
 
 search_request <- fhir_url(

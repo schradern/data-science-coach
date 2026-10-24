@@ -49,8 +49,10 @@ high <- creatinine[creatinine > 2.0]
 cat("Creatinine > 2.0:", paste(high, collapse = ", "), "\n")
 cat(sprintf("Fraction: %.0f%%\n", mean(creatinine > 2.0) * 100))
 ```
-**Hinweis:** ~29 %, klinisch relevant; Kreatinin > 2,0 ist ein grober Marker
-für behandlungspflichtige Niereninsuffizienz (abhängig von Baseline und Alter).
+**Hinweis:** 2 von 7 Werten (~29 %) liegen über 2,0 mg/dl. Ein fester Grenzwert
+ist nur ein grober Hinweis auf eine eingeschränkte Nierenfunktion: Die Bewertung
+hängt von Baseline, Alter, Geschlecht und Muskelmasse ab, und ein akutes
+Nierenversagen definiert KDIGO über den Anstieg, nicht über einen Absolutwert.
 
 ## Aufgabe 3 – Eigene Funktion schreiben
 
@@ -81,12 +83,12 @@ def assess_map(map_mmhg: float) -> str:
     """Classify mean arterial pressure by clinical thresholds."""
     if map_mmhg < 65:
         return "Schock-Grenzwert unterschritten"
-    elif map_mmhg <= 90:
+    elif map_mmhg <= 100:
         return "Normbereich"
     else:
         return "Erhöht"
 
-for val in [58, 72, 95, 63, 88]:
+for val in [58, 72, 105, 63, 88]:
     print(f"  MAP {val:3d} mmHg -> {assess_map(val)}")
 ```
 ```r
@@ -94,19 +96,20 @@ library(dplyr)
 assess_map <- function(map_mmhg) {
   case_when(
     map_mmhg < 65  ~ "Schock-Grenzwert unterschritten",
-    map_mmhg <= 90 ~ "Normbereich",
+    map_mmhg <= 100 ~ "Normbereich",
     .default       = "Erhöht"
   )
 }
 
-values  <- c(58, 72, 95, 63, 88)
+values  <- c(58, 72, 105, 63, 88)
 results <- assess_map(values)
 for (i in seq_along(values)) {
   cat(sprintf("  MAP %3d mmHg -> %s\n", values[i], results[i]))
 }
 ```
-**Klinischer Bezug:** MAP < 65 mmHg ist der Schwellenwert der Sepsis-Leitlinien
-für Flüssigkeits- und Vasopressortherapie (Surviving Sepsis Campaign).
+**Klinischer Bezug:** Ein MAP von mindestens 65 mmHg ist der initiale Zielwert
+der Surviving Sepsis Campaign für Patient:innen unter Vasopressortherapie; der
+Normbereich Gesunder liegt etwa bei 70–100 mmHg.
 
 ## Aufgabe 5 – DataFrame-Basics
 
@@ -161,7 +164,7 @@ library(readr)
 cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 cohort <- cohort |> mutate(age_z = (alter - mean(alter)) / sd(alter))
 print(summary(cohort$age_z))
-# mean ≈ 0, sd ≈ 1 — as expected.
+# mean ≈ 0, sd ≈ 1 – as expected.
 ```
 **Erklärung:** Der z-Score misst, wie viele Standardabweichungen ein Wert vom
 Mittelwert entfernt liegt. In einer Normalverteilung liegen ≈ 95 % aller Werte

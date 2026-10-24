@@ -11,11 +11,19 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 # pre and column lists from code/python.py
-auc = cross_val_score(mlp_pipe, X, y,
+mlp_cv = Pipeline([("pre", pre),
+                   ("mlp", MLPClassifier(hidden_layer_sizes=(64, 32), alpha=0.01,
+                                         max_iter=500, random_state=42))])
+auc = cross_val_score(mlp_cv, X, y,
                       cv=StratifiedKFold(5, shuffle=True, random_state=42),
                       scoring="roc_auc").mean()
 print(f"MLP CV-AUC: {auc:.3f}")
+# MLP CV-AUC: 0.656
 ```
+
+Nimm für die CV bewusst ein Netz **ohne** `early_stopping`: `mlp_pipe` aus
+Abschnitt 2 bricht nach der Validierungsgenauigkeit ab und kommt in derselben
+CV nur auf eine AUC um 0,50 (siehe Aufgabe 2).
 
 `StandardScaler` ist beim MLP unverzichtbar, weil Gradient Descent auf der
 euklidischen Verlustlandschaft arbeitet: Merkmale mit großen Absolutwerten
@@ -34,10 +42,10 @@ mlp = mlp_pipe.named_steps["mlp"]
 fig, ax1 = plt.subplots(figsize=(8, 4))
 ax1.plot(mlp.loss_curve_, color="steelblue", label="Trainingsverlust")
 ax2 = ax1.twinx()
-ax2.plot(mlp.validation_scores_, color="firebrick", label="Validierungs-AUC")
+ax2.plot(mlp.validation_scores_, color="firebrick", label="Validierungsgenauigkeit")
 ax1.set_xlabel("Epoche")
 ax1.set_ylabel("Verlust")
-ax2.set_ylabel("Validierungs-AUC")
+ax2.set_ylabel("Validierungsgenauigkeit (Accuracy)")
 print(f"Early stopping nach {mlp.n_iter_} Epochen")
 plt.show()
 ```
@@ -45,7 +53,12 @@ plt.show()
 Überanpassung erkennt man daran, dass der Trainingsverlust weiter sinkt,
 während die Validierungsgüte stagniert oder fällt. Early Stopping hält an
 dem Punkt an, an dem die Validierungsgüte über mehrere Epochen nicht mehr
-verbessert wird (`n_iter_no_change` Epochen, Standard = 10).
+verbessert wird (`n_iter_no_change` Epochen, Standard = 10). Achtung:
+`validation_scores_` ist die Genauigkeit (Accuracy), keine AUC. In unserem Lauf
+stoppt das Training nach 15 Epochen bei 0,842, also etwa beim Anteil der
+Überlebenden; das Netz sagt zu diesem Zeitpunkt praktisch immer „überlebt“
+vorher (Test-AUC 0,407). Mit einem seltenen Ereignis ist Accuracy als
+Abbruchkriterium ungeeignet.
 
 ## Aufgabe 3 – Regularisierung vergleichen
 
@@ -53,11 +66,15 @@ verbessert wird (`n_iter_no_change` Epochen, Standard = 10).
 for alpha in [0.0001, 0.001, 0.01, 0.1, 1.0]:
     pipe = Pipeline([("pre", pre),
                      ("mlp", MLPClassifier(hidden_layer_sizes=(64, 32),
-                                           alpha=alpha, max_iter=300,
+                                           alpha=alpha, max_iter=500,
                                            random_state=42))])
     auc = cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc").mean()
     print(f"  alpha={alpha:.4f}  AUC={auc:.3f}")
 ```
+
+In unserem Lauf liegen alle fünf Werte zwischen 0,641 und 0,656 (knapp vorn:
+alpha = 0,01), also weit innerhalb der Fold-Streuung; die Regularisierungsstärke
+ist auf diesen Daten nicht der begrenzende Faktor.
 
 Zu kleines alpha (0.0001) führt zu Überanpassung, das Netz passt sich
 den Trainingsdaten zu stark an. Zu großes alpha (1.0) erzwingt sehr kleine
@@ -79,13 +96,13 @@ def summarise_folds(scores):
 fold_scores = {
     "Logistische Regression": cross_val_score(make_lr(), X, y, cv=cv, scoring="roc_auc"),
     "Gradient Boosting":      cross_val_score(make_gb(), X, y, cv=cv, scoring="roc_auc"),
-    "MLP":                    cross_val_score(mlp_pipe,  X, y, cv=cv, scoring="roc_auc"),
+    "MLP":                    cross_val_score(make_mlp(), X, y, cv=cv, scoring="roc_auc"),
 }
 for name, scores in fold_scores.items():
     mean, sd, lo, hi = summarise_folds(scores)
     print(f"  {name:<28} Mean={mean:.3f} SD={sd:.3f} 95%-CI=[{lo:.3f}, {hi:.3f}]")
 
-# Paired comparison — same folds for every model.
+# Paired comparison – same folds for every model.
 for other in ("Gradient Boosting", "MLP"):
     diff = fold_scores["Logistische Regression"] - fold_scores[other]
     mean, sd, lo, hi = summarise_folds(diff)
@@ -97,22 +114,22 @@ Ausgeführt auf diesem Datensatz (n=500, 78 Ereignisse) liefert das:
 | Modell | Mean | SD | 95-%-CI |
 |---|---|---|---|
 | Logistische Regression | 0,775 | 0,037 | [0,729; 0,821] |
-| Gradient Boosting | 0,735 | 0,036 | [0,690; 0,780] |
+| Gradient Boosting | 0,735 | 0,036 | [0,691; 0,780] |
 | MLP | 0,656 | 0,047 | [0,598; 0,714] |
 
 Und die gepaarten Fold-Differenzen (LR minus jeweils anderes Modell):
 
-- LR − Gradient Boosting: Mean-Diff +0,040, 95-%-CI [+0,010; +0,069] — CI schließt 0 nur **knapp** aus (k=5 Folds), ein fragiles, kein robustes Ergebnis.
-- LR − MLP: Mean-Diff +0,119, 95-%-CI [+0,072; +0,166] — CI schließt 0 deutlich aus, ein vergleichsweise klarer Unterschied.
+- LR − Gradient Boosting: Mean-Diff +0,040, 95-%-CI [+0,012; +0,067] – CI schließt 0 nur **knapp** aus (k=5 Folds), ein fragiles, kein robustes Ergebnis.
+- LR − MLP: Mean-Diff +0,119, 95-%-CI [+0,072; +0,166] – CI schließt 0 deutlich aus, ein vergleichsweise klarer Unterschied.
 
 Führe den Code selbst aus, deine genauen Zahlen können je nach installierter
 sklearn-Version leicht abweichen. Wichtig ist die ehrliche Einordnung,
-nicht ein bestimmtes Modell als „Sieger" zu verkünden: Ohne Streuungsmaß
+nicht ein bestimmtes Modell als „Sieger“ zu verkünden: Ohne Streuungsmaß
 sähe die Mittelwert-Rangfolge (0,775 > 0,735 > 0,656) nach einem klaren,
 dreistufigen Sieg von LR über GB über MLP aus. Die gepaarte CI-Betrachtung
 zeigt aber, dass nur der Abstand zum MLP robust belegt ist. Der Abstand
 zwischen den beiden Klassikern ist zwar statistisch von 0 verschieden, aber
-so knapp (CI-Untergrenze 0,010, nur 5 Fold-Differenzen), dass er nicht als
+so knapp (CI-Untergrenze 0,012, nur 5 Fold-Differenzen), dass er nicht als
 verlässliche Rangfolge zwischen Gradient Boosting und logistischer
 Regression zählt. Die ehrliche Aussage: **das MLP ist auf diesem Datensatz
 eindeutig schwächer; welcher der beiden Klassiker besser ist, lässt sich bei
@@ -139,7 +156,7 @@ for arch in [(32,), (64, 32), (128, 64, 32)]:
 ```
 
 Auf 500 Patient:innen bringt eine tiefere Architektur (128, 64, 32) oft keinen
-Vorteil, der Gewinn durch mehr Kapazität wird durch Überanpassung kompensiert.
+Vorteil (in unserem Lauf: (32,) 0,710, (64, 32) 0,662, (128, 64, 32) 0,652), der Gewinn durch mehr Kapazität wird durch Überanpassung kompensiert.
 Mehr Schichten machen nur Sinn, wenn genug Trainingsdaten vorhanden sind,
 um die zusätzlichen Parameter zu schätzen. Bei n < 2 000 und einer kleinen
 Merkmalszahl ist eine flache Architektur ((32,) oder (64, 32)) robuster.

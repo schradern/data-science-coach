@@ -78,7 +78,7 @@ Erkrankung (FN) sind selten gleich schlimm.
 
 Der **Net Benefit** (Vickers & Elkin 2006) macht genau diesen Kompromiss
 explizit. Man wählt eine **Schwellenwahrscheinlichkeit** $p_t$: „behandeln, wenn
-das vorhergesagte Risiko ≥ $p_t$". Damit legt man implizit fest, wie viele falsch
+das vorhergesagte Risiko ≥ $p_t$“. Damit legt man implizit fest, wie viele falsch
 Positive ein vermiedener falsch Negativer wert ist, nämlich $(1-p_t)/p_t$. Der
 Net Benefit ist
 
@@ -92,7 +92,7 @@ Modell ist nur dort nützlich, wo seine Kurve **über beiden** Referenzlinien li
 > Schwellenwahrscheinlichkeit $p_t$ kodiert beide. Deshalb ist die
 > Decision-Curve die ehrlichere Grundlage für eine klinische Schwelle.
 
-![Decision-Curve-Analyse für Laktat als Marker der 30-Tage-Mortalität: Net Benefit des Laktat-Modells (blau) gegenüber „alle behandeln" (rot gestrichelt) und „niemanden behandeln" (grau gepunktet, NB = 0) über die Schwellenwahrscheinlichkeit. Das Modell liegt nur in einem schmalen Bereich mittlerer Schwellen knapp über beiden Referenzlinien.](assets/decision_curve.png)
+![Decision-Curve-Analyse für Laktat als Marker der 30-Tage-Mortalität: Net Benefit des Laktat-Modells (blau) gegenüber „alle behandeln“ (rot gestrichelt) und „niemanden behandeln“ (grau gepunktet, NB = 0) über die Schwellenwahrscheinlichkeit. Das Modell liegt nur in einem schmalen Bereich mittlerer Schwellen knapp über beiden Referenzlinien.](assets/decision_curve.png)
 
 Auf den Kursdaten liegt die Laktat-Kurve nur in einem schmalen Bereich knapp über
 den Referenzlinien, ein schwacher Marker bringt wenig zusätzlichen Nutzen. Modul
@@ -120,7 +120,7 @@ youden_threshold = thr[(tpr - fpr).argmax()]
 pred = score >= youden_threshold
 tn, fp, fn, tp = confusion_matrix(y, pred).ravel()
 
-# Net benefit: predicted probabilities aus einem logistischen Modell
+# Net benefit: predicted probabilities from a logistic model
 model = smf.logit("verstorben_30d ~ laktat_mmol_l", data=df).fit(disp=False)
 prob = model.predict(df).to_numpy()
 y_arr = y.to_numpy()
@@ -158,7 +158,7 @@ score <- df$laktat_mmol_l
 roc_obj <- roc(y, score, quiet = TRUE, direction = "<")
 auc(roc_obj)
 
-# Youden an den beobachteten Cutoffs (gleiche Konvention wie scikit-learn)
+# Youden at the observed cutoffs (same convention as scikit-learn)
 cutoffs <- sort(unique(score))
 j <- vapply(cutoffs, function(t) {
   pred <- score >= t
@@ -166,7 +166,7 @@ j <- vapply(cutoffs, function(t) {
 }, numeric(1))
 youden <- cutoffs[which.max(j)]
 
-# Net benefit: predicted probabilities aus einem logistischen Modell
+# Net benefit: predicted probabilities from a logistic model
 model <- glm(verstorben_30d ~ laktat_mmol_l, data = df, family = binomial)
 prob  <- predict(model, type = "response")
 prev  <- mean(y); N <- length(y)
@@ -191,7 +191,7 @@ Beispiel:
 > D. Da PPV/NPV prävalenzabhängig sind, gelten diese Werte für eine Kohorte mit
 > der beobachteten Ereignisrate.
 
-> **Wann du Hilfe holst.** Sobald ein Cut-off reale Behandlungsentscheidungen steuern soll, hängt die richtige Schwelle von Prävalenz und dem Schaden-Nutzen-Verhältnis falsch-positiver zu falsch-negativer Befunde ab — diese Abwägung (Decision-Curve, Zielprävalenz) trifft man gemeinsam mit Methodik und Fachdisziplin, nicht allein durch Ablesen der Youden-Schwelle.
+> **Wann du Hilfe holst.** Sobald ein Cut-off reale Behandlungsentscheidungen steuern soll, hängt die richtige Schwelle von Prävalenz und dem Schaden-Nutzen-Verhältnis falsch-positiver zu falsch-negativer Befunde ab – diese Abwägung (Decision-Curve, Zielprävalenz) trifft man gemeinsam mit Methodik und Fachdisziplin, nicht allein durch Ablesen der Youden-Schwelle.
 
 ## Fallstricke und Merksätze
 
@@ -202,9 +202,9 @@ Beispiel:
 
 ## Selbstcheck
 
-1. **Warum kann PPV niedrig sein, obwohl Sensitivität und Spezifität gut sind?**, Weil PPV stark von der Prävalenz abhängt.
-2. **Was optimiert Youden, und was ignoriert es?**, Youden maximiert Sensitivität + Spezifität − 1, ignoriert aber die Prävalenz und das relative Gewicht von falsch Positiven gegenüber falsch Negativen.
-3. **Wann wählst du eine niedrige Schwelle?**, Wenn falsch Negative gefährlich sind und du möglichst wenige Fälle verpassen willst.
-4. **Was macht der Net Benefit besser als Youden?**, Über die Schwellenwahrscheinlichkeit $p_t$ kodiert er Prävalenz und Kostenverhältnis (ein vermiedener falsch Negativer ist $(1-p_t)/p_t$ falsch Positive wert) und vergleicht das Modell mit „alle behandeln" und „niemanden behandeln".
-5. **Warum ist eine an denselben Daten gewählte und bewertete Youden-Schwelle optimistisch?**, Weil Schwelle und Bewertung in-sample stammen; auf neuen Daten fallen Sensitivität/Spezifität meist schlechter aus. Erst eine Validierung an unabhängigen Daten (Module 24/25) zeigt die realistische Leistung.
+1. **Warum kann PPV niedrig sein, obwohl Sensitivität und Spezifität gut sind?** – Weil PPV stark von der Prävalenz abhängt.
+2. **Was optimiert Youden, und was ignoriert es?** – Youden maximiert Sensitivität + Spezifität − 1, ignoriert aber die Prävalenz und das relative Gewicht von falsch Positiven gegenüber falsch Negativen.
+3. **Wann wählst du eine niedrige Schwelle?** – Wenn falsch Negative gefährlich sind und du möglichst wenige Fälle verpassen willst.
+4. **Was macht der Net Benefit besser als Youden?** – Über die Schwellenwahrscheinlichkeit $p_t$ kodiert er Prävalenz und Kostenverhältnis (ein vermiedener falsch Negativer ist $(1-p_t)/p_t$ falsch Positive wert) und vergleicht das Modell mit „alle behandeln“ und „niemanden behandeln“.
+5. **Warum ist eine an denselben Daten gewählte und bewertete Youden-Schwelle optimistisch?** – Weil Schwelle und Bewertung in-sample stammen; auf neuen Daten fallen Sensitivität/Spezifität meist schlechter aus. Erst eine Validierung an unabhängigen Daten (Module 24/25) zeigt die realistische Leistung.
 

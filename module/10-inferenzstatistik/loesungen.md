@@ -66,11 +66,11 @@ d <- (mean(with_d) - mean(without_d)) / pooled_sd
 cat(sprintf("Cohen's d = %.3f\n", d))
 ```
 
-**Befund:** Patient:innen mit Diabetes haben einen höheren SOFA-Score (Mittel ≈ 4,59) als Patient:innen ohne Diabetes (≈ 3,48). Die Differenz beträgt ~1,11 Punkte (95-%-KI ≈ [0,64; 1,57]), Welch-t ≈ 4,69, p < 0,001, Cohen's d ≈ 0,54 (mittlerer Effekt).
+**Befund:** Patient:innen mit Diabetes haben einen höheren SOFA-Score (Mittel ≈ 4,59) als Patient:innen ohne Diabetes (≈ 3,48). Die Differenz beträgt ~1,11 Punkte (95-%-KI ≈ [0,64; 1,57]), Welch-t ≈ 4,69, p < 0,001, Cohens d ≈ 0,54 (mittlerer Effekt).
 
 **p-Wert in eigenen Worten:** Wenn es in der Population keinen Unterschied im SOFA-Score zwischen Diabetiker:innen und Nicht-Diabetiker:innen gäbe, würden wir eine mindestens so große Teststatistik mit einer Wahrscheinlichkeit von p < 0,001 beobachten, der p-Wert sagt nichts darüber aus, wie wahrscheinlich diese Nullhypothese selbst ist.
 
-**Häufige Fehldeutung:** „p < 0,001 bedeutet, dass H₀ mit 99,9 %-Wahrscheinlichkeit falsch ist." Falsch: Der p-Wert ist P(Daten | H₀), nicht P(H₀ | Daten). Letzteres wäre eine Bayesianische Aussage, die einen Prior erfordert.
+**Häufige Fehldeutung:** „p < 0,001 bedeutet, dass H₀ mit 99,9 %-Wahrscheinlichkeit falsch ist.“ Falsch: Der p-Wert ist P(Daten | H₀), nicht P(H₀ | Daten). Letzteres wäre eine Bayesianische Aussage, die einen Prior erfordert.
 
 ---
 
@@ -88,15 +88,16 @@ print(f"Normalverteilung abgelehnt (p<0.05): {p_sw < 0.05}")
 laktat <- df$laktat_mmol_l |> na.omit()
 sw_res <- shapiro.test(laktat)
 print(sw_res)
-cat(sprintf("Schiefe (approx.) = %.2f\n",
-            (mean(laktat) - median(laktat)) / sd(laktat)))
+n_l <- length(laktat)   # same skewness estimator as pandas .skew()
+cat(sprintf("Schiefe = %.2f\n",
+            n_l / ((n_l - 1) * (n_l - 2)) * sum(((laktat - mean(laktat)) / sd(laktat))^3)))
 ```
 
 **Befund:** W ≈ 0,891, p < 0,001, die Normalverteilungshypothese wird klar abgelehnt. Laktat ist mit Schiefe ≈ 1,39 deutlich rechtsschief: die meisten Patient:innen haben niedrige Werte (~1–2 mmol/l), wenige haben sehr hohe Werte (septischer Schock).
 
-**Trennschärfe:** Ab N > 200–300 ist Shapiro-Wilk so mächtig, dass er klinisch unwichtige Abweichungen als signifikant ausweist. Immer visualisieren (Histogramm, QQ-Plot) und den Shapiro-Test als ergänzendes Hilfsmittel sehen, nicht als alleinige Entscheidungsgrundlage.
+**Trennschärfe:** Das Problem ist nicht zu wenig, sondern zu viel Power. Ab N > 200–300 ist Shapiro-Wilk so mächtig, dass er klinisch unwichtige Abweichungen als signifikant ausweist. Immer visualisieren (Histogramm, QQ-Plot) und den Shapiro-Test als ergänzendes Hilfsmittel sehen, nicht als alleinige Entscheidungsgrundlage. Bei sehr kleinem N übersieht er umgekehrt auch deutliche Abweichungen.
 
-**Robustere Alternative:** Der Mann-Whitney-U-Test (Wilcoxon-Rangsummentest) benötigt keine Verteilungsannahme und ist bei schiefen Daten wie Laktat oder CRP die sicherere Wahl.
+**Robustere Alternative:** Der Mann-Whitney-U-Test (Wilcoxon-Rangsummentest) benötigt keine Normalverteilungsannahme und ist bei schiefen Daten wie Laktat oder CRP die sicherere Wahl.
 
 ---
 
@@ -130,9 +131,9 @@ cramers_v <- sqrt(chi_res$statistic / (sum(ct) * (min(dim(ct)) - 1)))
 cat(sprintf("Cramér's V = %.3f\n", cramers_v))
 ```
 
-**Befund:** χ² ≈ 0,355, df = 1, p ≈ 0,551, Cramér's V ≈ 0,027. Es gibt keinen statistisch bedeutsamen Zusammenhang zwischen aktivem Rauchen und 30-Tage-Mortalität in dieser Kohorte. Cramér's V nahe 0 bestätigt: der Effekt ist vernachlässigbar klein.
+**Befund:** χ² ≈ 0,355, df = 1, p ≈ 0,551, Cramérs V ≈ 0,027. In dieser Stichprobe zeigt sich kaum ein Zusammenhang zwischen aktivem Rauchen und 30-Tage-Mortalität (Cramérs V nahe 0). Das ist eine Beschreibung der Stichprobe, kein Beleg für „kein Effekt“.
 
-**Klinische Interpretation:** Abwesenheit von Evidenz ist keine Evidenz für Abwesenheit eines Effekts. Um einen kleinen, aber klinisch relevanten Effekt (z. B. Cramér's V ≈ 0,1) mit 80 % Power nachzuweisen, wäre eine deutlich größere Kohorte nötig. Konfounder wie Aufnahmegrund könnten den Effekt außerdem verdecken.
+**Klinische Interpretation:** Abwesenheit von Evidenz ist keine Evidenz für Abwesenheit eines Effekts. Um einen kleinen, aber klinisch relevanten Effekt (z. B. Cramérs V ≈ 0,1) mit 80 % Power nachzuweisen, wäre eine deutlich größere Kohorte nötig. Tatsächlich enthält der Datensatz einen wahren Effekt von aktivem Rauchen (Hazard Ratio ≈ 1,5, siehe `data/README.md`): Der Test hier ist ein falsch-negativer Befund.
 
 ---
 
@@ -167,7 +168,7 @@ for (gr in groups) {
 | Herzinsuffizienz | 90 | 2,33 | [2,02; 2,65] |
 | Pneumonie | 105 | 2,00 | [1,71; 2,28] |
 
-Die KI von Sepsis und Herzinsuffizienz überschneiden sich stark, ein formaler Test würde keinen signifikanten Unterschied ergeben. Überlappende KI der Einzelgruppen schließen Signifikanz jedoch nicht automatisch aus: Das KI der *Differenz* ist die korrekte Grundlage. Hier ist die Überlappung groß genug, um Skepsis zu rechtfertigen. Das niedrigste Laktat bei Pneumonie ist klinisch plausibel.
+Die KI von Sepsis und Herzinsuffizienz überschneiden sich stark, ein formaler Test würde keinen signifikanten Unterschied ergeben. Überlappende KI der Einzelgruppen schließen Signifikanz jedoch nicht automatisch aus: Das KI der *Differenz* ist die korrekte Grundlage. Für die Frage Sepsis vs. Pneumonie heißt das: Welch-t-Test bzw. 95-%-KI der Differenz (`stats.ttest_ind(..., equal_var=False).confidence_interval()` bzw. `t.test()`). Er ergibt hier p ≈ 0,066, knapp nicht signifikant; die Überlappung der Einzel-KI allein hätte das nicht entscheiden können. Das niedrigste Laktat bei Pneumonie ist klinisch plausibel.
 
 ---
 
@@ -226,11 +227,11 @@ results <- results |>
 print(results)
 ```
 
-**Befund:** `leukozyten_g_l` zeigt einen deutlichen, hoch signifikanten Unterschied zwischen Überlebenden und Verstorbenen (t ≈ −5,77, p < 0,0001, Cohen's d ≈ −0,69, mittlerer bis großer Effekt), der auch nach Bonferroni- **und** Benjamini-Hochberg-Korrektur signifikant bleibt. Die übrigen vier Marker (Hämoglobin, Kreatinin, Laktat, Natrium) zeigen keinen signifikanten Unterschied (alle p_raw > 0,05, |d| < 0,25); `laktat_mmol_l` liegt mit p_raw ≈ 0,07 am nächsten an der Grenze, verliert die (ohnehin nicht erreichte) Signifikanz nach Korrektur aber vollständig.
+**Befund:** `leukozyten_g_l` zeigt einen deutlichen, hoch signifikanten Unterschied zwischen Überlebenden und Verstorbenen (t ≈ −5,77, p < 0,0001, Cohens d ≈ −0,69, mittlerer bis großer Effekt), der auch nach Bonferroni- **und** Benjamini-Hochberg-Korrektur signifikant bleibt. Die übrigen vier Marker (Hämoglobin, Kreatinin, Laktat, Natrium) zeigen keinen signifikanten Unterschied (alle p_raw > 0,05, |d| < 0,25); `laktat_mmol_l` liegt mit p_raw ≈ 0,07 am nächsten an der Grenze, verliert die (ohnehin nicht erreichte) Signifikanz nach Korrektur aber vollständig.
 
 **Was auffällt:** Anders als man vielleicht erwartet, trennen die Labormarker Überlebende von Verstorbenen nicht gleichmäßig schlecht, Leukozyten sind hier ein starker, robuster Prädiktor, während Laktat trotz seiner klinischen Prominenz in dieser Kohorte nur einen kleinen, nicht signifikanten Unterschied zeigt. `sofa_score` und `alter` bleiben zusätzlich relevante Prädiktoren (→ Modul 08 (Explorative Datenanalyse und Datenvisualisierung)). Bei 5 Tests ist der Unterschied zwischen Bonferroni und BH gering; bei 50 oder 500 Tests (Omics-Daten) wäre BH deutlich mächtiger.
 
-**Wann BH bevorzugen?** Wenn viele explorative Hypothesen geprüft werden und man den Anteil falsch-positiver Befunde kontrollieren will, nicht jede einzelne Falsch-Positiv-Rate. In konfirmatorischen Studien mit wenigen vorab festgelegten Tests ist Bonferroni angemessener.
+**Wann BH bevorzugen?** Wenn viele explorative Hypothesen geprüft werden und man den Anteil falsch-positiver Befunde kontrollieren will statt der Wahrscheinlichkeit für auch nur einen einzigen falsch-positiven Befund (familienweise Fehlerrate, Bonferroni). In konfirmatorischen Studien mit wenigen vorab festgelegten Tests ist Bonferroni angemessener.
 
 ---
 
@@ -274,11 +275,9 @@ d_lac    <- 0.197   # observed Cohen's d
 n_sepsis <- 87
 n_other  <- 327
 
-# Harmonic mean n for unequal groups
-n_harm <- 2 / (1/n_sepsis + 1/n_other)
-power_res <- pwr.t.test(d = d_lac, n = n_harm / 2,
-                         sig.level = 0.05, type = "two.sample",
-                         alternative = "two.sided")
+# Unequal group sizes: pwr.t2n.test takes n1 and n2 directly
+power_res <- pwr.t2n.test(n1 = n_sepsis, n2 = n_other, d = d_lac,
+                          sig.level = 0.05, alternative = "two.sided")
 print(power_res)
 
 # Required n per group for power = 0.8
@@ -294,20 +293,20 @@ Gruppe etwa **n ≈ 405** erforderlich (prospektive Fallzahlplanung für eine
 
 **Was Power = 0,8 bedeutet:** In 8 von 10 Wiederholungsstudien, unter der Annahme, dass der wahre Effekt d = 0,197 besteht, würde der Test korrekt die Nullhypothese ablehnen. Diese Aussage ist nur für die **Planung** einer neuen Studie sinnvoll.
 
-**Stolperstein — die „beobachtete Power" ist (fast) wertlos:** Die oben berechnete
+**Stolperstein – die „beobachtete Power“ ist (fast) wertlos:** Die oben berechnete
 Power aus dem *tatsächlich gemessenen* Effekt der *bereits durchgeführten* Studie
 als nachträgliche Erklärung für das nicht-signifikante Ergebnis zu verwenden
-("die Studie war halt underpowered, deshalb kein p < 0,05") ist ein bekannter
+(„die Studie war halt underpowered, deshalb kein p < 0,05“) ist ein bekannter
 Zirkelschluss (Hoenig & Heisey 2001): Beobachtete Power ist eine
 **deterministische, monoton fallende Funktion des p-Werts** und liefert damit
 **keine Information**, die der p-Wert nicht schon enthält, ein nicht
 signifikantes Ergebnis erzeugt *immer* eine niedrig wirkende beobachtete Power,
 unabhängig davon, ob der wahre Effekt existiert oder nicht. Genau davor warnt
 Modul 13 (Studiendesign und Power) explizit: „Power nach dem Ergebnis ist meist
-wertlos. Nutze beobachtete Effekte nicht als nachträgliche Rechtfertigung."
+wertlos. Nutze beobachtete Effekte nicht als nachträgliche Rechtfertigung.“
 Richtig eingesetzt wird eine Power-Berechnung **vor** der Datenerhebung, mit
 einem *a priori* geplanten (nicht dem beobachteten) Effekt, zur Fallzahlplanung,
 so wie das `n ≈ 405`-Ergebnis oben für eine künftige Studie sinnvoll ist. Eine
 kleine Studie, die keinen Effekt findet, ist ein Designproblem
 (zu wenig Power, um einen echten kleinen Effekt zuverlässig zu erkennen), kein
-Beweis für „kein Effekt".
+Beweis für „kein Effekt“.

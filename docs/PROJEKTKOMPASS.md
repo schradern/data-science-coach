@@ -65,7 +65,7 @@ Die Methode folgt aus Ziel, Outcome und Design:
 |-----------|------------|
 | Stetiger Outcome, unabhängige Zeilen | Lineare Regression, robuste Diagnostik |
 | Binärer Outcome | Logistische Regression, OR vorsichtig interpretieren |
-| Zeit bis Ereignis | Kaplan-Meier, Cox, competing risks prüfen |
+| Zeit bis Ereignis | Kaplan-Meier, Cox, konkurrierende Risiken prüfen |
 | Wiederholte Messungen | Mixed Model oder GEE |
 | Beobachtungsdaten mit Therapieentscheidung | DAG, Propensity Score, Sensitivität |
 | Vorhersagemodell | Split, Pipeline, AUC, Kalibrierung, Decision Curve |

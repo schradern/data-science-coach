@@ -1,7 +1,11 @@
 # Module 34 - why silent deployment catches what a one-off retrospective
-# validation misses: simulate the shared cohort's model performance under a
-# gradual population shift (a sicker ICU population over time), which is
-# exactly the kind of drift a real silent-deployment phase monitors for.
+# validation misses: freeze a model, then let the true risk drift while the
+# patients' recorded features look the same. The drift is a genuine change of
+# P(Y|X): month by month the log-odds of death rise by a fixed offset for every
+# patient profile (factors the model does not see). It is simulated
+# deterministically by up-weighting the observed deaths of the held-out
+# patients -- weight exp(delta) per event multiplies the event odds at each X by
+# exp(delta). No random resampling, so R and code/python.py print the same numbers.
 #   Rscript module/34-design-ki-studien/code/r.R
 
 script <- normalizePath(sub("--file=", "", grep("--file=", commandArgs(), value = TRUE)[1]))
@@ -36,77 +40,57 @@ print(checklist, row.names = FALSE)
 cat("\nDecision rule: do not move to patient-facing use before silent deployment\n")
 cat("shows stable data flow, calibration, and subgroup performance.\n")
 
-# Rank-based AUC (Mann-Whitney U) and Brier score -- no extra package needed.
+# Rank-based AUC (Mann-Whitney U) -- no extra package needed. With weights that
+# are constant within each class the weighted AUC equals this unweighted one:
+# a pure baseline-risk shift leaves the ranking untouched.
 auc_fn <- function(y, p) {
   r <- rank(p)
   n1 <- sum(y == 1); n0 <- sum(y == 0)
   (sum(r[y == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0)
 }
-brier_fn <- function(y, p) mean((p - y)^2)
+
+features <- c("alter", "sofa_score", "crp_mg_l", "diabetes")
+validation_every <- 3           # every third patient (patient_id divisible by 3) is held out
+n_months <- 6
+logodds_shift_per_month <- 0.15 # true log-odds of death rise by 0.15 per month at every X
 
 df <- load_cohort()
-n <- nrow(df)
-train_idx <- sample(seq_len(n), size = round(0.7 * n))
-train <- df[train_idx, ]
-test <- df[-train_idx, ]
+is_test <- df$patient_id %% validation_every == 0
+dev <- df[!is_test, ]
+test <- df[is_test, ]
 
 fit <- glm(verstorben_30d ~ alter + sofa_score + crp_mg_l + diabetes,
-           data = train, family = binomial)
+           data = dev, family = binomial)
+p <- predict(fit, newdata = test, type = "response")
+lp <- qlogis(p)
+y <- test$verstorben_30d
 
-p_test <- predict(fit, newdata = test, type = "response")
-auc0 <- auc_fn(test$verstorben_30d, p_test)
-brier0 <- brier_fn(test$verstorben_30d, p_test)
+cat("\n=== Simuliertes Silent Deployment: Grundrisiko steigt, Modell bleibt eingefroren ===\n")
+cat(sprintf("(entwickelt an %d Patient:innen, bewertet an %d zurueckgehaltenen; Log-Odds +%.2f pro Monat)\n",
+            nrow(dev), nrow(test), logodds_shift_per_month))
 
-cat("\n=== Simuliertes Silent Deployment: Population wird schrittweise kraenker ===\n")
-cat("(dasselbe, eingefrorene Modell -- nur die Population verschiebt sich)\n")
-cat(sprintf("Monat 0: mean_sofa=%.2f  AUC=%.3f  Brier=%.3f\n", mean(test$sofa_score), auc0, brier0))
+rows <- lapply(0:n_months, function(month) {
+  delta <- logodds_shift_per_month * month
+  w <- ifelse(y == 1, exp(delta), 1)
+  observed <- sum(w * y) / sum(w)
+  predicted <- sum(w * p) / sum(w)
+  # quasibinomial: same point estimates as binomial, no warning for non-integer weights
+  slope <- unname(coef(glm(y ~ lp, weights = w, family = quasibinomial))[2])
+  data.frame(month = month, observed = observed, predicted = predicted,
+             oe = observed / predicted, slope = slope, auc = auc_fn(y, p),
+             brier = sum(w * (p - y)^2) / sum(w))
+})
+drift <- do.call(rbind, rows)
+print(round(drift, 3), row.names = FALSE)
 
-# Every drift month must be scored OUT OF SAMPLE, exactly like month 0.
-# Resample only from the held-out TEST set (never the full cohort, which is
-# ~70% training patients the frozen model already saw); otherwise the
-# drift-month metrics would be largely in-sample and optimistically biased.
-sofa_mean <- mean(test$sofa_score); sofa_sd <- sd(test$sofa_score)
-n_test <- nrow(test)
-n_resample <- 3000
-n_repeats <- 25
-n_months <- 6
-auc_final <- auc0
-brier_final <- brier0
-for (m in 1:n_months) {
-  shift <- 0.15 * m
-  w <- exp(shift * (test$sofa_score - sofa_mean) / sofa_sd)
-  pr <- w / sum(w)
-  aucs <- numeric(n_repeats); briers <- numeric(n_repeats); sofas <- numeric(n_repeats)
-  for (r in 1:n_repeats) {
-    samp <- test[sample(seq_len(n_test), size = n_resample, replace = TRUE, prob = pr), ]
-    p_samp <- predict(fit, newdata = samp, type = "response")
-    aucs[r] <- auc_fn(samp$verstorben_30d, p_samp)
-    briers[r] <- brier_fn(samp$verstorben_30d, p_samp)
-    sofas[r] <- mean(samp$sofa_score)
-  }
-  cat(sprintf("Monat %d: mean_sofa=%.2f  AUC=%.3f  Brier=%.3f\n",
-              m, mean(sofas), mean(aucs), mean(briers)))
-  if (m == n_months) {
-    auc_final <- mean(aucs)
-    brier_final <- mean(briers)
-  }
-}
-
-auc_change <- auc_final - auc0
-brier_change <- brier_final - brier0
-cat(sprintf("\nAUC von Monat 0 zu Monat %d: %+.3f\n", n_months, auc_change))
-cat(sprintf("Brier Score von Monat 0 zu Monat %d: %+.3f (%+.0f%% relativ)\n",
-            n_months, brier_change, 100 * brier_change / brier0))
-if (brier_change > 0.02 && auc_change > -0.02) {
-  cat("-> Die Diskriminierung (AUC) bleibt stabil oder verbessert sich sogar, waehrend sich die\n")
-  cat("   Kalibrierung (Brier Score) deutlich verschlechtert: die vorhergesagten Risiken passen\n")
-  cat("   nicht mehr zur tatsaechlichen Ereignisrate der (nun kraenkeren) Population. Eine einmalige\n")
-  cat("   retrospektive AUC-Zahl haette das nie gezeigt -- genau dafuer beobachtet Silent Deployment\n")
-  cat("   die Kalibrierung fortlaufend mit.\n")
-} else if (auc_change < -0.02) {
-  cat("-> Sowohl Diskriminierung als auch Kalibrierung verschlechtern sich unter der\n")
-  cat("   verschobenen Population.\n")
-} else {
-  cat("-> In diesem Lauf zeigt sich kein eindeutiger Drift-Effekt -- Ergebnis ist zufallsabhaengig\n")
-  cat("   (SEED, Resampling-Staerke); wiederhole mit anderem SEED, um Robustheit zu pruefen.\n")
-}
+first <- drift[1, ]; last <- drift[nrow(drift), ]
+cat(sprintf("\nAUC von Monat 0 zu Monat %d: %+.3f\n", n_months, round(last$auc - first$auc, 3) + 0))
+cat(sprintf("Kalibrierungs-Steigung von Monat 0 zu Monat %d: %+.3f\n", n_months,
+            round(last$slope - first$slope, 3) + 0))
+cat(sprintf("O:E von Monat 0 zu Monat %d: %.2f -> %.2f\n", n_months, first$oe, last$oe))
+cat(sprintf("Brier Score von Monat 0 zu Monat %d: %+.3f (bewegt sich auch mit der Ereignisrate, kein reines Kalibrierungsmass)\n",
+            n_months, last$brier - first$brier))
+cat("-> Rangfolge (AUC) und Kalibrierungs-Steigung bleiben unveraendert, waehrend die\n")
+cat("   vorhergesagten Risiken immer weiter unter der beobachteten Sterblichkeit liegen\n")
+cat("   (O:E steigt). Eine einmalige retrospektive AUC-Zahl haette das nie gezeigt --\n")
+cat("   genau dafuer beobachtet Silent Deployment die Kalibrierung fortlaufend mit.\n")

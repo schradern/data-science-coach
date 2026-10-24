@@ -68,10 +68,11 @@ def prepare_data() -> pd.DataFrame:
 def fit_propensity_scores(df: pd.DataFrame) -> pd.DataFrame:
     X = df[PS_COVARIATES]
     y = df[TREATMENT]
-    # penalty=None: plain maximum-likelihood logistic regression (matches R's glm()
-    # exactly) - scikit-learn's default L2 regularization would otherwise shift the
-    # propensity scores slightly and make the two language tracks diverge.
-    ps_model = LogisticRegression(max_iter=2000, penalty=None).fit(X, y)
+    # C=np.inf: no penalty, i.e. plain maximum-likelihood logistic regression
+    # (matches R's glm() exactly) - scikit-learn's default L2 regularization would
+    # otherwise shift the propensity scores slightly and make the two language
+    # tracks diverge. (penalty=None does the same but is deprecated since 1.8.)
+    ps_model = LogisticRegression(max_iter=2000, C=np.inf).fit(X, y)
     df = df.copy()
     df["ps"] = ps_model.predict_proba(X)[:, 1].clip(1e-6, 1 - 1e-6)
     df["logit_ps"] = np.log(df["ps"] / (1 - df["ps"]))

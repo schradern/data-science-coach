@@ -4,27 +4,29 @@
 
 ## Aufgabe 1 – Umgebung prüfen
 ```bash
-# Aus der Projektwurzel:
+# From the project root:
 python module/02-werkzeuge/code/python.py
 ```
-Fehlende Pakete nachinstallieren:
+Fehlende Pakete nachinstallieren, mit den gepinnten Versionen aus `requirements.txt`
+(ein bloßes `uv pip install pandas` zöge die neueste, für den Kurs ungetestete Version):
 ```bash
-uv pip install pandas numpy matplotlib seaborn scipy statsmodels scikit-learn
-# oder ohne uv, aber erst die virtuelle Umgebung aktivieren:
+uv pip install -r requirements.txt
+# or without uv, after activating the virtual environment:
 source .venv/bin/activate        # macOS/Linux; Windows: .venv\Scripts\activate
-pip install pandas numpy matplotlib seaborn scipy statsmodels scikit-learn
+pip install -r requirements.txt
 ```
 
 **Stolperstein:** Installiere nie mit `pip install --break-system-packages`
 außerhalb einer virtuellen Umgebung, das überschreibt die vom Betriebssystem
 verwaltete Python-Installation und kann sie beschädigen, genau die
-„Dependency Hell", vor der Modul 02 §1 warnt. Aktiviere stattdessen immer
+„Dependency Hell“, vor der Abschnitt 3 der Lektion warnt. Aktiviere stattdessen immer
 zuerst `.venv/`.
 
 ## Aufgabe 2 – Eigenes Prüfskript
 Speichere das folgende Skript als `module/02-werkzeuge/code/check_env.py`
-(also direkt neben `python.py`), dann liegt es genau eine Ebene unter
-`code/`, zwei unter dem Modulordner, drei unter `module/`, `ROOT` ist damit
+(also direkt neben `python.py`). Von der Datei aus gezählt ist dann
+`parents[0]` der Ordner `code/`, `parents[1]` der Modulordner, `parents[2]`
+`module/` und `parents[3]` die Projektwurzel; `ROOT` ist damit
 `Path(__file__).resolve().parents[3]` (wie bei allen anderen `code/*.py`
 im Kurs). Legst du die Datei woanders ab, muss die Anzahl der `.parents[...]`
 entsprechend angepasst werden.
@@ -56,6 +58,7 @@ Versionskonflikte entstehen, Reproduzierbarkeit geht verloren.
 
 ## Aufgabe 4 – Git initialisieren
 ```bash
+# create the .gitignore from the bonus first, so .venv/ stays out of the commit
 git init
 git add .
 git commit -m "Initial commit: environment set up"

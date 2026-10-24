@@ -1,11 +1,11 @@
-"""Module 30 — Deep learning intro: MLP on tabular clinical data.
+"""Module 30 – Deep learning intro: MLP on tabular clinical data.
 
 Runs standalone from the project root:
     python module/30-deep-learning/code/python.py
 
 Data: read from data/ (committed with the repo); if that folder is
 missing, the same files are fetched from the published URL.
-Only scikit-learn is required (torch is NOT imported — CNN code in README is
+Only scikit-learn is required (torch is NOT imported – CNN code in README is
 prose-only and clearly marked as illustrative).
 """
 from __future__ import annotations
@@ -33,7 +33,7 @@ from sklearn.pipeline import Pipeline  # noqa: E402
 from sklearn.preprocessing import OneHotEncoder, StandardScaler  # noqa: E402
 
 # On small imbalanced data the MLP optimiser may not fully converge within
-# max_iter; suppress the warning — this is expected behaviour and part of
+# max_iter; suppress the warning – this is expected behaviour and part of
 # the teaching point (MLPs need more data than we have here).
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
@@ -106,7 +106,7 @@ def make_mlp_es(pre: ColumnTransformer, alpha: float = 0.01) -> Pipeline:
 
 
 def make_mlp(pre: ColumnTransformer, alpha: float = 0.01) -> Pipeline:
-    """MLP with fixed iterations — used for CV comparisons.
+    """MLP with fixed iterations – used for CV comparisons.
 
     early_stopping is disabled so the full fold training set is used.
     max_iter=500 prevents ConvergenceWarnings on this small dataset.
@@ -169,7 +169,7 @@ def main() -> None:
     # ── 3) AUC comparison: LR vs GB vs MLP ────────────────────────────────
     # A single point estimate per model hides the fold-to-fold noise. With
     # only 5 folds on ~500 patients, that noise can be as large as the gap
-    # between models — so we report per-fold scores, mean +/- SD, and a
+    # between models – so we report per-fold scores, mean +/- SD, and a
     # 95% CI for every model, AND the *paired* per-fold difference between
     # models (paired is the right comparison here because every model sees
     # the exact same 5 folds, so fold-to-fold difficulty cancels out).
@@ -196,7 +196,7 @@ def main() -> None:
     winner, winner_auc = order[0]
     print(f"\n  Highest mean CV-AUC (point estimate only): {winner} ({winner_auc:.3f})")
 
-    # Paired per-fold differences vs. the winner — this is the honest test
+    # Paired per-fold differences vs. the winner – this is the honest test
     # of whether the ranking is actually established, or within noise.
     print("\n  Paired per-fold differences vs. "
           f"{winner} (same 5 folds for every model):")
@@ -212,12 +212,12 @@ def main() -> None:
               f"95%-CI = [{summary['ci_low']:+.3f}, {summary['ci_high']:+.3f}]"
               f"  → {'CI excludes 0' if excludes_zero else 'CI includes 0'}")
 
-    # Rewrite the conclusion from what the paired CIs actually show — do not
+    # Rewrite the conclusion from what the paired CIs actually show – do not
     # assume a fixed narrative (e.g. "the two classical models are tied").
     # A CI that excludes 0 is not automatically "robust": with only k=5
     # folds, a CI whose bound sits just barely past 0 is fragile (one
     # different fold split could flip it). FRAGILE_MARGIN is a rule-of-thumb
-    # cutoff for flagging that in the printed text — the exact CI is always
+    # cutoff for flagging that in the printed text – the exact CI is always
     # printed too, so nothing is hidden behind the label.
     FRAGILE_MARGIN = 0.03
     print("\n  Befund (aus den paarweisen CIs, nicht aus den Punktschätzern):")
@@ -231,10 +231,10 @@ def main() -> None:
         print(f"    {winner} schlägt {name}: das 95%-CI der paarweisen Differenz "
               f"([{summary['ci_low']:+.3f}, {summary['ci_high']:+.3f}]) schließt 0 aus.")
         if margin < FRAGILE_MARGIN:
-            print(f"    Aber die CI-Grenze liegt nur {margin:.3f} von 0 entfernt — bei k=5")
+            print(f"    Aber die CI-Grenze liegt nur {margin:.3f} von 0 entfernt – bei k=5")
             print("    Folds ist das ein knappes, fragiles Ergebnis, kein robuster Beleg.")
         else:
-            print(f"    Die CI-Grenze liegt {margin:.3f} von 0 entfernt — trotz kleiner")
+            print(f"    Die CI-Grenze liegt {margin:.3f} von 0 entfernt – trotz kleiner")
             print("    Fold-Zahl ein vergleichsweise klarer Unterschied.")
     print("  MLPs need large datasets to justify their parameter count; on")
     print("  small clinical tables, simpler models are often at least on par.")
@@ -249,9 +249,9 @@ def main() -> None:
     print(f"\nDone. Honest finding on this {len(X)}-patient dataset ({y.sum()} events):")
     print(f"  {winner} had the highest mean CV-AUC ({winner_auc:.3f}), but only the")
     print("  gap(s) whose paired 95%-CI excludes 0 (printed above) are actually")
-    print("  established at this sample size — see per-model output for which.")
+    print("  established at this sample size – see per-model output for which.")
     print("  In any case: deep learning does not automatically win on small")
-    print("  tabular clinical data — a fixed-architecture MLP needs far more than")
+    print("  tabular clinical data – a fixed-architecture MLP needs far more than")
     print(f"  {len(X)} rows to reliably beat a well-regularised linear or")
     print("  tree-ensemble baseline.")
 

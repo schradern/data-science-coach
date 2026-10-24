@@ -1,4 +1,4 @@
-"""Module 10 — Inferential statistics and hypothesis testing (Python / scipy.stats).
+"""Module 10 – Inferential statistics and hypothesis testing (Python / scipy.stats).
 
 Runs standalone from the project root:
     python module/10-inferenzstatistik/code/python.py
@@ -131,7 +131,7 @@ def main() -> None:
 
     # -----------------------------------------------------------------------
     # 0) Shapiro-Wilk: DESCRIPTIVE normality diagnostic for laktat_mmol_l
-    #    NOT a test-selection rule — see module 21 ("Normalitätstest-Autopilot").
+    #    NOT a test-selection rule – see module 21 ("Normalitätstest-Autopilot").
     # -----------------------------------------------------------------------
     print("=" * 60)
     print("0) Shapiro-Wilk: descriptive normality diagnostic for laktat_mmol_l")
@@ -145,14 +145,14 @@ def main() -> None:
     print("  NOTE: Shapiro-Wilk is a DESCRIPTIVE diagnostic, not a test-selection")
     print("  rule (it over-rejects at large N, misses departures at small N).")
     print("  Choose the test from the estimand, the shape seen in a plot, and")
-    print("  robustness (Welch-t is robust at N>30) — see module 21. laktat is")
+    print("  robustness (Welch-t is robust at N>30) – see module 21. laktat is")
     print("  strongly right-skewed, so we report BOTH Welch-t and Mann-Whitney-U.")
 
     # -----------------------------------------------------------------------
-    # 1) Welch-t-test: laktat — Sepsis vs. nicht-Sepsis
+    # 1) Welch-t-test: laktat – Sepsis vs. non-Sepsis
     # -----------------------------------------------------------------------
     print("\n" + "=" * 60)
-    print("1) Welch-t-test: laktat_mmol_l — Sepsis vs. nicht-Sepsis")
+    print("1) Welch-t-test: laktat_mmol_l – Sepsis vs. nicht-Sepsis")
     print("=" * 60)
 
     sepsis = df.loc[df["aufnahmegrund"] == "Sepsis", "laktat_mmol_l"].dropna()
@@ -172,14 +172,14 @@ def main() -> None:
     print(f"  Effect size Cohen's d = {d:.3f}  (0.2 small, 0.5 medium, 0.8 large)")
     print()
     print("  Correct interpretation of p:")
-    print("  p = P(data as extreme or more | H0 true) — NOT P(H0 true | data).")
+    print("  p = P(data as extreme or more | H0 true) – NOT P(H0 true | data).")
     print("  Always report effect size + CI alongside p.")
 
     # -----------------------------------------------------------------------
-    # 2) Mann-Whitney-U (nonparametric — preferred for skewed laktat)
+    # 2) Mann-Whitney-U (nonparametric – preferred for skewed laktat)
     # -----------------------------------------------------------------------
     print("\n" + "=" * 60)
-    print("2) Mann-Whitney-U: laktat_mmol_l — Sepsis vs. nicht-Sepsis")
+    print("2) Mann-Whitney-U: laktat_mmol_l – Sepsis vs. nicht-Sepsis")
     print("   (nonparametric, robust against skew and outliers)")
     print("=" * 60)
 
@@ -223,7 +223,7 @@ def main() -> None:
     print("  at high event rates (>10 %) OR overestimates RR.")
 
     # -----------------------------------------------------------------------
-    # 4) Multiple testing — Bonferroni correction for 5 lab markers
+    # 4) Multiple testing – Bonferroni correction for 5 lab markers
     # -----------------------------------------------------------------------
     print("\n" + "=" * 60)
     print("4) Multiple testing: Bonferroni correction (5 lab markers)")

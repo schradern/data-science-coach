@@ -1,4 +1,4 @@
-# Module 03 — Programming fundamentals for data (R, parallel to Python).
+# Module 03 – Programming fundamentals for data (R, parallel to Python).
 #   Rscript module/03-grundlagen/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
@@ -39,7 +39,7 @@ assess_map <- function(map_mmhg) {
   # Classify mean arterial pressure by clinical thresholds (vectorised).
   case_when(
     map_mmhg < 65  ~ "Schock-Grenzwert unterschritten",
-    map_mmhg <= 90 ~ "Normbereich",
+    map_mmhg <= 100 ~ "Normbereich",
     .default       = "Erhöht"
   )
 }
@@ -49,10 +49,10 @@ assess_map <- function(map_mmhg) {
 # ---------------------------------------------------------------------- #
 cat("=== 1) Variables and data types ===\n")
 
-age             <- 67L          # integer — patient age
-temperature     <- 38.9         # numeric — body temperature
-admission_reason <- "Sepsis"    # character — diagnosis
-has_diabetes    <- TRUE         # logical — comorbidity flag
+age             <- 67L          # integer – patient age
+temperature     <- 38.9         # numeric – body temperature
+admission_reason <- "Sepsis"    # character – diagnosis
+has_diabetes    <- TRUE         # logical – comorbidity flag
 
 cat("age:             ", age, " (", class(age), ")\n", sep = "")
 cat("temperature:     ", temperature, " (", class(temperature), ")\n", sep = "")
@@ -64,7 +64,7 @@ cat("has_diabetes:    ", has_diabetes, " (", class(has_diabetes), ")\n", sep = "
 # ---------------------------------------------------------------------- #
 cat("\n=== 2) Vectors and lists ===\n")
 
-# Vector — all elements share the same type.
+# Vector – all elements share the same type.
 temperatures <- c(36.8, 37.2, 38.9, 36.5, 39.4, 37.1)
 
 cat("Measurements:", paste(temperatures, collapse = ", "), "\n")
@@ -72,11 +72,11 @@ cat("Count:", length(temperatures), "\n")
 cat("Maximum:", max(temperatures), "\n")
 cat(sprintf("Mean: %.2f\n", mean(temperatures)))
 
-# Indexing — R counts from 1.
+# Indexing – R counts from 1.
 cat("First measurement (index 1):", temperatures[1], "\n")
 cat("Last measurement:", temperatures[length(temperatures)], "\n")
 
-# List — can hold mixed types (analogous to dict in Python).
+# List – can hold mixed types (analogous to dict in Python).
 patient <- list(
   id             = 42L,
   age            = 71L,
@@ -111,10 +111,10 @@ for (i in seq_along(sample_bmis)) {
 # ---------------------------------------------------------------------- #
 cat("\n=== 4) Control flow ===\n")
 
-# if/else — fever severity tiers (scalar decisions).
+# if/else – fever severity tiers (scalar decisions).
 for (temp in c(37.2, 38.4, 39.6)) {
   if (temp >= 39.0) {
-    level <- "Hohes Fieber — ärztliche Beurteilung erforderlich"
+    level <- "Hohes Fieber – ärztliche Beurteilung erforderlich"
   } else if (temp >= FEVER_THRESHOLD) {
     level <- "Fieber"
   } else {
@@ -123,18 +123,18 @@ for (temp in c(37.2, 38.4, 39.6)) {
   cat(sprintf("  %.1f °C -> %s\n", temp, level))
 }
 
-# MAP assessment — vectorised operations are idiomatic in R.
+# MAP assessment – vectorised operations are idiomatic in R.
 cat("\nMAP assessment (sample values):\n")
-map_values <- c(58, 72, 95, 63, 88)
+map_values <- c(58, 72, 105, 63, 88)
 results    <- assess_map(map_values)
 for (i in seq_along(map_values)) {
   cat(sprintf("  MAP %3d mmHg -> %s\n", map_values[i], results[i]))
 }
 
 # ---------------------------------------------------------------------- #
-#  5) DataFrames — tables in code                                         #
+#  5) DataFrames – tables in code                                         #
 # ---------------------------------------------------------------------- #
-cat("\n=== 5) DataFrames — tables in code ===\n")
+cat("\n=== 5) DataFrames – tables in code ===\n")
 
 cohort <- load_cohort()
 
@@ -145,18 +145,18 @@ glimpse(cohort)
 cat("\nFirst 5 rows (selected columns):\n")
 print(cohort |> select(patient_id, alter, aufnahmegrund, sofa_score, verstorben_30d) |> head(5))
 
-# Filter rows — only patients with Sepsis.
+# Filter rows – only patients with Sepsis.
 septic <- cohort |> filter(aufnahmegrund == "Sepsis")
 cat(sprintf("\nSeptic patients: %d\n", nrow(septic)))
 cat(sprintf("Deceased within 30 days: %d\n", sum(septic$verstorben_30d)))
 
-# Derive a new column — BMI category.
+# Derive a new column – BMI category.
 cohort <- cohort |> mutate(bmi_cat = bmi_category(bmi))
 cat("\nBMI category distribution:\n")
 print(table(cohort$bmi_cat))
 
 # Descriptive statistics.
-cat("\nAge — descriptive statistics:\n")
+cat("\nAge – descriptive statistics:\n")
 print(summary(cohort$alter))
 
 # Group comparison.

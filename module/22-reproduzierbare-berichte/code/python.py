@@ -1,4 +1,4 @@
-"""Module 22 — Reproducible reports and workflows (Python).
+"""Module 22 – Reproducible reports and workflows (Python).
 
 Demonstrates three pillars of reproducible clinical data analysis:
   1. Seed setting (numpy global + random_state per call)
@@ -75,7 +75,7 @@ def write_manifest(versions: dict[str, str], output_path: Path) -> None:
 
 def main() -> None:
     # ---------------------------------------------------------------------- #
-    # 1) Set the seed — must happen before any random operation               #
+    # 1) Set the seed – must happen before any random operation               #
     # ---------------------------------------------------------------------- #
     np.random.seed(SEED)
     print(f"=== Seed gesetzt: {SEED} ===\n")

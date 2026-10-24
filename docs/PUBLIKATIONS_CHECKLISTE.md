@@ -1,6 +1,6 @@
 # Publikations-Checkliste für klinische Datenanalysen
 
-Diese Checkliste orientiert sich an den internationalen Berichtsstandards (**EQUATOR Network**) und stellt sicher, dass deine statistischen Analysen und Machine-Learning-Modelle den Anforderungen hochrangiger medizinischer Fachzeitschriften (z. B. NEJM, Lancet, JAMA) entsprechen.
+Diese Checkliste orientiert sich an den internationalen Berichtsstandards (**EQUATOR Network**) und hilft dir, statistische Analysen und Machine-Learning-Modelle so zu berichten, wie es medizinische Fachzeitschriften erwarten.
 
 ---
 
@@ -12,7 +12,7 @@ Diese Checkliste orientiert sich an den internationalen Berichtsstandards (**EQU
 ---
 
 ## 2. Statistische Hypothesentests und Fehlerquellen
-- [ ] **Effektstärken und Konfidenzintervalle:** Wird zu jedem signifikanten p-Wert die Effektstärke (z. B. Cohen's d, Odds Ratio, Hazard Ratio) inklusive des 95%-Konfidenzintervalls angegeben? (P-Werte allein beweisen keine klinische Relevanz!).
+- [ ] **Effektstärken und Konfidenzintervalle:** Wird zu jedem berichteten Test, ob signifikant oder nicht, die Effektstärke (z. B. Cohens d, Odds Ratio, Hazard Ratio) inklusive des 95%-Konfidenzintervalls angegeben? (P-Werte allein beweisen keine klinische Relevanz!).
 - [ ] **Multiple Testing:** Wurde bei der Prüfung mehrerer Hypothesen für Alpha-Fehler-Kumulierung korrigiert (z. B. Bonferroni für konfirmatorische, FDR/Benjamini-Hochberg für explorative Studien)?
 - [ ] **Voraussetzungsprüfungen:** Wurden die Verteilungsannahmen der Tests (z. B. Normalität für t-Test, Varianzhomogenität) geprüft und ggf. nicht-parametrische Alternativen gewählt?
 - [ ] **Der Median-Mythos:** Wurde beim Mann-Whitney-U-Test beachtet, dass er bei ungleichen Verteilungsformen stochastische Dominanz prüft und nicht zwingend den Median vergleicht?
@@ -20,7 +20,7 @@ Diese Checkliste orientiert sich an den internationalen Berichtsstandards (**EQU
 ---
 
 ## 3. Fehlende Werte (Missing Data)
-- [ ] **Fehlenden-Profiling:** Ist für jede Variable der Prozentsatz fehlender Werte dokumentiert?
+- [ ] **Profil fehlender Werte:** Ist für jede Variable der Prozentsatz fehlender Werte dokumentiert?
 - [ ] **Mechanismus-Diskussion:** Wurde begründet, ob die Daten MCAR, MAR oder MNAR sind?
 - [ ] **Imputationsverfahren:** Falls Multiple Imputation (z. B. MICE) genutzt wurde: Wurden die Variablen im Imputationsmodell benannt und die Anzahl der Datensätze angegeben?
 - [ ] **Sensitivitätsanalyse:** Wurden die Ergebnisse der Komplettfall-Analyse (Complete Case) mit den imputierten Daten verglichen und Abweichungen diskutiert?
@@ -35,16 +35,17 @@ Diese Checkliste orientiert sich an den internationalen Berichtsstandards (**EQU
 
 ---
 
-## 5. Machine Learning und Validierung (TRIPOD)
+## 5. Machine Learning und Validierung (TRIPOD+AI)
 - [ ] **Daten-Leakage:** Ist ausgeschlossen, dass Preprocessing-Schritte (Skalierung, Imputation) vor dem Train/Test-Split auf dem gesamten Datensatz durchgeführt wurden? (Pipelines verwenden!).
 - [ ] **Diskrimination:** Werden neben der ROC-Kurve (AUC) auch Precision-Recall-Kurven (PR-AUC) berichtet, wenn das Zielereignis selten ist (Klassenungleichgewicht)?
-- [ ] **Kalibrierung:** Wird die Übereinstimmung von vorhergesagten Wahrscheinlichkeiten und realen Ereignisraten (Kalibrierungskurve, Brier Score) dargestellt? (Nur eine gute Kalibrierung erlaubt den sicheren klinischen Einsatz).
+- [ ] **Kalibrierung:** Wird die Übereinstimmung von vorhergesagten Wahrscheinlichkeiten und realen Ereignisraten (Kalibrierungskurve, Kalibrierungs-Intercept und -Steigung) dargestellt? Der Brier Score ergänzt das als Gesamtmaß, mischt aber Kalibrierung, Trennschärfe und Ereignisrate. (Schlecht kalibrierte Risiken führen bei festen Schwellen zu systematisch falschen Entscheidungen.)
 - [ ] **Klinischer Nutzen (DCA):** Wurde eine Decision-Curve-Analyse (DCA) durchgeführt, um den Net Benefit des Modells gegenüber den Standardstrategien („alle behandeln“ vs. „niemanden behandeln“) zu zeigen?
 - [ ] **Validierungsstrategie:** Wurde das Modell über Kreuzvalidierung oder Bootstrapping intern validiert? (Optimal ist eine zusätzliche externe Validierung an einer unabhängigen Kohorte).
+- [ ] **Passende Berichtsleitlinie:** Wurde die zum Design passende Leitlinie genutzt? TRIPOD+AI (Entwicklung/Validierung von Vorhersagemodellen), STARD-AI (diagnostische Genauigkeit), DECIDE-AI (frühe klinische Evaluation), CONSORT-AI bzw. SPIRIT-AI (randomisierte Studie bzw. Protokoll); für das Verzerrungsrisiko von Vorhersagemodellen PROBAST+AI.
 
 ---
 
 ## 6. Reproduzierbarkeit und Transparenz
-- [ ] **Seed-Fixierung:** Wurden alle Zufallszahlengeneratoren für Splits und stochastische Algorithmen fixiert (`seed`), um exakte Reproduzierbarkeit zu garantieren?
-- [ ] **Code und Daten-Freigabe:** Sind der Analyse-Code (z. B. als Quarto- oder R-Markdown-Dokument) und die anonymisierten Daten in einem öffentlichen Repository (z. B. GitHub, OSF, Zenodo) hinterlegt?
+- [ ] **Seed-Fixierung:** Wurden alle Zufallszahlengeneratoren für Splits und stochastische Algorithmen fixiert (`seed`), damit Dritte die Ergebnisse reproduzieren können? (Über Plattformen und Paketversionen hinweg sind kleine Abweichungen in den letzten Stellen trotzdem möglich.)
+- [ ] **Code und Daten-Freigabe:** Sind der Analyse-Code (z. B. als Quarto- oder R-Markdown-Dokument) und, soweit rechtlich zulässig, die anonymisierten Daten in einem öffentlichen Repository (z. B. GitHub, OSF, Zenodo) hinterlegt? Wo das nicht geht: Ist der Zugangsweg zu den Daten beschrieben?
 - [ ] **Umgebungskonsistenz:** Wurde die Software-Umgebung (z. B. über `requirements.txt` oder `renv.lock`) für Dritte nachvollziehbar dokumentiert?

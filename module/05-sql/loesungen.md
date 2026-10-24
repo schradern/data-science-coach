@@ -27,7 +27,7 @@ print(len(result), "patients")
 print(result["aufnahmegrund"].value_counts())
 ```
 ```sql
--- SQL-Variante (direkt in DuckDB-CLI)
+-- pure SQL variant: count per admission reason directly in the query
 SELECT aufnahmegrund, COUNT(*) AS n
 FROM kohorte
 WHERE crp_mg_l > 100 AND sofa_score < 5
@@ -65,13 +65,13 @@ print(result)
 ## Aufgabe 3 – JOIN
 
 ```sql
--- Ohne Kreatininwert
+-- patients without a creatinine value
 SELECT COUNT(*) AS ohne_kreatinin
 FROM kohorte AS k
 LEFT JOIN labor AS l ON k.patient_id = l.patient_id
 WHERE l.kreatinin_mg_dl IS NULL;
 
--- Kreatinin > 2.0
+-- creatinine > 2.0 mg/dl
 SELECT COUNT(*) AS kreatinin_hoch
 FROM kohorte AS k
 LEFT JOIN labor AS l ON k.patient_id = l.patient_id
@@ -159,9 +159,11 @@ GROUP BY a.gruppe
 ORDER BY kreatinin_median DESC;
 ```
 **Beobachtung:** Schwer kranke Patient:innen (SOFA ≥ 7, n=49) zeigen einen
-höheren medianen Laktatwert (2,1 vs. 1,8 mmol/l) als der Rest, das Kreatinin
-unterscheidet sich in dieser Kohorte dagegen kaum (0,93 vs. 1,05 mg/dl). Nur
-die Laktat-Messwahrscheinlichkeit (nicht der Kreatininwert) ist im Datensatz
-absichtlich an den SOFA-Score gekoppelt (siehe `data/README.md`), ein gutes
-Beispiel dafür, dass nicht jede klinisch plausible Assoziation im Datensatz
-tatsächlich eingebaut ist, immer nachrechnen statt nur vermuten.
+höheren medianen Laktatwert (2,1 vs. 1,8 mmol/l) als der Rest, beim Kreatinin
+liegen sie sogar leicht darunter (0,93 vs. 1,05 mg/dl). Das spiegelt die
+Konstruktion des Datensatzes (`data/generate_data.py`): Der Laktatwert steigt
+mit dem SOFA-Score (und wird bei hohem SOFA häufiger gemessen), das Kreatinin
+wird unabhängig davon erzeugt. Klinisch wäre ein Zusammenhang zu erwarten, die
+Nierenfunktion ist ja Teil des SOFA-Scores. Ein gutes Beispiel dafür, dass
+nicht jede klinisch plausible Assoziation im Datensatz eingebaut ist: immer
+nachrechnen statt nur vermuten.

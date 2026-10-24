@@ -31,8 +31,8 @@ Schweregrad-Stufen klinisch interpretierbar sind und sich in Mortalität und
 Verweildauer unterscheiden lassen (siehe Aufgabe 4), eine explizit **klinisch
 begründete**, keine rein datengetriebene Entscheidung. Wichtig für die
 Publikationspraxis: Diese Wahl muss im Methodenteil offen benannt werden
-("wir wählen k=3 aus klinischen Gründen, obwohl k=2 den höchsten
-Silhouettenwert hat"), nicht als "das Elbow/die Silhouette bestätigt k=3"
+(„wir wählen k=3 aus klinischen Gründen, obwohl k=2 den höchsten
+Silhouettenwert hat“), nicht als „das Elbow/die Silhouette bestätigt k=3“
 verkauft werden, das wäre hier schlicht falsch.
 
 ## Aufgabe 2 – Auswirkung der Skalierung
@@ -94,15 +94,17 @@ mismatch = np.sum(labels_km != aligned_hier)
 print(f"Patients in different clusters (after label alignment): {mismatch} / {len(labels_km)}")
 ```
 
-In dieser Kohorte: **ARI = 0,243** (niedrig bis mäßig, weit unter dem oft
-zitierten Schwellenwert 0,7 für "stabile" Cluster), und nach
+In dieser Kohorte: **ARI = 0,243** (niedrig bis mäßig), und nach
 Label-Angleichung landen **177 von 500 Patient:innen (35 %)** in
 unterschiedlichen Clustern je nach Verfahren. Das zeigt: Die Cluster sind
 **nicht robust**, die Wahl des Algorithmus (k-Means vs. hierarchisch)
 beeinflusst spürbar, wer in welche Gruppe fällt, ein wichtiges Caveat im
 Methodik-Abschnitt jeder Phänotypisierungsstudie und konsistent mit der
 schwachen Clusterstruktur aus Aufgabe 1 (niedrige Silhouettenwerte für
-jedes k).
+jedes k). Ein Algorithmenvergleich ersetzt allerdings keine eigentliche
+Stabilitätsprüfung; dazu clustert man zusätzlich wiederholt Bootstrap-Stichproben
+und prüft, wie oft dieselben Gruppen wiederkehren (z. B. mittlere
+Jaccard-Ähnlichkeit je Cluster).
 
 ## Aufgabe 4 – Phänotyp-Profil
 
@@ -115,7 +117,7 @@ profile = df.groupby("cluster")[
 ].mean().round(2)
 print(profile.T)
 
-# Names are assigned AFTER reading the profile, ranked by mean SOFA — never
+# Names are assigned AFTER reading the profile, ranked by mean SOFA – never
 # hardcode {0: "mild", 1: "severe", ...}: k-Means cluster IDs are arbitrary
 # and not guaranteed to come out in severity order.
 severity_order = profile["sofa_score"].sort_values().index.tolist()
@@ -124,13 +126,16 @@ df["phenotype"] = df["cluster"].map(phenotype_names)
 ```
 
 Beispielhafter Befund in dieser Kohorte (k=3, seed=42): ein Cluster mit
-niedrigem SOFA (2,4) und niedriger Mortalität (5 %) -> "Leichter Verlauf";
+niedrigem SOFA (2,4) und niedriger Mortalität (5 %) -> „Leichter Verlauf“;
 ein Cluster mit hohem SOFA (6,0), hohem Laktat (3,2 mmol/l) und hoher
-Mortalität (30 %) -> "Hochrisiko"; ein dazwischenliegender Cluster (SOFA 3,3,
-Mortalität 16 %) -> "Mittelschwer". Verweildauer unterscheidet sich zwischen
-den Clustern nur wenig (6,2–7,2 Tage), sie trägt hier kaum zur Trennung bei,
-ein Hinweis darauf, dass die Cluster primär akute Schwere und nicht
-Krankenhausverlauf abbilden.
+Mortalität (30 %) -> „Hochrisiko“; ein dazwischenliegender Cluster (SOFA 3,3,
+Mortalität 16 %) -> „Mittelschwer“. Verweildauer unterscheidet sich zwischen
+den Clustern nur wenig (6,2–7,2 Tage), sie trägt hier kaum zur Trennung bei.
+Vorsicht bei der Lesart „drei Schweregrad-Stufen“: Der „mittelschwere“ Cluster
+unterscheidet sich vom leichten kaum im SOFA (3,3 vs. 2,4), sondern vor allem im
+Alter (74 vs. 53 Jahre), in BMI und Kreatinin. Die Benennung nach mittlerem SOFA
+verdeckt also, dass k-Means hier eher eine Altersgruppe gefunden hat; die höhere
+Mortalität dieses Clusters passt zum Alterseffekt.
 
 Die Benennung ist **interpretativ** und muss explizit begründet werden.
 Einschränkungen: (1) Cluster-Nummern sind arbiträr und können zwischen Runs

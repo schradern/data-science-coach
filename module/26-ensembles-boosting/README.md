@@ -15,9 +15,11 @@
 Ein einzelner Entscheidungsbaum fragt: *Ist SOFA > 7? Ist Alter > 72? Dann hohes
 Risiko.* Transparent, und fragil: Schon kleine Datenvariationen kippen den
 Baum. Ensembles stimmen Hunderte solcher Bäume ab und mitteln ihre Fehler weg.
-Gradient Boosting, das Herzstück von XGBoost und LightGBM, geht weiter: Jeder
-neue Baum korrigiert gezielt die Fehler des vorherigen. Diese Modellklasse
-gewinnt seit Jahren Wettbewerbe auf tabellarischen klinischen Daten.
+Gradient Boosting, das Prinzip hinter XGBoost und LightGBM, geht weiter: Jeder
+neue Baum korrigiert gezielt die verbleibenden Fehler des bisherigen Ensembles.
+Diese Modellklasse gilt seit Jahren als besonders stark auf tabellarischen
+Daten; in klinischen Vergleichsstudien ist ihr Vorsprung vor einer gut
+spezifizierten logistischen Regression aber oft klein.
 
 ## 1 Der einzelne Entscheidungsbaum: transparent, aber instabil
 
@@ -38,7 +40,7 @@ Fold neu anpasst, sonst leakt Information aus den Validierungszeilen ins
 Training:
 
 <!-- excerpt-note -->
-> **Hinweis — die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/26-ensembles-boosting/code/python.py` — siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+> **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/26-ensembles-boosting/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
 from sklearn.compose import ColumnTransformer
@@ -61,7 +63,7 @@ auc_tree = cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc").mean()
 
 **Stolperstein:** `pre.fit_transform(X)` einmal auf dem gesamten `X` aufrufen
 und dann erst kreuzvalidieren ist dieselbe Leakage-Falle wie in Modul 24: Der
-Imputer "sieht" beim Median-Berechnen bereits die Validierungszeilen jedes
+Imputer „sieht“ beim Median-Berechnen bereits die Validierungszeilen jedes
 Folds. Bei reiner Median-Imputation ist der Effekt oft klein, aber die
 Gewohnheit zählt, dieselbe Pipeline-Disziplin verhindert bei komplexeren
 Vorverarbeitungsschritten (Skalierung, Feature-Auswahl) einen echten Bias.
@@ -71,7 +73,7 @@ während die Validierungs-AUC ab einer gewissen Tiefe wieder fällt.
 
 ![Überanpassungskurve: Trainings- und Validierungs-AUC über die Baumtiefe (einmaliger 75/25-Split, Imputation nur auf den Trainingsdaten gefittet). Die Trainings-AUC steigt monoton bis 1,0, die Validierungs-AUC fällt nach einem frühen Optimum wieder.](assets/baum_tiefe.png)
 
-**Stolperstein:** `max_depth=None` (Standard) erzeugt immer Trainings-AUC 1,00, ein sicheres Zeichen für Überanpassung, das Anfänger oft als Erfolg interpretieren.
+**Stolperstein:** `max_depth=None` (Standard) erzeugt praktisch immer Trainings-AUC 1,00, ein sicheres Zeichen für Überanpassung, das Anfänger oft als Erfolg interpretieren.
 
 **Darüber hinaus:** `min_samples_leaf` und `min_samples_split` regularisieren
 stärker als `max_depth` allein: Sie steuern, wie viele Fälle mindestens in einem
@@ -91,22 +93,24 @@ from sklearn.ensemble import RandomForestClassifier
 
 rf = RandomForestClassifier(
     n_estimators=300,
-    max_depth=None,          # Bäume wachsen voll; Ensemble regelt die Varianz
-    max_features="sqrt",     # sqrt(p) Merkmale pro Knoten — Standardregel
+    max_depth=None,          # trees grow fully; the ensemble controls variance
+    max_features="sqrt",     # sqrt(p) features per node – standard rule
     class_weight="balanced",
     random_state=42,
     n_jobs=-1,
 )
-auc_rf = cross_val_score(rf, X_imp, y, cv=cv, scoring="roc_auc").mean()
+# Imputation/encoding in the pipeline as above, refitted per fold
+auc_rf = cross_val_score(Pipeline([("pre", pre), ("model", rf)]), X, y,
+                         cv=cv, scoring="roc_auc").mean()
 ```
 
 In R:
 ```r
 library(ranger)
-# Balanced weights aus den Daten (wie sklearns class_weight="balanced":
-# weight_c = n / (n_classes * n_c)) statt eines fest verdrahteten 10:1, das
-# weder zur ~84/16-Basisrate noch zur Python-Seite passt. table() ist in
-# Faktorstufen-Reihenfolge; ranger liest class.weights in dieser Reihenfolge.
+# Balanced weights from the data (like sklearn's class_weight="balanced":
+# weight_c = n / (n_classes * n_c)) instead of a hard-coded 10:1 that
+# matches neither the ~84/16 base rate nor the Python side. table() is in
+# factor-level order; ranger reads class.weights in that same order.
 class_counts  <- table(train_df$verstorben_30d)
 class_weights <- as.numeric(nrow(train_df) / (2 * class_counts))
 model_rf <- ranger(verstorben_30d ~ ., data = train_df,
@@ -115,16 +119,24 @@ model_rf <- ranger(verstorben_30d ~ ., data = train_df,
 ```
 
 **Stolperstein:** Bei starker Klassenungleichheit (hier ~16 % Ereignisse) ohne
-`class_weight="balanced"` lernt der Random Forest, fast immer „0" vorherzusagen, hohe Accuracy, AUC nahe 0,50. Immer `class_weight` setzen.
+`class_weight="balanced"` sagt der Random Forest an der Standardschwelle 0,5
+überwiegend „0“ vorher: hohe Accuracy, aber niedriger Recall (auf unserem
+Testsplit 0,32 statt 0,58 mit Gewichtung). Die AUC leidet dagegen kaum
+(CV-AUC 0,771 ohne vs. 0,791 mit Gewichtung), weil sie nur die Rangfolge
+bewertet. Gewichtung oder eine niedrigere Schwelle heben den Recall; die
+Gewichtung verzerrt aber die Wahrscheinlichkeiten (Modul 25).
 
-**Darüber hinaus:** Feature Importance aus dem Random Forest ist bei
-korrelierten Merkmalen verzerrt (Alter und SOFA korrelieren). Permutations-Importance
-(`permutation_importance`) ist robuster, aber teurer.
+**Darüber hinaus:** Die impurity-basierte Feature Importance des Random Forest
+wird auf den Trainingsdaten berechnet und bevorzugt kontinuierliche Merkmale mit
+vielen möglichen Schnittpunkten. Permutations-Importance
+(`permutation_importance`) auf Testdaten ist robuster, aber teurer; bei
+korrelierten Merkmalen (hier z. B. SOFA-Score und Leukozyten) sind beide
+Verfahren mit Vorsicht zu lesen (Modul 27).
 
 ## 3 Boosting-Intuition: iterative Fehlerkorrektur
 
 Boosting trainiert Bäume **sequenziell**, nicht parallel. Jeder neue Baum
-konzentriert sich auf die Fälle, die der vorherige schlecht vorhergesagt hat.
+konzentriert sich auf die Fälle, die das bisherige Ensemble schlecht vorhersagt.
 Formal minimiert **Gradient Boosting** eine differenzierbare Verlustfunktion
 durch gradientenbasierte Schritte im Funktionsraum.
 
@@ -137,8 +149,9 @@ Die wichtigsten Regularisierungsparameter:
 | `n_estimators` | Anzahl Bäume | 100–2 000 |
 | `subsample` | Anteil Zeilen je Baum | 0,5–1,0 |
 
-Eine niedrige Lernrate braucht mehr Bäume, wird aber stabiler. Als Daumenregel:
-`learning_rate × n_estimators ≈ 30–100`.
+Eine niedrige Lernrate braucht mehr Bäume, wird aber stabiler. Grob gilt:
+Halbiert man die Lernrate, braucht man etwa doppelt so viele Bäume. Die passende
+Baumzahl bestimmt man am saubersten per Early Stopping (siehe unten).
 
 ## 4 HistGradientBoosting, XGBoost und LightGBM
 
@@ -157,15 +170,19 @@ hgb = HistGradientBoostingClassifier(
     class_weight="balanced",
     random_state=42,
 )
-auc_hgb = cross_val_score(hgb, X_raw, y, cv=cv, scoring="roc_auc").mean()
+# pre_native: like pre, but without an imputer (NaN values are kept); only
+# the categories are encoded in the pipeline
+auc_hgb = cross_val_score(Pipeline([("pre", pre_native), ("model", hgb)]), X, y,
+                          cv=cv, scoring="roc_auc").mean()
 ```
 
-**Praxis — xgboost/lightgbm installieren:** Beide sind optional, `code/python.py`
+**Praxis – xgboost/lightgbm installieren:** Beide sind optional, `code/python.py`
 läuft auch ohne sie (Fallback: `HistGradientBoostingClassifier`). Installation:
 `uv pip install xgboost lightgbm`. Auf macOS brauchen beide zusätzlich die
-OpenMP-Laufzeitbibliothek: `brew install libomp`, danach Python mit
+OpenMP-Laufzeitbibliothek: `brew install libomp`. Scheitert der Import danach
+noch mit einem Ladefehler, Python mit
 `DYLD_LIBRARY_PATH=/opt/homebrew/opt/libomp/lib python module/26-ensembles-boosting/code/python.py`
-starten, sonst schlägt der Import mit einem Ladefehler fehl.
+starten.
 
 XGBoost- und LightGBM-Fallback:
 ```python
@@ -176,9 +193,10 @@ try:
         scale_pos_weight=(y == 0).sum() / (y == 1).sum(),
         eval_metric="auc", random_state=42, verbosity=0,
     )
-    auc_xgb = cross_val_score(xgb_model, X_imp, y, cv=cv, scoring="roc_auc").mean()
-except ImportError:
-    print("xgboost nicht installiert — HistGradientBoosting als Ersatz.")
+    auc_xgb = cross_val_score(Pipeline([("pre", pre), ("model", xgb_model)]), X, y,
+                              cv=cv, scoring="roc_auc").mean()
+except Exception:  # not installed or failed to load (e.g. missing libomp)
+    print("xgboost nicht verfügbar – HistGradientBoosting als Ersatz.")
     auc_xgb = None
 ```
 
@@ -200,7 +218,8 @@ Validierungsgüte stagniert.
 **Darüber hinaus:** LightGBM wächst blattweise (`num_leaves` statt `max_depth`),
 was bei großen Datensätzen schneller und oft genauer ist. Für klinische Datensätze
 (<5 000 Fälle) ist der Unterschied zu HistGBM marginal; bei größeren Kohorten
-ist LightGBM/XGBoost klar vorzuziehen.
+spielen LightGBM/XGBoost ihre Geschwindigkeit und zusätzlichen Stellschrauben
+eher aus.
 
 ## 5 Modellvergleich: kreuzvalidierte AUC
 
@@ -218,31 +237,33 @@ for name, pipe in models.items():
     print(f"{name}: {scores.mean():.3f} ± {scores.std():.3f}")
 ```
 
-Auf unserer Kohorte: Entscheidungsbaum 0,655 ± 0,043, Random Forest 0,778 ±
-0,026, HistGradBoost 0,717 ± 0,058, XGBoost 0,742 ± 0,034, LightGBM 0,755 ±
-0,047. Random Forest gewinnt hier klar (+0,12 AUC vs. Einzelbaum) — aber das
+Auf unserer Kohorte: Entscheidungsbaum 0,655 ± 0,043, Random Forest 0,791 ±
+0,028, HistGradBoost 0,711 ± 0,064, XGBoost 0,739 ± 0,030, LightGBM 0,755 ±
+0,047. Random Forest gewinnt hier klar (+0,135 AUC vs. Einzelbaum) – aber das
 ist ein *Ergebnis dieses Laufs*, keine allgemeine Wahrheit. Führe den
 Vergleich immer neu aus und lies die tatsächlichen Zahlen ab, `code/python.py`
 leitet die Schlussfolgerung am Ende genauso her (nie hartkodiert), und wenn
 die Modelle bei dir gleichauf liegen oder der Baum vorn liegt, ist das ein
 genauso gültiges, berichtenswertes Ergebnis.
 
-![Modellvergleich: kreuzvalidierte ROC-AUC (±1 SD) für Entscheidungsbaum, Random Forest, HistGradBoost, XGBoost und LightGBM. Der Titel benennt das tatsächliche Ergebnis dieses Laufs (hier: Random Forest übertrifft den einzelnen Baum), nicht eine vorab angenommene Rangfolge — bei einem anderen Split/Seed kann das Ergebnis anders ausfallen.](assets/modellvergleich_auc.png)
+![Modellvergleich: kreuzvalidierte ROC-AUC (±1 SD) für Entscheidungsbaum, Random Forest, HistGradBoost, XGBoost und LightGBM. Der Titel benennt das tatsächliche Ergebnis dieses Laufs (hier: Random Forest übertrifft den einzelnen Baum), nicht eine vorab angenommene Rangfolge – bei einem anderen Split/Seed kann das Ergebnis anders ausfallen.](assets/modellvergleich_auc.png)
 
 **Stolperstein:** Die Standardabweichung der CV-Scores (±) zeigt die Instabilität
-des Schätzers. Ein Modell mit AUC 0,82 ± 0,08 ist nicht besser als 0,80 ± 0,02, der Unterschied liegt im Rauschen.
+des Schätzers. Ein Modell mit AUC 0,82 ± 0,08 ist nicht nachweislich besser als 0,80 ± 0,02, der Unterschied liegt im Rauschen.
 
-**Darüber hinaus:** Für den formalen Modellvergleich gibt es den **Delong-Test** für
+**Darüber hinaus:** Für den formalen Modellvergleich gibt es den **DeLong-Test** für
 AUC-Unterschiede (`pROC::roc.test()` in R). In Python approximierst du ihn mit
 Bootstrap-Konfidenzintervallen über `scipy.stats.bootstrap`.
 
-> **Wann du Hilfe holst.** Baum-Ensembles überfitten auf kleinen klinischen Kohorten leicht (hier EPV ≈ 7), und ihre scheinbare Güte hält externer Validierung oft nicht stand — bevor ein solches Modell klinisch genutzt wird, gehören Tuning-Strategie und Validierung methodisch abgesichert.
+> **Wann du Hilfe holst.** Baum-Ensembles überfitten auf kleinen klinischen Kohorten leicht (hier EPV ≈ 7), und ihre scheinbare Güte hält externer Validierung oft nicht stand – bevor ein solches Modell klinisch genutzt wird, gehören Tuning-Strategie und Validierung methodisch abgesichert.
 
 ## Fallstricke und Merksätze
 - **Einzelner Baum tief = Overfit.** Ensembles regeln Varianz, aber Bias bleibt.
 - **Vorverarbeitung gehört in die Pipeline**, auch bei Baum-Ensembles, sonst
  dieselbe Leakage-Falle wie in Modul 24.
-- **`class_weight="balanced"` immer setzen** bei seltenen klinischen Ereignissen.
+- **`class_weight="balanced"` bewusst einsetzen** bei seltenen klinischen Ereignissen:
+ Es hebt den Recall an der Standardschwelle, verzerrt aber die Wahrscheinlichkeiten
+ (vor Kalibrierung und DCA rekalibrieren, Modul 25).
 - **Lernrate und Iterationen hängen zusammen.** Kleine Lernrate → mehr Bäume.
 - **HistGBM braucht keinen Imputer.** Fehlende Werte werden nativ gelernt.
 - **CV-Streuung ist Information.** Ein stabiler schlechterer Schätzer kann besser
@@ -251,16 +272,16 @@ Bootstrap-Konfidenzintervallen über `scipy.stats.bootstrap`.
  Modelle gleichauf liegen oder ein einfacheres Modell vorn liegt.
 
 ## Selbstcheck
-1. **Warum senkt Bagging die Varianz, aber nicht den Bias?**, Weil gemittelte
+1. **Warum senkt Bagging die Varianz, aber nicht den Bias?** – Weil gemittelte
  Schätzer (bei gleichem Erwartungswert) weniger streuen, der systematische Fehler
  (Bias) aber vom mittleren Modell bestimmt wird und nicht verschwindet.
 
-2. **Was bewirkt eine sehr kleine Lernrate beim Gradient Boosting?**, Das Modell
+2. **Was bewirkt eine sehr kleine Lernrate beim Gradient Boosting?** – Das Modell
  macht kleine Schritte; es braucht viele Bäume (hohes `n_estimators`), generalisiert
  aber besser und reagiert robuster auf Rauschen.
 
-3. **Warum verarbeitet HistGradientBoosting fehlende Werte nativ?**, Weil es bei
- jedem Binning-Schritt einen eigenen Zweig für fehlende Werte lernt (Richtung,
- die den Verlust am meisten senkt), statt auf Imputation angewiesen zu sein.
+3. **Warum verarbeitet HistGradientBoosting fehlende Werte nativ?** – Weil es bei
+ jedem Split lernt, auf welche Seite fehlende Werte geschickt werden (die
+ Richtung, die den Verlust am meisten senkt), statt auf Imputation angewiesen zu sein.
 
-4. **Warum muss die Imputation (z. B. Median) für den Entscheidungsbaum-Vergleich in einer Pipeline stecken statt einmal vorab auf dem Gesamtdatensatz zu laufen?**, Weil der Median sonst auch aus den Validierungs-/Testzeilen jedes Folds berechnet wird, Information aus Daten, die das Modell offiziell noch nicht gesehen haben soll, fließt ins Training (Leakage), genau das Prinzip, das Modul 24 einführt und das auch für Baum-Ensembles gilt.
+4. **Warum muss die Imputation (z. B. Median) für den Entscheidungsbaum-Vergleich in einer Pipeline stecken statt einmal vorab auf dem Gesamtdatensatz zu laufen?** – Weil der Median sonst auch aus den Validierungs-/Testzeilen jedes Folds berechnet wird, Information aus Daten, die das Modell offiziell noch nicht gesehen haben soll, fließt ins Training (Leakage), genau das Prinzip, das Modul 24 einführt und das auch für Baum-Ensembles gilt.

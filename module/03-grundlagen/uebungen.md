@@ -28,10 +28,10 @@ Schreibe eine Funktion `assess_map(map_mmhg)`, die den mittleren arteriellen
 Druck (MAP) bewertet:
 
 - MAP < 65 → `"Schock-Grenzwert unterschritten"`
-- MAP 65–90 → `"Normbereich"`
-- MAP > 90 → `"Erhöht"`
+- MAP 65–100 → `"Normbereich"`
+- MAP > 100 → `"Erhöht"`
 
-Teste mit den Werten `[58, 72, 95, 63, 88]`.
+Teste mit den Werten `[58, 72, 105, 63, 88]`.
 
 ## Aufgabe 5 – DataFrame-Basics mit dem Kohortendatensatz
 Lade die Kohorte, z. B. mit `pd.read_csv("{{DATEN}}kohorte.csv")`

@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 import matplotlib  # noqa: E402
 
-matplotlib.use("Agg")  # headless backend — no display needed
+matplotlib.use("Agg")  # headless backend – no display needed
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
@@ -75,7 +75,7 @@ def main() -> None:
     print(f"AUC={auc:.3f}")
     print(f"Youden threshold={youden:.2f}, sensitivity={tpr[best]:.3f}, specificity={1 - fpr[best]:.3f}")
     print("NOTE: the Youden threshold here is chosen AND evaluated on the same data")
-    print("(in-sample) — optimistic. Validate on held-out data (see modules 24/25).")
+    print("(in-sample) – optimistic. Validate on held-out data (see modules 24/25).")
 
     print("\n2) Metrics at clinically simple thresholds")
     rows = [metrics_at_threshold(y, score, t) for t in [1.5, 2.0, 2.5, youden]]

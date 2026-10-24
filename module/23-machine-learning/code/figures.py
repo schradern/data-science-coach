@@ -3,7 +3,7 @@
 Writes PNGs to ../assets/. German labels (display), English code.
 
 Replaces the module-18 figure block that used to live inside the shared
-`data/figures.py` script (old "Module 14" section) — module 23 now owns its
+`data/figures.py` script (old "Module 14" section) – module 23 now owns its
 figures directly, consistent with modules 24–27.
 """
 from __future__ import annotations

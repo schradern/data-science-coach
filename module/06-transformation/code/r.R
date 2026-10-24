@@ -1,4 +1,4 @@
-# Module 06 — Data cleaning and transformation (R / tidyverse)
+# Module 06 – Data cleaning and transformation (R / tidyverse)
 #
 # Runs standalone from the project root:
 #   Rscript module/06-transformation/code/r.R
@@ -26,15 +26,15 @@ cohort <- cohort |> mutate(geschlecht = if_else(geschlecht == "w", "weiblich", g
 cat("after: ", paste(sort(unique(cohort$geschlecht)), collapse = ", "), "\n")
 
 # ------------------------------------------------------------------
-# 2) Count missing values — understand before acting
+# 2) Count missing values – understand before acting
 # ------------------------------------------------------------------
-# Three columns, three different mechanisms. Naming all three here keeps the
+# Four columns, three different mechanisms. Naming all of them here keeps the
 # printed output, the figure and the README's table in agreement.
-cat("\n=== 2) Missing values — understand first ===\n")
+cat("\n=== 2) Missing values – understand first ===\n")
 merged <- left_join(cohort, labs, by = "patient_id")
 mechanisms <- c(
-  bmi           = "MCAR — random",
-  gewicht_kg    = "MCAR — random",
+  bmi           = "MCAR – random",
+  gewicht_kg    = "MCAR – random",
   laktat_mmol_l = "depends on sofa_score (a covariate)",
   bga_ph        = "depends on verstorben_30d (the OUTCOME)"
 )
@@ -44,7 +44,7 @@ for (col in names(mechanisms)) {
   cat(sprintf("%-16s%9d%8.1f%%   %s\n",
               col, n_miss, 100 * n_miss / nrow(merged), mechanisms[[col]]))
 }
-cat("Only the mechanism decides whether dropna() is harmless — see Module 14.\n")
+cat("Only the mechanism decides whether dropna() is harmless – see Module 14.\n")
 
 # ------------------------------------------------------------------
 # 3) Join: cohort + labs (LEFT JOIN keeps all patients)

@@ -10,10 +10,10 @@
 - Das **TRIPOD-Checklist**-Konzept für transparente Modellberichte kennen.
 
 ## Klinischer Aufhänger
-Ihr Prädiktionsmodell für 30-Tage-Mortalität zeigt im Testset eine AUC von 0,84, beeindruckend. Doch zwei Fragen bleiben offen: *Stimmen die
-Wahrscheinlichkeiten?* (Calibration) und *Sollte der Arzt dem Modell überhaupt
+Dein Prädiktionsmodell für 30-Tage-Mortalität zeigt im Testset eine AUC von 0,84, beeindruckend. Doch zwei Fragen bleiben offen: *Stimmen die
+Wahrscheinlichkeiten?* (Calibration) und *Sollte die Ärztin oder der Arzt dem Modell überhaupt
 folgen?* (Net Benefit). Ein Modell mit scharfen Scores, das aber systematisch
-zu hoch kalibriert ist, schadet mehr als es nützt. Dieses Modul gibt dir die
+zu hoch kalibriert ist, kann mehr schaden als nützen. Dieses Modul gibt dir die
 Werkzeuge, um beide Fragen ehrlich zu beantworten.
 
 **Stolperstein:** Die Modelle aus Modul 23/24 verwenden `class_weight="balanced"`,
@@ -34,7 +34,7 @@ Entscheidungsschwelle. Der Wert ist die Wahrscheinlichkeit, dass das Modell eine
 zufälligen Ereignisfall einen höheren Score gibt als einem zufälligen Nicht-Ereignis.
 
 <!-- excerpt-note -->
-> **Hinweis — die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/25-modellguete-validierung/code/python.py` — siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+> **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/25-modellguete-validierung/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
 import numpy as np
@@ -58,12 +58,12 @@ pr_lo,  pr_hi  = bootstrap_metric_ci(y_test, proba, average_precision_score)
 print(f"ROC-AUC: {auc_roc:.3f} (95%-KI {auc_lo:.3f}–{auc_hi:.3f})")
 print(f"PR-AUC:  {auc_pr:.3f} (95%-KI {pr_lo:.3f}–{pr_hi:.3f})")
 # ROC-AUC: 0.844 (95%-KI 0.707–0.946)   PR-AUC: 0.624 (95%-KI 0.398–0.847)
-# Testset: n = 125, davon 19 Ereignisse; Ereignisrate 15.2 %
+# Test set: n = 125, 19 of them events; event rate 15.2 %
 ```
 
 **Eine Zahl ohne Intervall täuscht Präzision vor.** Bei nur 19 Ereignissen im
-Testset reicht das 95 %-Bootstrap-KI der ROC-AUC von 0,71 bis 0,95 — ein Modell
-mit „AUC 0,84" ist mit diesen Daten von einem mit AUC 0,72 kaum zu unterscheiden.
+Testset reicht das 95 %-Bootstrap-KI der ROC-AUC von 0,71 bis 0,95 – ein Modell
+mit „AUC 0,84“ ist mit diesen Daten von einem mit AUC 0,72 kaum zu unterscheiden.
 Berichte darum jeden Gütewert mit Konfidenzintervall (Bootstrap oder DeLong);
 das gilt auch für den Subgruppenvergleich in Modul 32.
 
@@ -95,7 +95,7 @@ pr_obj$auc.integral
 ```
 
 **Stolperstein:** Ein Modell kann ROC-AUC ≈ 0,80 zeigen und trotzdem bei
-jedem Hochrisikopatienten falsch liegen, nämlich dann, wenn es zwar korrekt
+Hochrisikopatient:innen systematisch falsche Wahrscheinlichkeiten ausgeben, nämlich dann, wenn es zwar korrekt
 rangordnet, aber schlecht kalibriert ist. Die AUC allein sagt nichts über die
 absolute Güte der Wahrscheinlichkeiten.
 
@@ -105,7 +105,7 @@ Mortalität) ergibt sich die zeitabhängige AUC aus Survival-Analysen
 
 ## 2 Kalibrierung: Stimmen die Wahrscheinlichkeiten?
 
-Diskriminierung beantwortet: *Wer ist höherrisikoreicher?* Kalibrierung
+Diskriminierung beantwortet: *Wer hat das höhere Risiko?* Kalibrierung
 beantwortet: *Ist ein Score von 0,20 wirklich ~20 % Sterberisiko?* Beides kann
 unabhängig voneinander gut oder schlecht sein.
 
@@ -119,13 +119,13 @@ Wahrscheinlichkeiten braucht:
 from sklearn.calibration import CalibratedClassifierCV
 
 print(f"Mittlere vorhergesagte Mortalität (unkalibriert): {proba.mean():.1%}")
-# 40.9 %  --  beobachtete Mortalität im Testset: 15.2 %
+# 40.9 %  --  observed mortality in the test set: 15.2 %
 
 calibrated = CalibratedClassifierCV(build_pipeline(), method="sigmoid", cv=5)
 calibrated.fit(X_train, y_train)
 proba_cal = calibrated.predict_proba(X_test)[:, 1]
 print(f"Mittlere vorhergesagte Mortalität (rekalibriert): {proba_cal.mean():.1%}")
-# 16.2 %  --  nahe an den beobachteten 15.2 %; ROC-AUC bleibt bei 0.843
+# 16.2 %  --  close to the observed 15.2 %; ROC-AUC stays at 0.843
 ```
 
 `CalibratedClassifierCV` fittet die Neuskalierung per interner Kreuzvalidierung
@@ -147,7 +147,7 @@ from sklearn.metrics import brier_score_loss
 frac_pos, mean_pred = calibration_curve(y_test, proba_cal, n_bins=10)
 brier = brier_score_loss(y_test, proba_cal)
 print(f"Brier Score: {brier:.4f}")
-# unkalibriert: 0.1679   rekalibriert: 0.0955  (Nullmodell bei 15.2 % Basisrate: 0.129)
+# uncalibrated: 0.1679   recalibrated: 0.0955  (null model at 15.2 % base rate: 0.129)
 ```
 
 Die **Kalibrierungskurve** trägt den beobachteten Anteil (y-Achse) gegen den
@@ -162,9 +162,9 @@ Zwei erweiterte Kennzahlen aus logistischer Rekalibrierung:
  **Offset** eingeht (Steigung fest = 1); 0 = im Mittel richtig, negativ =
  Modell überschätzt systematisch, positiv = unterschätzt.
 
-- **Calibration slope**: Steigung aus `logit(outcome) ~ logit(proba)` mit
+- **Calibration slope**: Steigung einer logistischen Regression des Outcomes auf
  `logit(proba)` als freiem Prädiktor; <1 = Modell überstreckt Scores (zu
- extremal), >1 = zu konservativ (Scores zu vorsichtig).
+ extrem), >1 = zu konservativ (Scores zu vorsichtig).
 
 ```python
 import numpy as np
@@ -173,36 +173,38 @@ import statsmodels.api as sm
 
 log_odds = logit(np.clip(proba_cal, 1e-6, 1 - 1e-6))
 
-# Calibration-in-the-large: log_odds als OFFSET, nur Intercept wird geschätzt
+# Calibration-in-the-large: log_odds as OFFSET, only the intercept is estimated
 citl_model = sm.GLM(y_test, np.ones(len(y_test)),
                     family=sm.families.Binomial(), offset=log_odds).fit()
 citl = citl_model.params[0]
 
-# Calibration slope: log_odds als freier Prädiktor
+# Calibration slope: log_odds as a free predictor
 slope_model = sm.Logit(y_test, sm.add_constant(log_odds)).fit(disp=False)
 slope = slope_model.params[1]
 print(f"CITL: {citl:+.3f}   Slope: {slope:.3f}")
 # CITL: -0.085   Slope: 1.871
 ```
 
-**Stolperstein:** `sm.Logit(y_test, sm.add_constant(np.zeros(len(y_test))))`
+**Stolperstein:** `sm.Logit(y_test, np.ones(len(y_test)))`
 sieht nach einem Intercept-Modell aus, ignoriert `proba` aber komplett und
 liefert *immer* `logit(mean(y_test))`, egal wie gut oder schlecht das Modell
 ist. Ein perfekt kalibriertes und ein katastrophal überschätzendes Modell mit
-derselben mittleren Ereignisrate bekämen exakt denselben Wert. Die Steigung
+derselben mittleren Ereignisrate bekämen exakt denselben Wert. `logit(proba)`
 muss als **Offset** eingehen (Code oben), nicht weggelassen werden.
 
 In R:
 ```r
 library(rms)
-val.prob(proba, y_test)   # gibt Intercept, Slope und E/O-Ratio aus
+val.prob(proba, y_test)   # reports Brier, intercept and slope, among others
+# Caution: this intercept comes from the model with a freely estimated slope,
+# it is not the offset-based CITL from above.
 ```
 
-![Kalibrierungskurve: beobachteter gegen vorhergesagten Anteil, auf rekalibrierten Wahrscheinlichkeiten (CalibratedClassifierCV). Eine perfekte Kalibrierung entspricht der Diagonalen. Bei nur 19 Ereignissen im Testset schwankt die Kurve zwischen den Bins deutlich. Der CITL (−0,085) liegt nahe null (kein systematischer Über-/Unterschätzungs-Offset), aber der Slope (1,87) liegt klar außerhalb des akzeptierten Bereichs von etwa 0,8–1,2: ein Slope deutlich über 1 bedeutet zu wenig extreme, überschrumpfte Vorhersagen (hohe Risiken werden zu niedrig, niedrige zu hoch geschätzt). Bei nur 19 Ereignissen ist dieser Slope zudem extrem unsicher — was gerade dafür spricht, Unsicherheit auszuweisen, statt den Wert als „nahe ideal" zu verkaufen.](assets/kalibrierung.png)
+![Kalibrierungskurve: beobachteter gegen vorhergesagten Anteil, auf rekalibrierten Wahrscheinlichkeiten (CalibratedClassifierCV). Eine perfekte Kalibrierung entspricht der Diagonalen. Bei nur 19 Ereignissen im Testset schwankt die Kurve zwischen den Bins deutlich. Der CITL (−0,085) liegt nahe null (kein systematischer Über-/Unterschätzungs-Offset), aber der Slope (1,87) liegt klar außerhalb des akzeptierten Bereichs von etwa 0,8–1,2: ein Slope deutlich über 1 bedeutet zu wenig extreme, überschrumpfte Vorhersagen (hohe Risiken werden zu niedrig, niedrige zu hoch geschätzt). Bei nur 19 Ereignissen ist dieser Slope zudem extrem unsicher – was gerade dafür spricht, Unsicherheit auszuweisen, statt den Wert als „nahe ideal“ zu verkaufen.](assets/kalibrierung.png)
 
 **Stolperstein:** Kalibrierungskurven mit wenigen Fällen je Bin schwanken stark.
 Bei ~19 Testevents auf 10 Bins ist das im obigen Chart sichtbar. Weniger Bins
-(5–10) sind stabiler, aber grober. Isotonische Regression oder Platt-Scaling
+(z. B. 5 statt 10) sind stabiler, aber grober. Isotonische Regression oder Platt-Scaling
 können die Kalibrierung nachträglich verbessern, aber stets auf
 einem getrennten Datensatz.
 
@@ -222,11 +224,11 @@ Der **Net Benefit (NB)** bei Schwelle p_t:
 NB(p_t) = (TP / N) - (p_t / (1 - p_t)) * (FP / N)
 ```
 Die Schwelle p_t kodiert das Verhältnis, zu dem du einen Fehlalarm gegen einen
-übersehenen Fall eintauschen. p_t = 0,10 bedeutet: du akzeptierst bis zu
+übersehenen Fall eintauschst. p_t = 0,10 bedeutet: du akzeptierst bis zu
 9 Fehlalarme, um 1 echten Fall nicht zu verpassen.
 
 **Stolperstein:** p_t wird als **echte Risikoschwelle** interpretiert
-("behandle, wenn Risiko ≥ p_t"). Das ist nur sinnvoll, wenn `proba` kalibriert
+(„behandle, wenn Risiko ≥ p_t“). Das ist nur sinnvoll, wenn `proba` kalibriert
 ist, deshalb verwenden wir hier weiterhin `proba_cal` aus Abschnitt 2.0, nicht
 die rohen, mit `class_weight="balanced"` aufgeblähten Scores.
 
@@ -248,10 +250,11 @@ nb_none    = [0.0] * len(thresholds)   # never treat = NB always 0
 ```
 
 Trägt man NB gegen die Schwelle auf, entsteht die **Decision Curve**. Das Modell
-ist nützlich, wenn seine Kurve sowohl die „Alle behandeln"- als auch die
-„Niemanden behandeln"-Linie übersteigt. Auf unseren Daten ist das über fast den
-gesamten gezeigten Schwellenbereich (0,01–0,50) der Fall, die Modellkurve liegt
-durchgehend über beiden Referenzlinien.
+ist nützlich, wenn seine Kurve sowohl die „Alle behandeln“- als auch die
+„Niemanden behandeln“-Linie übersteigt. Auf unseren Daten ist das über fast den
+gesamten gezeigten Schwellenbereich (0,01–0,50) der Fall. Nur unterhalb von etwa
+0,02 fällt die Modellkurve mit „alle behandeln“ zusammen, weil dort jede
+vorhergesagte Wahrscheinlichkeit über der Schwelle liegt.
 
 In R:
 ```r
@@ -260,15 +263,15 @@ dca(verstorben_30d ~ proba, data = test_df,
     thresholds = seq(0.01, 0.5, 0.01)) |> plot()
 ```
 
-![Decision Curve: Net Benefit über Entscheidungsschwelle für Modell (rekalibrierte Wahrscheinlichkeiten), „alle behandeln" und „niemanden behandeln". Die Modellkurve liegt im gezeigten Bereich (0,01–0,50) durchgehend über beiden Referenzlinien, das Modell ist hier klinisch nützlich.](assets/decision_curve.png)
+![Decision Curve: Net Benefit über Entscheidungsschwelle für Modell (rekalibrierte Wahrscheinlichkeiten), „alle behandeln“ und „niemanden behandeln“. Die Modellkurve liegt im gezeigten Bereich (0,01–0,50) über beiden Referenzlinien (unterhalb von etwa 0,02 fällt sie mit „alle behandeln“ zusammen), das Modell ist hier klinisch nützlich.](assets/decision_curve.png)
 
 **Stolperstein:** Der Net Benefit reagiert empfindlich auf den beobachteten
 Ereignisanteil. Bei einem anderen Datensatz (andere Klinik, andere Periode) kann
-die Kurve des Modells unter „Alle behandeln" fallen, selbst bei identischer AUC.
+die Kurve des Modells unter „Alle behandeln“ fallen, selbst bei identischer AUC.
 Das ist der Kernunterschied zwischen statistischer und klinischer Validierung.
 
 **Darüber hinaus:** Erweitere die DCA um **interventions avoided** (Anzahl
-vermiedener Behandlungen gegenüber „Alle behandeln" pro 100 Patient:innen), das lässt
+vermiedener Behandlungen gegenüber „Alle behandeln“ pro 100 Patient:innen), das lässt
 sich gegenüber klinischem Personal leichter kommunizieren.
 
 ## 4 Interne Validierung: Bootstrap-Optimismus-Korrektur
@@ -284,8 +287,6 @@ Jede Gütemessung auf den Trainingsdaten selbst ist optimistisch.
 4. Korrigierter Schätzer = `G_orig - Optimismus`.
 
 ```python
-from sklearn.utils import resample
-
 def bootstrap_optimism(X, y, pipeline, n_boot=200, seed=42):
     """Estimate AUC optimism via bootstrap resampling."""
     rng = np.random.default_rng(seed)
@@ -308,21 +309,24 @@ def bootstrap_optimism(X, y, pipeline, n_boot=200, seed=42):
 ```
 
 Auf den Trainingsdaten (n_boot=100): apparente AUC 0,814, mittlerer Optimismus
-0,051, korrigierte AUC 0,762. Die echte Test-AUC (0,844) liegt sogar darüber —
+0,051, korrigierte AUC 0,762. Die echte Test-AUC (0,844) liegt sogar darüber –
 aber der Testsplit enthält nur 19 Ereignisse, sodass beide Schätzer breite
-Konfidenzintervalle tragen und „bestätigt" zu viel gesagt wäre. Entscheidend
+Konfidenzintervalle tragen und „bestätigt“ zu viel gesagt wäre. Entscheidend
 ist, dass die Optimismus-Korrektur die apparente AUC überhaupt nach unten zieht,
 weg vom geschönten Trainingswert. Diese Rechnung verwendet weiterhin
 `class_weight="balanced"`, weil sie nur die AUC (Ranking) betrifft, keine
 absoluten Wahrscheinlichkeiten.
 
 **Stolperstein:** Bootstrap-Optimismus unterschätzt den echten Optimismus, wenn
-die Stichprobe klein ist oder das Modell stark regularisiert wurde. Ein scheinbar
+nicht jeder datengetriebene Schritt (Variablenauswahl, Hyperparameter-Tuning,
+Imputation) in jeder Bootstrap-Stichprobe wiederholt wird; bei sehr kleinen
+Stichproben ist zudem die Schätzung selbst unsicher. Ein scheinbar
 kleiner Optimismus ist kein Freifahrtschein für externe Validität.
 
-**Darüber hinaus:** Alternativ liefert **repeated k-fold CV** (statt Bootstrap)
-einen varianzärmeren Schätzer der Güte, oft ausreichend für Publikationen, wenn
-keine echte externe Kohorte verfügbar ist.
+**Darüber hinaus:** Alternativ liefert **wiederholte k-fache Kreuzvalidierung**
+(statt Bootstrap) einen vergleichbaren Schätzer der Güte; die Wiederholung senkt
+die Varianz gegenüber einer einzelnen CV. Beides ist ein Weg der internen
+Validierung, wenn keine echte externe Kohorte verfügbar ist.
 
 ## 5 Externe Validierung und TRIPOD-Checkliste
 
@@ -332,21 +336,23 @@ beantwortet, ob das Modell generalisiert.
 
 TRIPOD (Transparent Reporting of a multivariable prediction model for Individual
 Prognosis Or Diagnosis) ist der Berichtsstandard für Prädiktionsmodelle in der
-klinischen Forschung. Die wichtigsten Punkte aus der Checkliste:
+klinischen Forschung; für ML-Modelle gilt seit 2024 die erweiterte Fassung
+**TRIPOD+AI** (mit eigener Nummerierung). Die wichtigsten Punkte aus der
+ursprünglichen Checkliste (TRIPOD 2015):
 
 | TRIPOD-Punkt | Was gehört rein |
 |---|---|
-| 4a | Outcome, Prädiktoren, Zeitpunkt, Stichprobe |
+| 4–8 | Datenquelle, Teilnehmende, Outcome, Prädiktoren, Fallzahl |
 | 9 | Fehlende Werte: Umgang und Ausmaß |
-| 10a | Modellwahl und Entwicklung |
-| 10b | Interne Validierung (Methode + Ergebnis) |
-| 13 | Kalibrierung (Kurve + Brier) und Diskriminierung (AUC) |
-| 15 | Externe Validierung, falls vorhanden |
+| 10a, 10b | Umgang mit Prädiktoren, Modelltyp, Modellbildung, Methode der internen Validierung |
+| 10d, 16 | Gütemaße (Kalibrierung, Diskriminierung) und ihre Ergebnisse mit Konfidenzintervall |
+| 15 | Vollständige Modellspezifikation |
+| 10c, 12, 13c | Externe Validierung, falls vorhanden |
 
 Für diesen Kurs gilt: Ein Modell ohne Kalibrierungsabschnitt und ohne
 DCA ist klinisch unvollständig dokumentiert, unabhängig von der AUC.
 
-> **Wann du Hilfe holst.** Für die externe Validierung, belastbare Kalibrierungsaussagen bei wenigen Ereignissen und eine TRIPOD-konforme Berichterstattung vor Publikation oder Einsatz solltest du Biostatistik und Methodik einbeziehen — interne Optimismus-Korrektur ersetzt keine unabhängige Kohorte.
+> **Wann du Hilfe holst.** Für die externe Validierung, belastbare Kalibrierungsaussagen bei wenigen Ereignissen und eine TRIPOD-konforme Berichterstattung vor Publikation oder Einsatz solltest du Biostatistik und Methodik einbeziehen – interne Optimismus-Korrektur ersetzt keine unabhängige Kohorte.
 
 ## Fallstricke und Merksätze
 - **`class_weight="balanced"` zerstört Kalibrierung.** Rangordnung (AUC) bleibt
@@ -368,17 +374,17 @@ DCA ist klinisch unvollständig dokumentiert, unabhängig von der AUC.
 - **TRIPOD immer.** Kein Prädiktionsmodell ohne transparente Dokumentation.
 
 ## Selbstcheck
-1. **Warum kann PR-AUC bei seltenen Ereignissen informativer sein als ROC-AUC?**, Weil die ROC-AUC durch die vielen wahren Negativen aufgebläht wird. Die PR-AUC
- bewertet nur die Güte der positiven Vorhersagen und ist bei starker
- Klassenungleichheit der ehrlichere Maßstab.
+1. **Warum kann PR-AUC bei seltenen Ereignissen informativer sein als ROC-AUC?** – Weil die ROC-AUC von der Ereignisrate unabhängig ist: Eine kleine Falsch-Positiv-Rate kann bei sehr vielen Negativen trotzdem viele Fehlalarme bedeuten. Die PR-AUC
+ bewertet die Präzision (PPV) der positiven Vorhersagen und macht das bei starker
+ Klassenungleichheit sichtbar.
 
-2. **Was bedeutet Calibration Slope < 1?**, Das Modell überstreckt seine Scores:
+2. **Was bedeutet Calibration Slope < 1?** – Das Modell überstreckt seine Scores:
  Hochrisikopatienten werden noch höher bewertet, Niedrigrisikopatienten noch
  niedriger als sie sein sollten. Ein Slope von genau 1 (mit Intercept 0) signalisiert
  perfekte Kalibrierung.
 
-3. **In welchem Schwellenbereich ist ein Modell laut DCA nützlich?**, Dort, wo der
+3. **In welchem Schwellenbereich ist ein Modell laut DCA nützlich?** – Dort, wo der
  Net Benefit des Modells *über* beiden Referenzlinien (alle behandeln, niemanden
  behandeln) liegt. Außerhalb dieses Bereichs bringt das Modell keinen Mehrwert.
 
-4. **Warum berechnen wir in diesem Modul zuerst `CalibratedClassifierCV`, bevor wir Brier Score, Kalibrierungskurve oder DCA anschauen?**, Weil das Modell mit `class_weight="balanced"` trainiert wurde: Das verbessert das Ranking bei seltenen Ereignissen, bläht aber `predict_proba()` systematisch auf (hier im Mittel 41 % statt der beobachteten 15 %). AUC bleibt davon unberührt, aber Brier Score, Kalibrierungskurve, CITL/Slope und DCA werten die Wahrscheinlichkeiten absolut, ohne Rekalibrierung wären sie irreführend.
+4. **Warum berechnen wir in diesem Modul zuerst `CalibratedClassifierCV`, bevor wir Brier Score, Kalibrierungskurve oder DCA anschauen?** – Weil das Modell mit `class_weight="balanced"` trainiert wurde: Das verbessert das Ranking bei seltenen Ereignissen, bläht aber `predict_proba()` systematisch auf (hier im Mittel 41 % statt der beobachteten 15 %). AUC bleibt davon unberührt, aber Brier Score, Kalibrierungskurve, CITL/Slope und DCA werten die Wahrscheinlichkeiten absolut, ohne Rekalibrierung wären sie irreführend.

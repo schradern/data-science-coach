@@ -9,13 +9,13 @@ Führe folgenden Code zweimal aus, einmal mit `random_state=42`, einmal ohne:
 ```python
 import pandas as pd
 cohort = pd.read_csv("{{DATEN}}kohorte.csv")
-sample = cohort.sample(n=30, random_state=42)   # oder: cohort.sample(n=30)
+sample = cohort.sample(n=30, random_state=42)   # or: cohort.sample(n=30)
 print(sample["patient_id"].tolist())
 ```
 
 a) Was beobachtest du? Warum ist das für publizierte Analysen relevant?
 b) Setze zusätzlich `numpy.random.seed(42)` ganz am Anfang. Ändert das etwas an
- der Stichprobe? Begründe, warum `random_state` und `np.random.seed()` unabhängig sind.
+ der Stichprobe, einmal mit und einmal ohne `random_state=42`? Begründe.
 
 ## Aufgabe 2 – Paketversionen dokumentieren
 

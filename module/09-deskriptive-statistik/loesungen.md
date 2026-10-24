@@ -21,26 +21,30 @@ for (col in c("crp_mg_l", "sofa_score", "verweildauer_tage")) {
               col, mean(k[[col]], na.rm=TRUE), median(k[[col]], na.rm=TRUE)))
 }
 ```
-**Befund:** `crp_mg_l` und `verweildauer_tage` zeigen die größte Differenz
-(rechtschiefe Verteilung durch wenige sehr hohe Werte). `sofa_score` ist
-symmetrischer, Mittelwert und Median liegen nahe beieinander. 
-**Empfehlung:** CRP und Verweildauer → Median [IQR]; SOFA-Score → je nach
-Journal Median [IQR] (konservativ) oder Mittelwert ± SD.
+**Befund:** Deutlich weicht nur `crp_mg_l` ab (Mittelwert 75,3 vs. Median
+61,2 mg/l): rechtsschief durch wenige sehr hohe Werte. Bei `verweildauer_tage`
+(6,5 vs. 6) und `sofa_score` (3,7 vs. 3) ist die Differenz klein, obwohl beide
+ebenfalls rechtsschief sind (Schiefe 1,1 bzw. 0,6). Bei ganzzahligen Werten mit
+kleinem Wertebereich verrät der Abstand Mittelwert–Median die Schiefe nur grob;
+ein Histogramm zeigt sie zuverlässiger. 
+**Empfehlung:** CRP und Verweildauer → Median [IQR]; SOFA-Score (ordinal) →
+ebenfalls Median [IQR], Mittelwert ± SD höchstens zusätzlich, wenn das Journal es
+verlangt.
 
 ## Aufgabe 2 – Häufigkeiten und Anteile
 
 ```python
+import pandas as pd
 k = pd.read_csv("{{DATEN}}kohorte.csv")
 
-# a) Herzinsuffizienz
+# a) Heart failure (aufnahmegrund "Herzinsuffizienz")
 n_hi = (k["aufnahmegrund"] == "Herzinsuffizienz").sum()
 print(f"Herzinsuffizienz: {n_hi} ({n_hi/len(k):.1%})")
 
-# b) Hypertonie
+# b) Hypertension
 print(f"Hypertonie: {k['hypertonie'].mean():.1%}")
 
-# c) Kreuztabelle
-import pandas as pd
+# c) Cross-tabulation
 xt = pd.crosstab(k["raucherstatus"], k["diabetes"],
                  margins=True, margins_name="Gesamt")
 print(xt)
@@ -130,7 +134,8 @@ SOFA-Score (Ø 6,1 vs. ~3 in den anderen Gruppen, p < 0,001), sie sind bei
 Aufnahme am schwersten krank. Bei CRP zeigen sich dagegen keine klaren
 Gruppenunterschiede nach Aufnahmegrund (Sepsis hat hier sogar den niedrigsten
 Mittelwert), und auch das Alter unterscheidet sich zwischen den Gruppen kaum
-(p = 0,42). SOFA-Score ist hier der klinisch aussagekräftigste Unterschied.
+(p = 0,42 mit dem ANOVA-Test von tableone; gtsummary rechnet Kruskal-Wallis und
+zeigt p = 0,32). SOFA-Score ist hier der klinisch aussagekräftigste Unterschied.
 
 ## Aufgabe 5 – Fehlende Werte in Table 1
 
@@ -168,8 +173,6 @@ und Modul 14 (Umgang mit fehlenden Werten)).
 
 ```python
 import pandas as pd
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -189,7 +192,8 @@ print(iqr_tbl.sort_values("iqr", ascending=False).round(2))
 order = iqr_tbl.sort_values("iqr", ascending=False).index.tolist()
 fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(data=df.dropna(subset=["laktat_mmol_l"]),
-            x="aufnahmegrund", y="laktat_mmol_l", order=order, palette="Set2", ax=ax)
+            x="aufnahmegrund", y="laktat_mmol_l", order=order,
+            hue="aufnahmegrund", palette="Set2", legend=False, ax=ax)
 ax.set_title("Laktat [mmol/l] nach Aufnahmegrund (nach IQR sortiert)")
 ax.set_xlabel("Aufnahmegrund")
 ax.set_ylabel("Laktat (mmol/l)")

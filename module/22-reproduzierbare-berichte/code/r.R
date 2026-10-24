@@ -1,4 +1,4 @@
-# Module 22 — Reproducible reports and workflows (R)
+# Module 22 – Reproducible reports and workflows (R)
 #
 # Demonstrates:
 #   1. set.seed() for reproducibility
@@ -23,7 +23,7 @@ suppressPackageStartupMessages(library(tidyverse))
 )
 
 root <- if (!is.null(.this_script) && !is.na(.this_script)) {
-  # Four levels up: code/ -> 17-.../ -> module/ -> project root
+  # Four levels up: code/ -> 22-.../ -> module/ -> project root
   dirname(dirname(dirname(dirname(.this_script))))
 } else {
   normalizePath(getwd())
@@ -32,7 +32,7 @@ root <- if (!is.null(.this_script) && !is.na(.this_script)) {
 source(file.path(root, "lib", "helpers.R"))
 
 # ---------------------------------------------------------------------------
-# 1) Set the seed — before any random operation
+# 1) Set the seed – before any random operation
 # ---------------------------------------------------------------------------
 set.seed(SEED)
 cat(sprintf("=== Seed gesetzt: %d ===\n\n", SEED))
@@ -71,7 +71,7 @@ for (pkg in key_packages) {
 }
 
 cat("\nTipp: sessionInfo() am Ende eines R-Markdown- oder Quarto-Dokuments\n")
-cat("      gibt alle Versionen automatisch aus — Best Practice fuer Publikationen.\n")
+cat("      gibt alle Versionen automatisch aus – Best Practice fuer Publikationen.\n")
 
 # ---------------------------------------------------------------------------
 # 5) Descriptive summary grouped by admission reason

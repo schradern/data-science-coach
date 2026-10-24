@@ -1,4 +1,4 @@
-"""Module 26 — Tree ensembles and gradient boosting.
+"""Module 26 – Tree ensembles and gradient boosting.
 
 Runs standalone from the project root:
     python module/26-ensembles-boosting/code/python.py
@@ -7,12 +7,12 @@ Data: read from data/ (committed with the repo); if that folder is
 missing, the same files are fetched from the published URL.
 Requires scikit-learn. xgboost / lightgbm are used if available (install with
 `uv pip install xgboost lightgbm`; on macOS you also need the OpenMP runtime,
-`brew install libomp`, and must run Python with
+`brew install libomp`; only if the import still fails, run Python with
 `DYLD_LIBRARY_PATH=/opt/homebrew/opt/libomp/lib` so the two libraries can find
 it); otherwise HistGradientBoostingClassifier is used as a fallback and this
 script still runs and teaches the same concepts.
 
-IMPORTANT — leakage: imputation and one-hot encoding are NOT fit on the full
+IMPORTANT – leakage: imputation and one-hot encoding are NOT fit on the full
 dataset up front (that would be the exact leakage Module 24 warns against).
 Both live inside a Pipeline/ColumnTransformer that cross_val_score() re-fits
 on the training fold only, every fold, every model.
@@ -201,8 +201,8 @@ def main() -> None:
         print(
             "\n  xgboost / lightgbm nicht installiert -- sklearn HistGradBoost als"
             "\n  Ersatz. Installieren mit: uv pip install xgboost lightgbm"
-            "\n  (macOS: zusätzlich `brew install libomp`, dann Python mit"
-            "\n  DYLD_LIBRARY_PATH=/opt/homebrew/opt/libomp/lib starten)."
+            "\n  (macOS: zusätzlich `brew install libomp`; nur falls der Import dann"
+            "\n  noch scheitert, Python mit DYLD_LIBRARY_PATH=/opt/homebrew/opt/libomp/lib starten)."
         )
 
     for name, model in boosters.items():

@@ -22,7 +22,7 @@ cat(sprintf("events=%d/%d (%.3f)\n", events, n, events / n))
 # correct = FALSE gives the plain Wilson score interval, matching Python's
 # statsmodels proportion_confint(method="wilson"). The default correct = TRUE
 # would apply a continuity correction (a wider score interval), which is NOT
-# what "Wilson-KI" usually means — see the README Stolperstein in section 6.
+# what "Wilson-KI" usually means – see the README Stolperstein in section 6.
 print(prop.test(events, n, correct = FALSE)$conf.int)
 
 cat("\n3) Events per variable\n")

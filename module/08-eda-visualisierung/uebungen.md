@@ -31,5 +31,5 @@ Entspricht das Bild dem Koeffizienten?
 
 ## Bonus
 Erstelle eine Korrelationsmatrix für alle numerischen Variablen in der zusammengeführten
-Tabelle. Welches Variablenpaar korreliert am stärksten mit `verstorben_30d`?
+Tabelle. Welche Variable korreliert am stärksten mit `verstorben_30d`?
 Überrascht dich das Ergebnis?

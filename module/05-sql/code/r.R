@@ -1,4 +1,4 @@
-# Module 05 — SQL for data extraction (R / DBI + duckdb)
+# Module 05 – SQL for data extraction (R / DBI + duckdb)
 #
 # Runs standalone from the project root:
 #   Rscript module/05-sql/code/r.R
@@ -37,7 +37,7 @@ con <- dbConnect(duckdb::duckdb(), dbdir = ":memory:")
 
 # Register the datasets as DuckDB tables. Uses the shared, local-first/
 # URL-fallback loaders from helpers.R (not a hardcoded local path), then
-# hands the resulting data frames to DuckDB via duckdb_register() — no
+# hands the resulting data frames to DuckDB via duckdb_register() – no
 # read_csv_auto() on a file path needed.
 duckdb::duckdb_register(con, "kohorte", load_cohort())
 duckdb::duckdb_register(con, "labor", load_labs())
@@ -52,7 +52,7 @@ for (tbl in c("kohorte", "labor", "vitalwerte")) {
 # ---------------------------------------------------------------------------
 # 1) SELECT / WHERE / ORDER BY
 # ---------------------------------------------------------------------------
-cat("\n=== 1) SELECT / WHERE / ORDER BY — Sepsis, SOFA >= 6 ===\n")
+cat("\n=== 1) SELECT / WHERE / ORDER BY – Sepsis, SOFA >= 6 ===\n")
 res1 <- dbGetQuery(con, "
   SELECT patient_id, alter, aufnahmegrund, sofa_score
   FROM kohorte
@@ -64,9 +64,9 @@ res1 <- dbGetQuery(con, "
 print(res1)
 
 # ---------------------------------------------------------------------------
-# 2) GROUP BY — count, mean SOFA, mortality rate per admission type
+# 2) GROUP BY – count, mean SOFA, mortality rate per admission type
 # ---------------------------------------------------------------------------
-cat("\n=== 2) GROUP BY — aggregation per Aufnahmegrund ===\n")
+cat("\n=== 2) GROUP BY – aggregation per Aufnahmegrund ===\n")
 res2 <- dbGetQuery(con, "
   SELECT
       aufnahmegrund,
@@ -81,9 +81,9 @@ res2 <- dbGetQuery(con, "
 print(res2)
 
 # ---------------------------------------------------------------------------
-# 3) LEFT JOIN — cohort + labs; row count must not increase
+# 3) LEFT JOIN – cohort + labs; row count must not increase
 # ---------------------------------------------------------------------------
-cat("\n=== 3) LEFT JOIN — kohorte + labor (first 5 rows) ===\n")
+cat("\n=== 3) LEFT JOIN – kohorte + labor (first 5 rows) ===\n")
 res3 <- dbGetQuery(con, "
   SELECT
       k.patient_id,
@@ -106,9 +106,9 @@ stopifnot(n_join == n_cohort)
 cat(sprintf("  Row-count check OK: %d == %d\n", n_join, n_cohort))
 
 # ---------------------------------------------------------------------------
-# 4) JOIN + GROUP BY — median lactate per admission type
+# 4) JOIN + GROUP BY – median lactate per admission type
 # ---------------------------------------------------------------------------
-cat("\n=== 4) JOIN + GROUP BY — median lactate per Aufnahmegrund ===\n")
+cat("\n=== 4) JOIN + GROUP BY – median lactate per Aufnahmegrund ===\n")
 res4 <- dbGetQuery(con, "
   SELECT
       k.aufnahmegrund,
@@ -138,9 +138,9 @@ res5 <- dbGetQuery(con, "
 print(res5)
 
 # ---------------------------------------------------------------------------
-# 6) CTE — high-risk Sepsis patients (SOFA >= 8)
+# 6) CTE – high-risk Sepsis patients (SOFA >= 8)
 # ---------------------------------------------------------------------------
-cat("\n=== 6) CTE — lactate in high-risk Sepsis (SOFA >= 8) ===\n")
+cat("\n=== 6) CTE – lactate in high-risk Sepsis (SOFA >= 8) ===\n")
 res6 <- dbGetQuery(con, "
   WITH high_risk AS (
       SELECT patient_id
@@ -159,9 +159,9 @@ res6 <- dbGetQuery(con, "
 print(res6)
 
 # ---------------------------------------------------------------------------
-# 7) Three-way JOIN — cohort + labs + vitals at admission day
+# 7) Three-way JOIN – cohort + labs + vitals at admission day
 # ---------------------------------------------------------------------------
-cat("\n=== 7) Three-way JOIN — kohorte + labor + vitalwerte day 0 (Sepsis) ===\n")
+cat("\n=== 7) Three-way JOIN – kohorte + labor + vitalwerte day 0 (Sepsis) ===\n")
 res7 <- dbGetQuery(con, "
   SELECT
       k.patient_id,

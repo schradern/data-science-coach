@@ -29,7 +29,7 @@ dieser Akutsituation die 30-Tage-Mortalität, oder sind Patient:innen mit Diabet
 
 ## 2 DAG-Denken
 
-Ein DAG ist ein gerichtetes azyklisches Diagramm: Pfeile stehen für angenommene
+Ein DAG ist ein gerichteter azyklischer Graph: Pfeile stehen für angenommene
 kausale Beziehungen.
 
 Beispiel:
@@ -56,10 +56,12 @@ Adjustierung für den Confounder `alter` sinkt es auf ≈ 1,59 (95%-KI [0,90;
 **Stolperstein:** Adjustiert man zusätzlich für `sofa_score`, obwohl der DAG
 oben `Diabetes → SOFA → Mortalität` zeigt (SOFA ist hier **Mediator**, nicht
 Confounder), fällt die OR auf ≈ 0,99, praktisch keine Assoziation mehr. Das
-ist kein „genauerer" Effekt, sondern eine andere Frage: Man hat den Pfad
+ist kein „genauerer“ Effekt, sondern eine andere Frage: Man hat den Pfad
 blockiert, über den Diabetes tatsächlich wirkt, und schätzt nur noch den
-direkten, nicht den totalen Effekt. Für die Frage „Wie stark beeinflusst
-Diabetes insgesamt die Mortalität?" ist die SOFA-adjustierte Zahl **falsch**.
+direkten, nicht den totalen Effekt (und selbst den nur, wenn auch alle
+gemeinsamen Ursachen von SOFA und Mortalität, etwa der Aufnahmegrund Sepsis, im
+Modell stehen). Für die Frage „Wie stark beeinflusst Diabetes insgesamt die
+Mortalität?“ ist die SOFA-adjustierte Zahl **falsch**.
 
 > [!TIP]
 > **Das Simpson-Paradoxon als Extremfall des Confoundings**  
@@ -91,7 +93,9 @@ Gewicht nicht exponiert = 1 / (1 - PS)
 Danach prüfen wir Balance mit **Standardized Mean Difference (SMD)**. Ziel:
 SMD < 0,1 für wichtige Confounder. In dieser Kohorte sinkt die SMD für
 `alter` durch die Gewichtung von ≈ 0,58 auf ≈ 0,13, deutlich näher an
-Balance. `sofa_score` bleibt bewusst unbalanciert (rohe SMD ≈ 0,54): Da es
+Balance, aber noch über der Zielmarke. In einer echten Analyse wäre das der
+Anlass, das PS-Modell flexibler zu machen (z. B. Alter als Spline) und die
+größten Gewichte zu prüfen. `sofa_score` bleibt bewusst unbalanciert (rohe SMD ≈ 0,54): Da es
 ein Mediator ist, wird es nicht als PS-Balance-Ziel behandelt, ein
 Ungleichgewicht dort ist erwartbar und kein Hinweis auf ein fehlerhaftes
 PS-Modell.
@@ -101,8 +105,9 @@ Unbekannte oder ungemessene Confounder bleiben das zentrale Risiko.
 
 **Stolperstein:** Wenn du das gewichtete Outcome-Modell rechnest (IPTW → ATE, siehe
 `code/`), brauchst du einen **robusten (Sandwich-)Standardfehler**. IPW-Gewichte sind
-*keine* Häufigkeiten; behandelt man sie als solche (`freq_weights` in Python bzw.
-`weights` mit `quasibinomial` in R), wird das Konfidenzintervall künstlich zu schmal.
+*keine* Häufigkeiten; nimmt man den modellbasierten Standardfehler
+(`freq_weights` in Python bzw. `weights` ohne Sandwich in R, ob mit `binomial`
+oder `quasibinomial`), wird das Konfidenzintervall künstlich zu schmal.
 Korrekt ist `var_weights` + `cov_type="HC0"` (Python) bzw.
 `lmtest::coeftest(fit, vcov = sandwich::vcovHC(fit, "HC0"))` (R). Auf den Kursdaten ergibt
 das robuste CI `OR ≈ 1,76 [0,99; 3,15]` – es schließt die 1 knapp *ein*, der naive
@@ -120,12 +125,12 @@ from sklearn.linear_model import LogisticRegression
 df = pd.read_csv("{{DATEN}}kohorte.csv")
 df["diabetes"] = df["diabetes"].astype(int)
 
-# alter = Confounder -> adjustieren. sofa_score = Mediator auf dem
-# Diabetes-Pfad -> NICHT adjustieren, wenn der totale Effekt interessiert.
+# alter = confounder -> adjust. sofa_score = mediator on the
+# diabetes path -> do NOT adjust if the total effect is of interest.
 crude = smf.logit("verstorben_30d ~ diabetes", data=df).fit(disp=False)
 adj = smf.logit("verstorben_30d ~ diabetes + alter", data=df).fit(disp=False)
 
-X = df[["alter"]]   # nur Confounder, keine Mediatoren im PS-Modell
+X = df[["alter"]]   # confounders only, no mediators in the PS model
 ps_model = LogisticRegression(max_iter=1000).fit(X, df["diabetes"])
 df["ps"] = ps_model.predict_proba(X)[:, 1]
 df["iptw"] = np.where(df["diabetes"].eq(1), 1 / df["ps"], 1 / (1 - df["ps"]))
@@ -139,12 +144,12 @@ Das vollständige Skript liegt unter [`code/python.py`](code/python.py).
 library(tidyverse)
 
 df <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
-# alter = Confounder -> adjustieren. sofa_score = Mediator auf dem
-# Diabetes-Pfad -> NICHT adjustieren, wenn der totale Effekt interessiert.
+# alter = confounder -> adjust. sofa_score = mediator on the
+# diabetes path -> do NOT adjust if the total effect is of interest.
 summary(glm(verstorben_30d ~ diabetes, data = df, family = binomial))
 summary(glm(verstorben_30d ~ diabetes + alter, data = df, family = binomial))
 
-ps_fit <- glm(diabetes ~ alter, data = df, family = binomial)  # nur Confounder
+ps_fit <- glm(diabetes ~ alter, data = df, family = binomial)  # confounders only
 df <- df |>
   mutate(ps = predict(ps_fit, type = "response"),
          iptw = if_else(diabetes == 1, 1 / ps, 1 / (1 - ps)))
@@ -161,7 +166,7 @@ Ein ehrlicher Satz:
 > Effekt unterschätzen. Diese Analyse kontrolliert gemessene Confounder, kann
 > aber ungemessene Confounding-Strukturen nicht ausschließen.
 
-> **Wann du Hilfe holst.** Sobald plausibel ungemessene Confounder bestehen, der Adjustierungs-Satz aus dem DAG strittig ist, oder eine Variable zugleich Mediator und Confounder sein könnte, hol methodische Beratung — kein Adjustierungsverfahren rettet ein Kausalstatement, dessen Annahmen nicht haltbar sind.
+> **Wann du Hilfe holst.** Sobald plausibel ungemessene Confounder bestehen, der Adjustierungs-Satz aus dem DAG strittig ist, oder eine Variable zugleich Mediator und Confounder sein könnte, hol methodische Beratung – kein Adjustierungsverfahren rettet ein Kausalstatement, dessen Annahmen nicht haltbar sind.
 
 ## Fallstricke und Merksätze
 
@@ -172,7 +177,7 @@ Ein ehrlicher Satz:
 
 ## Selbstcheck
 
-1. **Was unterscheidet Confounder und Mediator?**, Ein Confounder verursacht Exposure und Outcome; ein Mediator liegt auf dem Pfad von Exposure zu Outcome.
-2. **Warum kann Adjustierung Bias erzeugen?**, Wenn man für einen Kollider oder Mediator adjustiert, kann man falsche Pfade öffnen oder den interessierenden Effekt blockieren.
-3. **Was zeigt SMD?**, Ob Kovariaten zwischen Expositionsgruppen balanciert sind, unabhängig von Stichprobengröße.
+1. **Was unterscheidet Confounder und Mediator?** – Ein Confounder verursacht Exposure und Outcome; ein Mediator liegt auf dem Pfad von Exposure zu Outcome.
+2. **Warum kann Adjustierung Bias erzeugen?** – Wenn man für einen Kollider oder Mediator adjustiert, kann man falsche Pfade öffnen oder den interessierenden Effekt blockieren.
+3. **Was zeigt SMD?** – Ob Kovariaten zwischen Expositionsgruppen balanciert sind, unabhängig von Stichprobengröße.
 

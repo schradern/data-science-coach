@@ -61,7 +61,7 @@ y <- df$verstorben_30d; score <- df$laktat_mmol_l
 roc_obj <- roc(y, score, quiet = TRUE, direction = "<")
 cat("AUC", as.numeric(auc(roc_obj)), "\n")
 
-# Youden an den beobachteten Cutoffs (Konvention pred = score >= t, wie sklearn)
+# Youden at the observed cutoffs (convention pred = score >= t, as in sklearn)
 cutoffs <- sort(unique(score))
 j <- vapply(cutoffs, function(t) {
   pred <- score >= t
@@ -83,9 +83,9 @@ Sensitivität.
 
 **Stolperstein – In-sample-Optimismus:** Die Youden-Schwelle wird hier an
 *denselben* Daten gewählt, an denen wir sie anschließend bewerten. Diese
-Sensitivität/Spezifität ist deshalb **optimistisch verzerrt**: An der
-Ausschöpfung des Zufallsrauschens (welcher Cutoff auf *diesen* 414 Patient:innen
-zufällig am besten trennt) beteiligt sich das Modell selbst. Auf unabhängigen
+Sensitivität/Spezifität ist deshalb **optimistisch verzerrt**: Gewählt wird der
+Cutoff, der auf *diesen* 414 Patient:innen am besten trennt, und damit auch
+derjenige, der ihr Zufallsrauschen am besten ausnutzt. Auf unabhängigen
 Daten fällt die Leistung typischerweise schlechter aus. Eine ehrliche Schätzung
 braucht Kreuzvalidierung oder einen Testdatensatz (siehe Module 24/25). Youden
 ist ein statistischer Kompromiss; klinisch kann eine niedrigere Schwelle
@@ -150,12 +150,13 @@ Auf den Kursdaten (identisch in beiden Sprachen):
 | 0,20  | 0,0072    | −0,0417           | 0 |
 | 0,25  | 0,0008    | −0,1111           | 0 |
 
-Bei $p_t = 0{,}10$ ist das Modell nicht von „alle behandeln" zu unterscheiden.
-Nur im Bereich um $p_t \approx 0{,}15$–$0{,}22$ liegt das Modell über **beiden**
-Referenzstrategien, und auch dort nur knapp, passend zur schwachen AUC ≈ 0,58.
+Bei $p_t = 0{,}10$ ist das Modell nicht von „alle behandeln“ zu unterscheiden.
+Nur zwischen $p_t = 0{,}10$ und knapp über $0{,}25$ liegt das Modell über **beiden**
+Referenzstrategien, und auch dort nur knapp (bei 0,25 noch um 0,0008), passend
+zur schwachen AUC ≈ 0,58.
 
 **Warum Youden das nicht leistet:** Youden liefert eine einzige Schwelle auf dem
 Rohscore und gewichtet FP und FN gleich. Der Net Benefit dagegen variiert die
 Schwellenwahrscheinlichkeit $p_t$ und macht damit explizit, wie viele falsch
 Positive ein vermiedener falsch Negativer wert ist ($(1-p_t)/p_t$), und bezieht
-die Prävalenz über die „alle behandeln"-Linie mit ein. Modul 25 vertieft das.
+die Prävalenz über die „alle behandeln“-Linie mit ein. Modul 25 vertieft das.
