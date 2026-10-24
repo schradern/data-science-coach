@@ -3,16 +3,16 @@
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
 # Code is English; dataset column names stay German.
-# R NLP for German text is limited without internet access; this script
-# demonstrates the tidytext workflow and logistic regression.
+# Same model as python.py: TF-IDF over unigrams and bigrams, fitted on the
+# training notes only, then a penalised logistic regression (glmnet).
 
 suppressPackageStartupMessages({
-  missing_pkgs <- setdiff(c("tidyverse", "tidytext", "tidymodels"), rownames(installed.packages()))
+  missing_pkgs <- setdiff(c("tidyverse", "tidytext", "tidymodels", "glmnet"), rownames(installed.packages()))
   if (length(missing_pkgs) > 0) {
     message("Missing R packages: ", paste(missing_pkgs, collapse = ", "))
     message("This lesson cannot run without them; nothing was computed.")
     message("Full per-module package list: DEPENDENCIES-R.md")
-    message("Install with: install.packages(c('tidyverse', 'tidytext', 'tidymodels'))")
+    message("Install with: install.packages(c('tidyverse', 'tidytext', 'tidymodels', 'glmnet'))")
     quit(save = "no", status = 1)
   }
   library(tidyverse)
@@ -31,50 +31,72 @@ cat("=== 1) Dataset overview ===\n")
 cat(sprintf("  %d notes | %.1f%% positive\n",
             nrow(notes), 100 * mean(notes$verschlechterung)))
 
-# Tokenise and compute tf-idf per document
-tidy_tokens <- notes |>
-  mutate(doc_id = row_number()) |>
-  unnest_tokens(word, notiz) |>
-  count(doc_id, word, name = "n") |>
-  bind_tf_idf(word, doc_id, n)
+docs <- notes |> mutate(doc_id = row_number())
 
-# Top tokens by mean tf-idf (rough importance proxy without a model)
-top_tokens <- tidy_tokens |>
-  group_by(word) |>
-  summarise(mean_tfidf = mean(tf_idf), .groups = "drop") |>
-  slice_max(mean_tfidf, n = 10)
+# ---- 2) Split FIRST, then learn vocabulary and IDF on the training notes ----
+# Like python.py's Pipeline: a vocabulary or IDF computed on all notes would
+# let the test notes leak into the features.
+split <- initial_split(docs, prop = 0.75, strata = verschlechterung)
+train_docs <- training(split)
+test_docs  <- testing(split)
 
-cat("\n=== 2) Top 10 tokens by mean TF-IDF ===\n")
-print(top_tokens)
-
-# Train/test split + logistic regression via tidymodels (document-level)
-# We join aggregated tf-idf features back onto the document level.
-doc_features <- tidy_tokens |>
-  group_by(doc_id) |>
-  summarise(
-    mean_tfidf  = mean(tf_idf),
-    n_tokens    = sum(n),
-    .groups = "drop"
+# Unigrams + bigrams, as in python.py (ngram_range = (1, 2)).
+count_terms <- function(df) {
+  bind_rows(
+    df |> unnest_tokens(term, notiz),
+    df |> unnest_tokens(term, notiz, token = "ngrams", n = 2) |> filter(!is.na(term))
   ) |>
-  left_join(notes |> mutate(doc_id = row_number()) |>
-              select(doc_id, verschlechterung), by = "doc_id") |>
-  mutate(verschlechterung = factor(verschlechterung, levels = c(1, 0)))
+    count(doc_id, term, name = "n")
+}
+train_counts <- count_terms(train_docs)
+test_counts  <- count_terms(test_docs)
 
-split  <- initial_split(doc_features, prop = 0.75, strata = verschlechterung)
-train  <- training(split)
+# Vocabulary and IDF from the training notes only: min_df = 2, max_df = 0.95,
+# smoothed IDF and sublinear tf, the same settings as sklearn's TfidfVectorizer.
+n_train <- nrow(train_docs)
+vocab <- train_counts |>
+  count(term, name = "doc_freq") |>
+  filter(doc_freq >= 2, doc_freq <= 0.95 * n_train) |>
+  mutate(idf = log((1 + n_train) / (1 + doc_freq)) + 1, col = row_number())
 
-rec <- recipe(verschlechterung ~ mean_tfidf + n_tokens, data = train) |>
-  step_normalize(all_numeric_predictors())
+tfidf_matrix <- function(counts, doc_ids) {
+  weighted <- counts |>
+    inner_join(vocab, by = "term") |>
+    mutate(row = match(doc_id, doc_ids), value = (1 + log(n)) * idf) |>
+    group_by(row) |>
+    mutate(value = value / sqrt(sum(value^2))) |>   # L2 row normalisation
+    ungroup()
+  Matrix::sparseMatrix(i = weighted$row, j = weighted$col, x = weighted$value,
+                       dims = c(length(doc_ids), nrow(vocab)),
+                       dimnames = list(NULL, vocab$term))
+}
+X_train <- tfidf_matrix(train_counts, train_docs$doc_id)
+X_test  <- tfidf_matrix(test_counts, test_docs$doc_id)
+y_train <- train_docs$verschlechterung
+y_test  <- test_docs$verschlechterung
+cat(sprintf("\n=== 2) Train/test split: %d / %d notes | vocabulary (train only): %d unigrams/bigrams ===\n",
+            nrow(train_docs), nrow(test_docs), nrow(vocab)))
 
-spec   <- logistic_reg() |> set_engine("glm")
-wf     <- workflow() |> add_recipe(rec) |> add_model(spec)
-fitted <- fit(wf, data = train)
+# ---- 3) Ridge-penalised logistic regression on the full TF-IDF matrix -------
+# class weights 'balanced' as in python.py; lambda chosen by 5-fold CV (AUC)
+# inside the training set.
+weights <- ifelse(y_train == 1, n_train / (2 * sum(y_train == 1)),
+                  n_train / (2 * sum(y_train == 0)))
+cv_fit <- glmnet::cv.glmnet(X_train, y_train, family = "binomial", alpha = 0,
+                            weights = weights, type.measure = "auc", nfolds = 5)
+cat(sprintf("\n=== 3) 5-fold CV-AUC (training set only): %.3f ===\n", max(cv_fit$cvm)))
 
-test_pred <- augment(fitted, new_data = testing(split))
-auc_val   <- roc_auc(test_pred, truth = verschlechterung,
-                     .pred_1, event_level = "first")$.estimate
+proba <- as.numeric(predict(cv_fit, newx = X_test, s = "lambda.min", type = "response"))
+test_auc <- roc_auc_vec(factor(y_test, levels = c(1, 0)), proba, event_level = "first")
+cat(sprintf("\n=== 4) Held-out test AUC: %.3f ===\n", test_auc))
 
-cat(sprintf("\n=== 3) Held-out test AUC (aggregate features only): %.3f ===\n", auc_val))
-cat("Note: Full TF-IDF feature matrices require specialised R packages\n")
-cat("(e.g., textrecipes). The Python pipeline in code/python.py is the\n")
-cat("primary implementation for this module.\n")
+# ---- 5) Most predictive tokens ----------------------------------------------
+coefs <- as.matrix(coef(cv_fit, s = "lambda.min"))[-1, 1]
+top <- head(coefs[order(abs(coefs), decreasing = TRUE)], 15)
+cat("\n=== 5) Most predictive tokens (largest |log-odds coefficient|) ===\n")
+print(tibble(token = names(top), koeffizient = round(unname(top), 3)) |>
+        arrange(desc(koeffizient)), n = 15)
+cat("\nA bag-of-words model ignores word order and negation context.\n")
+cat("R and python.py draw different train/test splits and tune the penalty differently\n")
+cat("(cv.glmnet here, C = 1 there): with 126 test notes, AUC differences of several\n")
+cat("points between the two tracks are sampling noise, not a better model.\n")

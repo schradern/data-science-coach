@@ -23,6 +23,7 @@ Jede Textverarbeitung beginnt damit, den Rohstring in **Tokens** zu zerlegen. Ei
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/31-klinische-texte-llm/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.feature_extraction.text import TfidfVectorizer
 vec = TfidfVectorizer(ngram_range=(1, 2), min_df=2, max_df=0.95)
 X_tfidf = vec.fit_transform(texts)   # shape: (n_docs, vocab_size)
@@ -41,6 +42,7 @@ X_tfidf = vec.fit_transform(texts)   # shape: (n_docs, vocab_size)
 Seltene, spezifische Wörter (z. B. „Laktat“) erhalten hohe Gewichte; universelle Wörter (z. B. „Patient“) werden abgewertet. Das Ergebnis ist eine dünn besetzte Matrix; `code/python.py` druckt die Vokabulargröße aus – für die 375 Trainingsnotizen entstehen **742** Spalten (Unigramme und Bigramme, `min_df=2`, `max_df=0.95`).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -60,6 +62,7 @@ pipe.fit(X_train, y_train)
 Die Pipeline wird auf `verschlechterung` (0/1) trainiert. Als Gütekriterium wählen wir die **AUC-ROC**, sie ist unabhängig von der Schwelle, und das Label ist leicht unbalanciert (34,6 % positiv).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.metrics import roc_auc_score, classification_report
 
 proba = pipe.predict_proba(X_test)[:, 1]
@@ -80,6 +83,7 @@ print(classification_report(y_test, pipe.predict(X_test), target_names=["stabil"
 Die Koeffizienten der logistischen Regression sind Log-Odds-Gewichte pro Token (genauer: pro Einheit seines TF-IDF-Werts). Positive Koeffizienten zeigen ein Verschlechterungs-Signal, negative stehen für stabile Verläufe.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import numpy as np
 import pandas as pd
 

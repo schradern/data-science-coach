@@ -108,6 +108,23 @@ if (epv < 10) {
   cat("  EPV >= 10 – model complexity is defensible.\n")
 }
 
+# Sensitivity: verstorben_30d counts an OBSERVED death only, so a patient lost
+# to follow-up before day 30 enters as 0. Refit on patients whose 30-day
+# outcome is known (fu_vollstaendig_30d == 1) and compare the ORs.
+complete <- df[df$fu_vollstaendig_30d == 1, ]
+fit_complete <- update(fit_logistic, data = complete)
+n_dropped <- nrow(df) - nrow(complete)
+cat(sprintf(
+  "\n--- Sensitivity: only patients with complete 30-day follow-up (%d of %d, %d dropped) ---\n",
+  nrow(complete), nrow(df), n_dropped
+))
+cat(sprintf("%-16s%10s%14s\n", "Predictor", "OR all", "OR complete"))
+for (p in preds) {
+  cat(sprintf("%-16s%10.3f%14.3f\n", p, or_est[[p]], exp(coef(fit_complete))[[p]]))
+}
+cat(sprintf("Deaths among the %d dropped patients: %d (an unobserved death cannot be counted).\n",
+            n_dropped, sum(df$verstorben_30d[df$fu_vollstaendig_30d == 0])))
+
 # ---------------------------------------------------------------------------
 # Section 2 – OLS: length of stay
 # ---------------------------------------------------------------------------

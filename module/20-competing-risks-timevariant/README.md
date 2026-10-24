@@ -148,9 +148,13 @@ Für Multivariaten-Analysen bei konkurrierenden Risiken gibt es zwei etablierte 
    * *Interpretation:* Wie beeinflussen die Kovariaten das tatsächliche Auftreten des Zielereignisses in
      der Population über die Zeit. Gut für klinische Prognosefragen und ökonomische Evaluationen.
 
+<!-- excerpt-note -->
+> **Hinweis – die Codeblöcke ab hier sind Auszüge.** Sie setzen die aufbereiteten Daten aus dem Skript voraus. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/20-competing-risks-timevariant/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
+
 ### Cause-Specific Cox (Python und R)
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from lifelines import CoxPHFitter
 
 cs_df = df[["event_time", "event_state", "alter", "sofa_score", "diabetes"]].copy()
@@ -238,6 +242,7 @@ Klassifiziert man die Exposition **naiv als Baseline-Kovariate** (an Tag 0 fixie
 Immortal Time Bias:
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from lifelines import CoxPHFitter, CoxTimeVaryingFitter
 
 # df: event_time, death, ever_vasopressor, sofa_score

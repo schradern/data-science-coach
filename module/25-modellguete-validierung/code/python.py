@@ -176,8 +176,10 @@ def main() -> None:
     proba = pipe.predict_proba(X_test)[:, 1]
 
     # --- 1) Discrimination ---------------------------------------------------
-    # Ranking metrics (AUC, PR-AUC) only depend on the ORDER of scores, so
-    # class_weight="balanced" does not distort them – use the raw pipeline.
+    # Ranking metrics (AUC, PR-AUC) only depend on the ORDER of scores. A
+    # monotone rescaling of fixed scores leaves them unchanged; REFITTING with
+    # class_weight="balanced" is a different model and can reorder patients
+    # (compared below).
     print("=== 1) Diskriminierung: ROC-AUC und PR-AUC ===")
     auc_roc = roc_auc_score(y_test, proba)
     auc_pr  = average_precision_score(y_test, proba)
@@ -191,6 +193,10 @@ def main() -> None:
     print(f"  Ereignisrate im Testset:  {event_rate:.3f}")
     print(f"  ROC-AUC:                  {auc_roc:.3f}  (95%-Bootstrap-KI {auc_lo:.3f}–{auc_hi:.3f})")
     print(f"  PR-AUC:                   {auc_pr:.3f}  (95%-Bootstrap-KI {pr_lo:.3f}–{pr_hi:.3f}, Baseline = {event_rate:.3f})")
+    unweighted = build_pipeline().set_params(model__class_weight=None).fit(X_train, y_train)
+    auc_unweighted = roc_auc_score(y_test, unweighted.predict_proba(X_test)[:, 1])
+    print(f"  ROC-AUC ohne class_weight (neu gefittet): {auc_unweighted:.4f} "
+          f"vs. mit: {auc_roc:.4f} – anderes Modell, andere Rangfolge")
 
     # --- 1b) Recalibrate before touching absolute probabilities ---------------
     # class_weight="balanced" reweights the loss as if the two classes were

@@ -189,7 +189,7 @@ Neben der geordneten Liste brauchst du zwei weitere Sammlungen:
   JSON-Antwort aufgebaut (Modul 04).
 
 - **Tupel (`tuple`)** – eine kleine, **feste** Wertegruppe, die sich nicht mehr
-  ändert, z. B. die Form einer Tabelle `(500, 16)` (unsere Kohorte, siehe Abschnitt 5).
+  ändert, z. B. die Form einer Tabelle `(500, 17)` (unsere Kohorte, siehe Abschnitt 5).
 
 ```python
 patient = {"alter": 67, "diagnose": "Sepsis", "sofa": 8}
@@ -387,7 +387,7 @@ import pandas as pd
 
 cohort = pd.read_csv("{{DATEN}}kohorte.csv")
 
-print(cohort.shape)                              # (500, 16)
+print(cohort.shape)                              # (500, 17)
 print(cohort.dtypes)                             # types per column
 print(cohort[["alter", "sofa_score"]].head(5))   # select columns
 
@@ -418,7 +418,7 @@ library(dplyr)
 library(readr)
 cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 
-dim(cohort)                                      # 500 16
+dim(cohort)                                      # 500 17
 glimpse(cohort)
 cohort |> select(alter, sofa_score) |> head(5)
 

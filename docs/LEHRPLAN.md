@@ -18,7 +18,9 @@ gleiches Ergebnis), **Zugänglichkeit** (klinische Beispiele, deutsche Sprache).
 
 - **Python zuerst** – durchgehende Leitsprache, jedes Konzept zuerst in Python.
 - **R parallel** – dasselbe Ergebnis idiomatisch in R (`tidyverse`), für die
- klinisch-statistische Community. Jede Lektion zeigt beide Wege nebeneinander.
+ klinisch-statistische Community. Die Lektionen zeigen beide Wege nebeneinander,
+ so weit die R-Spur reicht; wo sie kürzer ist, steht das in der Tabelle
+ „R-Abdeckung“ unten.
 
 - **SQL als Werkzeug** – fokussiert auf Datenextraktion (Modul 05: Datenbank-Abfragen mit SQL), später
  punktuell eingebunden.
@@ -231,13 +233,45 @@ KI-System Patient:innenversorgung verbessert, nicht nur Metriken.
 Dies ist die kanonische Liste (sieben Pfade); Modul 01 zeigt dieselben Pfade
 als Einstiegsorientierung.
 
-- **Mein erstes Paper (statistischer Shortcut)** · 7 Module: 02–03 → 06 → 09–10 → 12 → 22
-- **Schnell zur Auswertung** · 6 Module: 02–03 → 06 → 08–10
-- **Datenextraktion im Fokus** · 5 Module: 02 → 04–07
-- **Klinische Forschung / Publikation** · 15 Module: 06 → 09–22
+- **Mein erstes Paper (statistischer Shortcut)** · 9 Module: 02–04 → 06 → 08–10 → 12 → 22
+- **Schnell zur Auswertung** · 7 Module: 02–04 → 06 → 08–10
+- **Datenextraktion im Fokus** · 6 Module: 02–07
+- **Klinische Forschung / Publikation** · 16 Module: 06 → 08–22
+  - Setzt Module 02–04 voraus (Umgebung, Grundlagen, Daten einlesen).
 - **Statistik-Vertiefung** · 13 Module: 09–21
+  - Setzt Module 02–04, 06 und 08 voraus, also den Pfad „Schnell zur Auswertung“ bis Modul 08.
 - **Machine Learning / KI** · 12 Module: 23–34
+  - Setzt Module 10 und 12 voraus (Inferenz, Regression), für Modul 28 zusätzlich Modul 17 (Survival).
 - **Vollständig** · 34 Module: 01–34 in didaktischer Reihenfolge
+
+Jeder Pfad enthält die Voraussetzungen seiner Module, die Vertiefungspfade nennen
+ihr Vorwissen darunter. Welche Module ein Modul voraussetzt, steht oben in jeder Lektion.
+
+## R-Abdeckung
+
+Jedes Modul hat ein R-Skript (`code/r.R`). In den Modulen 01–11, 15–20, 22, 28,
+32–34 rechnet es dieselben Analysen wie `code/python.py`. In den übrigen ist es
+**teilweise** – der Kern läuft in R, einzelne Abschnitte nur in Python:
+
+| Modul | fehlt in `code/r.R` |
+|---|---|
+| 12 Regression | Confounder-/Mediator-Vergleich (Abschnitt 2b) |
+| 13 Studiendesign | Power bei beobachtetem n |
+| 14 Fehlende Werte | Outcome im Imputationsmodell weglassen (5b) |
+| 21 Testwahl | Cramérs V |
+| 23 Machine Learning | Kalibrierungstabelle |
+| 24 Prädiktions-Workflow | Leakage-Demo, Schwellenwahl |
+| 25 Modellgüte | Rekalibrierung, Bootstrap-Optimismus |
+| 26 Ensembles | Tiefen-Sweep, Lernraten-Tabelle, LightGBM |
+| 27 Erklärbarkeit | Prädiktivitäts-Check (CV-AUC) |
+| 29 Phänotypisierung | Benennung der Phänotypen |
+| 30 Deep Learning | Lernkurve, Alpha-Sweep |
+| 31 Klinische Texte | Klassifikationsbericht (Präzision/Recall/F1) |
+
+**Musterlösungen nur in Python** gibt es in den Modulen 02, 05, 14, 15, 17, 21
+und 24–32. Wer dort in R arbeitet, findet die passenden Schritte im R-Skript
+des Moduls; die Aufgaben selbst lassen sich mit den Funktionen aus der Lektion
+lösen.
 
 ## Durchgängiger Datensatz
 

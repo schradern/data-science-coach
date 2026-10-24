@@ -19,6 +19,7 @@ Ein trainiertes scikit-learn-Objekt wird mit `joblib.dump` als komprimierte Bin�
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/32-einsatz-governance/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import joblib
 
 # Save
@@ -106,6 +107,7 @@ Modelle altern. Zwei Hauptursachen:
 Wir simulieren **Konzept-Drift** durch gezieltes Label-Flipping: Ein wachsender Anteil der Testlabels wird invertiert. Das modelliert den Fall, in dem sich die Beziehung zwischen Textsignal und Outcome verändert, etwa weil geänderte Dokumentationspraktiken oder Therapieprotokolle die alten Signal-Tokens unzuverlässig machen.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import numpy as np
 
 rng = np.random.default_rng(SEED)
@@ -135,6 +137,7 @@ for flip_rate in [0.00, 0.05, 0.10, 0.15, 0.20]:
 Ein gutes mittleres AUC kann starke Leistungsunterschiede zwischen Subgruppen verdecken. Im klinischen Kontext ist Gleichheit nach `geschlecht`, Altersgruppe oder Ethnizität (soweit dokumentiert) eine ethische und zunehmend regulatorische Anforderung. Bei kleinen Subgruppen ist die AUC-Schätzung aber hochvariabel – **ein Bootstrap-Konfidenzintervall ist deshalb Pflicht**, nicht optional, bevor eine Lücke als real gilt.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import numpy as np
 from sklearn.metrics import roc_auc_score
 

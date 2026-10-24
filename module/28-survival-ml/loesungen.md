@@ -1,5 +1,26 @@
 # Musterlösungen · Maschinelles Lernen für Überlebenszeiten
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+lesson = runpy.run_path("module/28-survival-ml/code/python.py")
+SEED, FEATURES, build_data, impute_and_scale, make_survival_array = (
+    lesson[name] for name in ("SEED", "FEATURES", "build_data", "impute_and_scale",
+                              "make_survival_array"))
+X, events, times = build_data()
+(X_train, X_test, events_train, events_test,
+ times_train, times_test) = train_test_split(
+    X, events, times, test_size=0.25, stratify=events, random_state=SEED)
+X_tr_np, X_te_np = impute_and_scale(X_train, X_test)
+surv_train = make_survival_array(events_train, times_train)
+surv_test = make_survival_array(events_test, times_test)
+```
+
 ## Aufgabe 1 – Zensierung verstehen
 Ein **zensierter** Patient ist eine Person, die das Beobachtungsfenster (30 Tage)
 verlassen hat, **ohne** das Zielereignis (Tod) erlebt zu haben, in diesem

@@ -152,6 +152,8 @@ Für neue oder überarbeitete Module gilt deshalb zusätzlich:
 
 > **Teil N – Teiltitel** · Dauer: ~XX min · Voraussetzung: Modul …
 
+<!-- Dauer = Lektion ohne Übungen. Den Übungsaufwand nennt uebungen.md oben. -->
+
 ## Lernziele
 - …
 

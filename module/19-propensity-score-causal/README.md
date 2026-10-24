@@ -195,7 +195,7 @@ SMD bleibt identisch.
 | Methode | Estimand | Odds Ratio | 95 %-CI |
 |---|---|---|---|
 | Roh (unadjustiert) | – (nur Assoziation) | 2,07 | [1,19; 3,58] |
-| Gematcht (Caliper), 93 Paare | **ATT** (Effekt bei den Behandelten) | 1,39 | [0,71; 2,70] |
+| Gematcht (Caliper), 93 Paare | **ATT** (Effekt bei den Behandelten) | 1,39 | [0,73; 2,64] |
 | IPW-gewichtet | **ATE** (Effekt in der Gesamtkohorte) | 1,86 | [1,03; 3,36] |
 
 Die Zahlen stammen aus `code/python.py`. `code/r.R` vergibt beim gierigen Matching wegen numerisch

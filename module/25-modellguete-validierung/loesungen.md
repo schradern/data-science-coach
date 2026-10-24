@@ -1,5 +1,25 @@
 # Musterlösungen · Bewertung der Modellgüte und klinische Validierung
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+lesson = runpy.run_path("module/25-modellguete-validierung/code/python.py")
+SEED, build_pipeline, bootstrap_optimism = (
+    lesson[name] for name in ("SEED", "build_pipeline", "bootstrap_optimism"))
+features = lesson["NUMERIC"] + lesson["CATEGORICAL"] + lesson["BINARY"]
+df = lesson["load_cohort"]().merge(lesson["load_labs"](), on="patient_id", how="left")
+X, y = df[features], df[lesson["TARGET"]]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=SEED)
+pipe = build_pipeline().fit(X_train, y_train)
+proba = pipe.predict_proba(X_test)[:, 1]
+```
+
 ## Aufgabe 1 – AUC-Vergleich bei Klassenungleichheit
 ```python
 from sklearn.metrics import roc_auc_score, average_precision_score

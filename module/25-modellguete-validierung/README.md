@@ -37,6 +37,7 @@ zufälligen Ereignisfall einen höheren Score gibt als einem zufälligen Nicht-E
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/25-modellguete-validierung/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
 
@@ -67,10 +68,15 @@ mit „AUC 0,84“ ist mit diesen Daten von einem mit AUC 0,72 kaum zu untersche
 Berichte darum jeden Gütewert mit Konfidenzintervall (Bootstrap oder DeLong);
 das gilt auch für den Subgruppenvergleich in Modul 32.
 
-Diese Rangordnungs-Metriken sind gegenüber `class_weight="balanced"` robust:
-Eine monotone Neuskalierung der Scores ändert die Reihenfolge nicht, also auch
-nicht AUC/PR-AUC. Das ändert sich in Abschnitt 2, sobald wir absolute
-Wahrscheinlichkeiten brauchen.
+Diese Rangordnungs-Metriken hängen nur von der Reihenfolge der Scores ab.
+Halte zwei Vorgänge auseinander: Eine **monotone Neuskalierung fester Scores**
+(etwa die Rekalibrierung in Abschnitt 2) ändert die Reihenfolge nicht, also auch
+nicht AUC/PR-AUC. Ein **Neufit mit `class_weight="balanced"`** ist dagegen ein
+anderes Modell mit anderen Koeffizienten, und das kann die Reihenfolge der
+Patient:innen ändern. Auf diesem Split liegt die ROC-AUC mit Gewichtung bei
+0,8436, ohne bei 0,8515. Der Unterschied ist klein gegen das Bootstrap-KI, aber
+er ist nicht null. Absolute Wahrscheinlichkeiten verzerrt die Gewichtung in
+jedem Fall, das behandelt Abschnitt 2.
 
 **PR-AUC** (Precision-Recall) blendet die vielen wahren Negativen aus und bewertet
 nur die Qualität der Alarmierungen, klinisch oft relevanter.
@@ -116,6 +122,7 @@ Ranking, macht `predict_proba()` aber unbrauchbar für alles, was absolute
 Wahrscheinlichkeiten braucht:
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.calibration import CalibratedClassifierCV
 
 print(f"Mittlere vorhergesagte Mortalität (unkalibriert): {proba.mean():.1%}")
@@ -141,6 +148,7 @@ Leakage. Ab hier arbeitet dieses Modul mit `proba_cal`.
 ### 2.1 Kalibrierungskurve und Brier Score
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import brier_score_loss
 
@@ -167,6 +175,7 @@ Zwei erweiterte Kennzahlen aus logistischer Rekalibrierung:
  extrem), >1 = zu konservativ (Scores zu vorsichtig).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import numpy as np
 from scipy.special import logit
 import statsmodels.api as sm
@@ -233,6 +242,7 @@ ist, deshalb verwenden wir hier weiterhin `proba_cal` aus Abschnitt 2.0, nicht
 die rohen, mit `class_weight="balanced"` aufgeblähten Scores.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import numpy as np
 
 def net_benefit(y_true, proba, threshold):
@@ -355,8 +365,9 @@ DCA ist klinisch unvollständig dokumentiert, unabhängig von der AUC.
 > **Wann du Hilfe holst.** Für die externe Validierung, belastbare Kalibrierungsaussagen bei wenigen Ereignissen und eine TRIPOD-konforme Berichterstattung vor Publikation oder Einsatz solltest du Biostatistik und Methodik einbeziehen – interne Optimismus-Korrektur ersetzt keine unabhängige Kohorte.
 
 ## Fallstricke und Merksätze
-- **`class_weight="balanced"` zerstört Kalibrierung.** Rangordnung (AUC) bleibt
- intakt, absolute Wahrscheinlichkeiten sind es nicht. Vor Brier/Kalibrierung/DCA
+- **`class_weight="balanced"` zerstört Kalibrierung.** Die Rangordnung (AUC)
+ ändert sich nur wenig (hier 0,8436 statt 0,8515), absolute Wahrscheinlichkeiten
+ sind dagegen grob verzerrt. Vor Brier/Kalibrierung/DCA
  immer mit `CalibratedClassifierCV` rekalibrieren.
 
 - **AUC ≠ klinischer Nutzen.** Ein gut diskriminierendes Modell kann schlecht
@@ -387,4 +398,4 @@ DCA ist klinisch unvollständig dokumentiert, unabhängig von der AUC.
  Net Benefit des Modells *über* beiden Referenzlinien (alle behandeln, niemanden
  behandeln) liegt. Außerhalb dieses Bereichs bringt das Modell keinen Mehrwert.
 
-4. **Warum berechnen wir in diesem Modul zuerst `CalibratedClassifierCV`, bevor wir Brier Score, Kalibrierungskurve oder DCA anschauen?** – Weil das Modell mit `class_weight="balanced"` trainiert wurde: Das verbessert das Ranking bei seltenen Ereignissen, bläht aber `predict_proba()` systematisch auf (hier im Mittel 41 % statt der beobachteten 15 %). AUC bleibt davon unberührt, aber Brier Score, Kalibrierungskurve, CITL/Slope und DCA werten die Wahrscheinlichkeiten absolut, ohne Rekalibrierung wären sie irreführend.
+4. **Warum berechnen wir in diesem Modul zuerst `CalibratedClassifierCV`, bevor wir Brier Score, Kalibrierungskurve oder DCA anschauen?** – Weil das Modell mit `class_weight="balanced"` trainiert wurde: Das verbessert das Ranking bei seltenen Ereignissen, bläht aber `predict_proba()` systematisch auf (hier im Mittel 41 % statt der beobachteten 15 %). Die AUC verschiebt sich dadurch nur wenig, aber Brier Score, Kalibrierungskurve, CITL/Slope und DCA werten die Wahrscheinlichkeiten absolut, ohne Rekalibrierung wären sie irreführend.

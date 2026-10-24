@@ -62,6 +62,7 @@ Split erhält die Ereignisrate in beiden Mengen.
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/23-machine-learning/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=SEED)
 ```
@@ -91,6 +92,7 @@ und anschließend auf die Testdaten angewendet, nie umgekehrt. Modul 24 macht
 Leakage zum zentralen Thema; hier führen wir das Prinzip ein.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 pipeline = Pipeline([
     ("scale", StandardScaler()),
     ("model", LogisticRegression(max_iter=1000, class_weight="balanced",
@@ -132,6 +134,7 @@ durch Zufall. **Kreuzvalidierung** teilt die Trainingsdaten in k Blöcke, traini
 k-mal auf k–1 Blöcken, prüft auf dem übrigen und mittelt die Ergebnisse.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
 auc_scores = cross_val_score(pipeline, X_train, y_train, cv=cv, scoring="roc_auc")
 print(f"CV-AUC: {auc_scores.mean():.3f} ± {auc_scores.std():.3f}")
@@ -161,6 +164,7 @@ gegen beobachtete Ereignisraten (y-Achse) auf. Eine perfekt kalibrierte Kurve
 liegt auf der Diagonale.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.calibration import calibration_curve
 frac_pos, mean_probs = calibration_curve(y_test, probs, n_bins=5, strategy="quantile")
 ```
@@ -172,6 +176,7 @@ systematisch zu hoch sind. Rekalibrierung mit `CalibratedClassifierCV` bringt
 sie zurück in die Nähe der Diagonale:
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.calibration import CalibratedClassifierCV
 
 calibrated = CalibratedClassifierCV(pipeline, method="sigmoid", cv=5)
@@ -317,4 +322,4 @@ zwischen zwei Sprachen.
 1. **Warum stratifizieren wir beim Train/Test-Split?** – Bei ~16 % Mortalität kann ein zufälliger Split dazu führen, dass das Testset kaum oder gar keine Ereignisse enthält; Stratifizierung erhält die Ereignisrate in beiden Mengen und macht den AUC berechenbar.
 2. **Was verhindert die Pipeline bei der Skalierung?** – Dass der StandardScaler auf den Gesamtdaten (inkl. Testset) gefittet wird; in der Pipeline geschieht das erst nach dem Split auf den Trainingsdaten, kein Leakage.
 3. **Warum ist ein AUC von 0,88 bei einem Mortalitätsmodell mit kleinem Testset ein Ergebnis, das man nicht unkritisch feiern sollte?** – Bei nur ~16 Ereignissen im Testset (N = 100) ist das 95-%-KI des AUC breit; eine sehr hohe AUC kann auch auf Overfitting oder Leakage hindeuten und erfordert externe Validierung, bevor man ihr traut.
-4. **Warum sagt unser Modell im Mittel 46 % Mortalität vorher, obwohl nur 16 % der Testpatient:innen sterben?** – Weil `class_weight="balanced"` die Verlustfunktion so umgewichtet, als wären beide Klassen gleich häufig; das verschiebt die Standardschwelle zugunsten der Sensitivität und lässt die Rangordnung (AUC) praktisch unverändert, verzerrt aber `predict_proba()` als absolute Wahrscheinlichkeit. Vor jeder Kalibrierungsaussage muss zuerst mit `CalibratedClassifierCV` rekalibriert werden.
+4. **Warum sagt unser Modell im Mittel 46 % Mortalität vorher, obwohl nur 16 % der Testpatient:innen sterben?** – Weil `class_weight="balanced"` die Verlustfunktion so umgewichtet, als wären beide Klassen gleich häufig; das verschiebt die Standardschwelle zugunsten der Sensitivität und ändert die Rangordnung (AUC) nur wenig, weil der Neufit ein etwas anderes Modell ergibt, verzerrt aber `predict_proba()` als absolute Wahrscheinlichkeit. Vor jeder Kalibrierungsaussage muss zuerst mit `CalibratedClassifierCV` rekalibriert werden.

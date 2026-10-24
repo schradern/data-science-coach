@@ -43,6 +43,7 @@ Training:
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/26-ensembles-boosting/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -89,6 +90,7 @@ Stichprobe der Daten und mittle die Vorhersagen. Die Varianz sinkt um Faktor B
 der Merkmale, das entkoppelt die Bäume und senkt Korrelation und damit Varianz.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.ensemble import RandomForestClassifier
 
 rf = RandomForestClassifier(
@@ -161,6 +163,7 @@ fehlende Werte **nativ** (kein Imputer nötig). XGBoost und LightGBM gehen dense
 Weg und ergänzen weitere Regularisierung.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.ensemble import HistGradientBoostingClassifier
 
 hgb = HistGradientBoostingClassifier(
@@ -227,6 +230,7 @@ Der finale Vergleich läuft auf denselben Kreuzvalidierungs-Folds, so beruhen di
 Unterschiede nicht auf zufällig verschiedenen Splits.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 models = {
     "Entscheidungsbaum (Tiefe 4)": Pipeline([("pre", pre), ("model", tree)]),
     "Random Forest":               Pipeline([("pre", pre), ("model", rf)]),

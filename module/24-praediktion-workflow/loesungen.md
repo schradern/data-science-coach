@@ -1,8 +1,24 @@
 # Musterlösungen · Workflow für Prädiktionsmodelle und Data Leakage
 
-Die Codeblöcke zu Aufgabe 1–4 setzen auf `code/python.py` auf: `X`, `y`, `cv`,
-`X_train`/`X_test`, `y_train`/`y_test`, `NUMERIC` und `build_pipeline()` stammen von
-dort. Der Bonus-Block läuft für sich allein.
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach; der Bonus-Block läuft auch für sich allein. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.preprocessing import StandardScaler
+
+lesson = runpy.run_path("module/24-praediktion-workflow/code/python.py")
+SEED, NUMERIC, build_data, build_pipeline = (
+    lesson[name] for name in ("SEED", "NUMERIC", "build_data", "build_pipeline"))
+X, y = build_data()
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=SEED)
+```
 
 ## Aufgabe 1 – Ehrliche Kreuzvalidierung
 ```python
@@ -43,7 +59,8 @@ Ergebnis: innere CV-AUC 0,743 (bestes `C` = 0,01), Test-AUC 0,886. Erwartet hät
 man das Gegenteil: Die innere CV-AUC ist tendenziell optimistisch, weil `C` auf ihr
 ausgewählt wurde. Dass der Testwert hier deutlich höher liegt, ist Zufall des
 Splits: Das Testset enthält nur 19 Todesfälle; das 95-%-KI seiner AUC reicht grob
-±0,1. Der Testwert ist unverzerrt, aber unsicher; berichte ihn deshalb mit
+±0,1. Der Testwert ist für dieses eine Modell in derselben Population annähernd
+unverzerrt, weil nichts an ihm auf dem Testset gewählt wurde, aber er ist unsicher; berichte ihn deshalb mit
 95-%-KI (z. B. per Bootstrap) und lies ihn zusammen mit der CV-AUC.
 
 ## Aufgabe 4 – Schwelle nach Nutzen

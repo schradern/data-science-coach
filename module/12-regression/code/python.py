@@ -30,6 +30,11 @@ from lib.helpers import SEED, load_cohort  # noqa: E402
 pd.set_option("display.width", 100)
 pd.set_option("display.float_format", "{:.4f}".format)
 
+LOGIT_FORMULA = (
+    "verstorben_30d ~ age_centred + sofa_score + crp_mg_l"
+    " + diabetes + sepsis + active_smoker"
+)
+
 
 # ---------------------------------------------------------------------------
 # Feature engineering
@@ -120,11 +125,7 @@ def fit_logistic(df: pd.DataFrame) -> None:
     print("SECTION 2 – LOGISTIC REGRESSION: 30-day mortality")
     print("=" * 65)
 
-    formula = (
-        "verstorben_30d ~ age_centred + sofa_score + crp_mg_l"
-        " + diabetes + sepsis + active_smoker"
-    )
-    result = smf.logit(formula, data=df).fit(disp=False)
+    result = smf.logit(LOGIT_FORMULA, data=df).fit(disp=False)
 
     # Odds ratios and 95 % CI on the exponentiated scale
     ci = result.conf_int()
@@ -186,6 +187,31 @@ def fit_logistic(df: pd.DataFrame) -> None:
         print("  WARNING: EPV < 10 – model may be over-parametrised.")
     else:
         print("  EPV >= 10 – model complexity is defensible.")
+
+
+def follow_up_sensitivity(df: pd.DataFrame) -> None:
+    """Refit the logistic model on patients whose 30-day outcome is known.
+
+    `verstorben_30d` counts an observed death only: a patient lost to
+    follow-up on day 10 enters as 0 although a death on day 20 would go
+    unseen. `fu_vollstaendig_30d` marks who was followed to day 30 (or died
+    before). If the ORs barely move without the incomplete cases, the
+    0-coding does not drive the result; if they move, a survival model
+    (Section 3, Module 17) is the honest analysis.
+    """
+    complete = df[df["fu_vollstaendig_30d"] == 1]
+    n_dropped = len(df) - len(complete)
+    full = smf.logit(LOGIT_FORMULA, data=df).fit(disp=False)
+    known = smf.logit(LOGIT_FORMULA, data=complete).fit(disp=False)
+    print(f"\n--- Sensitivity: only patients with complete 30-day follow-up "
+          f"({len(complete)} of {len(df)}, {n_dropped} dropped) ---")
+    print(f"{'Predictor':<16}{'OR all':>10}{'OR complete':>14}")
+    for predictor in full.params.index.drop("Intercept"):
+        print(f"{predictor:<16}{np.exp(full.params[predictor]):>10.3f}"
+              f"{np.exp(known.params[predictor]):>14.3f}")
+    print(f"Deaths among the {n_dropped} dropped patients: "
+          f"{int(df.loc[df['fu_vollstaendig_30d'] == 0, 'verstorben_30d'].sum())} "
+          "(by construction: an unobserved death cannot be counted).")
 
 
 # ---------------------------------------------------------------------------
@@ -301,6 +327,7 @@ def main() -> None:
 
     fit_ols(df)
     fit_logistic(df)
+    follow_up_sensitivity(df)
     confounder_vs_mediator(df)
     fit_cox(df)
 

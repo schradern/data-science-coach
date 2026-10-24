@@ -24,7 +24,12 @@ sondern die **Güte auf unabhängigen Daten**. Alles in diesem Modul dient diese
 einen Maßstab.
 
 ## 2 Der Workflow, in dieser Reihenfolge
-1. Frage und Outcome festlegen (hier: `verstorben_30d`).
+1. Frage und Outcome festlegen (hier: `verstorben_30d`). Dazu gehört, wie du
+   mit unvollständiger Nachbeobachtung umgehst: Das Label zählt beobachtete
+   Todesfälle, 41 Patient:innen ohne vollständige 30 Tage
+   (`fu_vollstaendig_30d == 0`) gehen als `0` ein. Dieses Modul übernimmt die
+   Vereinfachung, Modul 12 zeigt die Sensitivitätsanalyse, Modul 28 die
+   zensierungsgerechte Alternative.
 2. Daten **aufteilen**, bevor du irgendetwas am Modell tust.
 3. Vorverarbeitung **in eine Pipeline** stecken.
 4. Modelle per **Kreuzvalidierung** vergleichen und Hyperparameter abstimmen.
@@ -47,6 +52,7 @@ teilt die Trainingsdaten in k Blöcke, trainiert auf k–1 und prüft auf dem
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/24-praediktion-workflow/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.model_selection import StratifiedKFold, train_test_split
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 X_train, X_test, y_train, y_test = train_test_split(
@@ -76,6 +82,7 @@ Die Gegenmaßnahme ist immer dieselbe: **alle** datenabhängigen Schritte in ein
 `Pipeline`, die nur auf den Trainingsfalten neu angepasst wird.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -101,6 +108,7 @@ Trainingsdaten. Wichtig: Die Abstimmung gehört in die innere Schleife; das
 Testset bleibt unberührt, sonst optimierst du auf den eigenen Prüfstein.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.model_selection import GridSearchCV
 grid = GridSearchCV(model, {"model__C": [0.01, 0.1, 1, 10]}, cv=cv, scoring="roc_auc")
 grid.fit(X_train, y_train)              # training data only

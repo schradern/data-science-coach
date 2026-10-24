@@ -7,7 +7,7 @@
 ```python
 import pandas as pd
 cohort = pd.read_csv("{{DATEN}}kohorte.csv")
-print(cohort.shape)          # (500, 16)
+print(cohort.shape)          # (500, 17)
 print(list(cohort.columns))
 ```
 ```r

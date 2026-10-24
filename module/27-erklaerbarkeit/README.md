@@ -37,6 +37,7 @@ irgendeine Erklärungsmethode aufruft:
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/27-erklaerbarkeit/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
 
@@ -76,6 +77,7 @@ zufällig durch und misst den Leistungsabfall auf dem **Testset**. So zeigt sie,
 wie stark das Modell von diesem Merkmal abhängt, unabhängig von Skaleneffekten.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.inspection import permutation_importance
 
 result = permutation_importance(
@@ -110,6 +112,7 @@ kreuzen sich), hat das Modell eine **Interaktion** gelernt, der Effekt des Merkm
 Variablen ab.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.inspection import PartialDependenceDisplay
 
 # PDP + ICE for sofa_score and alter (two panels in one figure)
@@ -144,15 +147,13 @@ Merkmal bei, verglichen mit dem Fall, dass es fehlt?
  nach oben oder unten verschieben.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 # Try shap; fall back to permutation importance if not installed.
 try:
     import shap
-    explainer = shap.Explainer(model, X_train_df)
-    # check_additivity=False: HistGradientBoostingClassifier + class_weight=
-    # "balanced" can trip shap's strict floating-point additivity check by a
-    # tiny margin without the explanation being wrong (known interaction, see
-    # code/python.py for details).
-    shap_values = explainer(X_test_df[:100], check_additivity=False)  # first 100 patients for speed
+    # Path-dependent TreeSHAP: exact for trees, shap checks additivity itself.
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer(X_test_df[:100])  # first 100 patients for speed
     print("SHAP summary (mean |SHAP|):")
     mean_abs = np.abs(shap_values.values).mean(axis=0)
     for feat, val in sorted(zip(FEATURES, mean_abs), key=lambda x: -x[1]):
@@ -170,8 +171,20 @@ Ohne SHAP bleibt die Permutation Importance als globales Ersatzmaß gültig; die
 lokale Erklärung eines Einzelfalls lässt sich über Koeffizienten (bei linearen
 Modellen) oder LIME approximieren.
 
-**Stolperstein:** SHAP-Werte für baumbasierte Modelle (TreeSHAP) sind exakt und
-schnell. Für neuronale Netze oder Kernel-SHAP steigt der Rechenaufwand stark an.
+**Stolperstein: „exakt“ gilt nur für eine Variante.** Pfadabhängiges TreeSHAP
+(`shap.TreeExplainer(model)`) ist für Baummodelle exakt: Die SHAP-Werte einer
+Person plus Basiswert ergeben genau den Log-Odds-Score des Modells, und `shap`
+prüft das selbst. Die interventionelle Variante mit Hintergrundstichprobe
+(`shap.Explainer(model, X_train)`) erfüllt das bei diesem Modell **nicht**. Das
+Skript misst eine Abweichung von bis zu 0,108 Log-Odds (SHAP-Summe 3,630 statt
+3,522), höchstens 0,47 Prozentpunkte Risiko. Ursache: Mehrere Messwerte liegen
+genau auf Split-Schwellen des HistGradientBoosting, und `shap` wertet die
+Verzweigungen mit geringerer Rechengenauigkeit aus, einzelne Werte landen dann
+im anderen Ast. Wer die Additivitätsprüfung mit `check_additivity=False`
+abschaltet, versteckt genau diesen Fehler. Und auch exakte SHAP-Werte erklären
+das **Modell** unter einer gewählten Referenz, sie sind keine exakte Eigenschaft
+der Patientin. Für neuronale Netze oder Kernel-SHAP steigt der Rechenaufwand
+außerdem stark an.
 
 **Stolperstein – korrelierte Merkmale:** Wie bei Permutation Importance (Abschnitt 2)
 können zwei korrelierte Merkmale (z. B. SOFA-Score und Leukozyten; im

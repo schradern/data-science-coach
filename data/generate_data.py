@@ -179,6 +179,11 @@ def generate_cohort(rng: np.random.Generator) -> pd.DataFrame:
     # Derived, not independently drawn: 30-day mortality is exactly the
     # observed event within the 30-day administrative horizon.
     verstorben_30d = ((status == 1) & (fu_zeit_tage <= ADMIN_HORIZON_DAYS)).astype(int)
+    # `verstorben_30d` is an OBSERVED-event label: a patient lost to follow-up
+    # before day 30 gets 0 although a later death is unobserved. This flag says
+    # whether the 30-day outcome is actually known (death observed, or followed
+    # to the horizon). Pure derivation, no RNG draw: every other number stays.
+    fu_vollstaendig_30d = ((status == 1) | (c_lost >= ADMIN_HORIZON_DAYS)).astype(int)
 
     df = pd.DataFrame({
         "patient_id": patient_id,
@@ -197,6 +202,7 @@ def generate_cohort(rng: np.random.Generator) -> pd.DataFrame:
         "fu_zeit_tage": fu_zeit_tage,
         "status": status,
         "verstorben_30d": verstorben_30d,
+        "fu_vollstaendig_30d": fu_vollstaendig_30d,
     })
 
     # Deliberate "dirt" for module 06 (cleaning): missing BMI and inconsistent

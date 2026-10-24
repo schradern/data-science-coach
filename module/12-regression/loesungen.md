@@ -44,16 +44,21 @@ hält, sieht eine „Verzerrung“, die keine ist.
 ## Aufgabe 2 – Multivariables Modell und Wahrheitsvergleich
 
 ```python
-from lib.ground_truth import true_odds_ratios_for
-
 df["sepsis"] = (df["aufnahmegrund"] == "Sepsis").astype(int)
 df["age_z"]  = df["alter"] - 64
 formula = "verstorben_30d ~ age_z + sofa_score + crp_mg_l + diabetes + sepsis"
 result2 = smf.logit(formula, data=df).fit(disp=False)
-
-wahr = true_odds_ratios_for(("age_centred", "sofa_score", "crp_mg_l", "diabetes", "sepsis"))
 print(np.exp(result2.params).round(3))
-print(wahr)
+```
+
+Die wahren ORs liefert `lib/ground_truth.py`. Das geht nur im Projektordner
+(lokal oder in Colab nach dem Klonen); im Browser-Weg nimmst du die Zahlen
+aus der Tabelle unten.
+
+```python
+# Only from the project folder: lib/ is part of the repository.
+from lib.ground_truth import true_odds_ratios_for
+print(true_odds_ratios_for(("age_centred", "sofa_score", "crp_mg_l", "diabetes", "sepsis")))
 ```
 
 ```r

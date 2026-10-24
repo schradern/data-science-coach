@@ -44,11 +44,16 @@ Die Wahl des statistischen Tests hängt entscheidend von der Form und Struktur d
 >
 > ![Abbildung: Der Median-Mythos des Mann-Whitney-U-Tests. Beide Gruppen haben den exakt identischen Median von 3,50, aber die unterschiedliche Streuung und Form führt zu einem hochsignifikanten Mann-Whitney-U-Test (p < 0,001).](assets/mann_whitney_median_myth.png)
 
-### 2. Gepaarter Vergleich (Vorher/Nachher): Gepaarter t-Test vs. Wilcoxon-Vorzeichen-Rang-Test
-- **Gepaarter t-Test:** Wenn die Verteilung der *Differenzen* (Wert B - Wert A) symmetrisch und annähernd normalverteilt ist.
-- **Wilcoxon-Vorzeichen-Rang-Test:** Wenn die Differenzen stark schief sind oder extreme Ausreißer aufweisen (z. B. CRP-Änderungen).
+### 2. Gepaarter Vergleich (Vorher/Nachher): erst das Estimand, dann der Test
+Entscheide zuerst, **welche Größe** der *Differenzen* (Wert B − Wert A) du berichten willst. Daraus folgt der Test:
 
-![Abbildung: Vergleich der Differenzverteilungen für den gepaarten t-Test (symmetrisch) und den Wilcoxon-Vorzeichen-Rang-Test (schief mit Ausreißern).](assets/dist_paired_t_vs_wilcoxon.png)
+- **Mittlere Differenz → gepaarter t-Test.** Er braucht annähernd normalverteilte Differenzen oder genug Paare; ab einigen Dutzend Paaren trägt der zentrale Grenzwertsatz auch bei mäßiger Schiefe. Bei wenigen Paaren und deutlicher Schiefe: Bootstrap-KI für die mittlere Differenz.
+- **Pseudomedian / Lageverschiebung bei symmetrischen Differenzen → Wilcoxon-Vorzeichen-Rang-Test.** Sinnvoll, wenn die Differenzen symmetrisch, aber mit schweren Rändern oder einzelnen Ausreißern verteilt sind. Dann sind Median und Pseudomedian (Hodges-Lehmann-Schätzer) dasselbe, und der Test ist eine robuste Alternative zum t-Test.
+- **Median der Differenzen bei schiefen Differenzen → Vorzeichentest** (Binomialtest auf den Anteil positiver Differenzen) mit Konfidenzintervall für den Median, oder ein Bootstrap-KI für den Median. Alternative: auf einer Skala rechnen, auf der die Differenzen symmetrisch werden, etwa der log-Quotient nachher/vorher bei CRP, und das Ergebnis als Verhältnis berichten.
+
+**Stolperstein:** Der Wilcoxon-Vorzeichen-Rang-Test ist **keine** Lösung für schiefe Differenzen. Ohne Symmetrie testet er nicht mehr die Lage, sondern eine Mischung aus Lage und Form. Das Skript zeigt einen Stresstest: 50 negative Differenzen von −1 und 50 positive von 1 bis 50, Median der Differenzen exakt 0. Der Vorzeichentest findet nichts (p = 1,0), der Vorzeichen-Rang-Test verwirft hochsignifikant (p ≈ 0,00002), nur weil die positiven Differenzen größer sind.
+
+![Abbildung: Drei Differenzverteilungen und der jeweils passende Test: gepaarter t-Test für die mittlere Differenz, Wilcoxon-Vorzeichen-Rang-Test für symmetrische Differenzen mit schweren Rändern, Vorzeichentest oder Bootstrap für den Median schiefer Differenzen.](assets/dist_paired_t_vs_wilcoxon.png)
 
 ### 3. Mehrgruppeneffekt (≥ 3 Gruppen): ANOVA vs. Kruskal-Wallis-Test
 - **ANOVA:** Vergleicht die Mittelwerte von drei oder mehr unabhängigen Gruppen. Voraussetzung: annähernd normalverteilte Werte je Gruppe und ähnliche Varianzen; bei ungleichen Varianzen die Welch-ANOVA (analog zum Welch-t-Test).
@@ -75,7 +80,7 @@ Die Wahl des statistischen Tests hängt entscheidend von der Form und Struktur d
 | Frage | Typische Daten | Standard | Robuste Alternative | Berichten |
 |---|---|---|---|---|
 | Mittelwert zweier unabhängiger Gruppen | stetig, zwei Gruppen | Welch-t-Test | Mann-Whitney-U | Differenz, 95-%-KI, Cohens d oder Rang-r |
-| Vorher/Nachher bei denselben Patient:innen | gepaart stetig | gepaarter t-Test | Wilcoxon-Vorzeichen-Rang | mittlere/mediane Differenz, 95-%-KI |
+| Vorher/Nachher bei denselben Patient:innen | gepaart stetig | gepaarter t-Test | Wilcoxon-Vorzeichen-Rang (nur bei symmetrischen Differenzen), sonst Vorzeichentest oder Bootstrap | mittlere/mediane Differenz, 95-%-KI |
 | Mehr als zwei Gruppen | stetig, >2 Gruppen | ANOVA | Kruskal-Wallis | Gruppenmittel, η² oder ε², Post-hoc geplant |
 | Zwei kategoriale Variablen | 2x2 oder RxC | Chi-Quadrat | Fisher exakt bei kleinen Zellen | OR/RR, Cramérs V, 95-%-KI |
 | Stetiger Outcome mit Adjustierung | stetig | lineare Regression | robuste SE / Transformation | β, 95-%-KI, Residuencheck |

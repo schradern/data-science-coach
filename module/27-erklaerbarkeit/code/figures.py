@@ -157,10 +157,10 @@ def fig_shap_beeswarm(model, X_train: pd.DataFrame, X_test: pd.DataFrame) -> boo
               "(install: uv pip install shap)")
         return False
 
-    explainer = shap.Explainer(model, X_train)
-    # check_additivity=False: see code/python.py for why this is needed with
-    # HistGradientBoostingClassifier + class_weight="balanced".
-    shap_values = explainer(X_test.iloc[:150], check_additivity=False)
+    # Path-dependent TreeSHAP, as in code/python.py: exact for trees, and shap
+    # checks the additivity itself.
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer(X_test.iloc[:150])
     shap_values.feature_names = [LABEL_MAP.get(f, f) for f in FEATURES]
 
     fig = plt.figure(figsize=(7.5, 5.5))

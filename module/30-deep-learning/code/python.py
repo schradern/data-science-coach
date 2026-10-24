@@ -125,19 +125,24 @@ def make_mlp(pre: ColumnTransformer, alpha: float = 0.01) -> Pipeline:
 
 
 def summarise_folds(scores: np.ndarray) -> dict:
-    """Mean, sample SD and a 95% t-based CI for a set of per-fold scores.
+    """Mean, sample SD and two approximate 95% t-intervals for per-fold scores.
 
-    Uses the t-distribution with k-1 degrees of freedom (k = number of
-    folds) rather than a normal approximation, since k is small (5).
+    The naive interval treats the k fold scores as independent. They are not:
+    the training sets overlap, so the naive interval is too narrow, and no
+    unbiased estimator of the k-fold variance exists (Bengio & Grandvalet
+    2004). The corrected interval inflates the variance by the Nadeau-Bengio
+    factor (1/k + n_test/n_train, with n_test/n_train = 1/(k-1) for k-fold).
+    Both are descriptive approximations, not exact confidence intervals.
     """
     k = len(scores)
     mean = scores.mean()
     sd = scores.std(ddof=1)
-    se = sd / np.sqrt(k)
     t_crit = stats.t.ppf(0.975, df=k - 1)
-    half_width = t_crit * se
+    half_naive = t_crit * sd * np.sqrt(1 / k)
+    half_corrected = t_crit * sd * np.sqrt(1 / k + 1 / (k - 1))
     return {"k": k, "mean": mean, "sd": sd,
-            "ci_low": mean - half_width, "ci_high": mean + half_width}
+            "ci_low": mean - half_naive, "ci_high": mean + half_naive,
+            "nb_low": mean - half_corrected, "nb_high": mean + half_corrected}
 
 
 def main() -> None:
@@ -188,7 +193,8 @@ def main() -> None:
         print(f"  {name}")
         print(f"    Folds (k={summary['k']}): {fold_str}")
         print(f"    Mean = {summary['mean']:.3f}  SD = {summary['sd']:.3f}  "
-              f"95%-CI = [{summary['ci_low']:.3f}, {summary['ci_high']:.3f}]")
+              f"naive 95%-CI = [{summary['ci_low']:.3f}, {summary['ci_high']:.3f}]  "
+              f"corrected = [{summary['nb_low']:.3f}, {summary['nb_high']:.3f}]")
 
     # Never hardcode the winner: derive it from the actually computed means.
     means = {name: scores.mean() for name, scores in fold_scores.items()}
@@ -204,38 +210,28 @@ def main() -> None:
     for name, _ in order[1:]:
         diff = fold_scores[winner] - fold_scores[name]
         summary = summarise_folds(diff)
-        excludes_zero = summary["ci_low"] > 0 or summary["ci_high"] < 0
-        comparisons.append((name, summary, excludes_zero))
+        comparisons.append((name, summary))
         diff_str = ", ".join(f"{d:+.3f}" for d in diff)
         print(f"    {winner} − {name}: {diff_str}")
         print(f"      Mean diff = {summary['mean']:+.3f}  SD = {summary['sd']:.3f}  "
-              f"95%-CI = [{summary['ci_low']:+.3f}, {summary['ci_high']:+.3f}]"
-              f"  → {'CI excludes 0' if excludes_zero else 'CI includes 0'}")
+              f"naive 95%-CI = [{summary['ci_low']:+.3f}, {summary['ci_high']:+.3f}]  "
+              f"corrected = [{summary['nb_low']:+.3f}, {summary['nb_high']:+.3f}]")
 
-    # Rewrite the conclusion from what the paired CIs actually show – do not
-    # assume a fixed narrative (e.g. "the two classical models are tied").
-    # A CI that excludes 0 is not automatically "robust": with only k=5
-    # folds, a CI whose bound sits just barely past 0 is fragile (one
-    # different fold split could flip it). FRAGILE_MARGIN is a rule-of-thumb
-    # cutoff for flagging that in the printed text – the exact CI is always
-    # printed too, so nothing is hidden behind the label.
-    FRAGILE_MARGIN = 0.03
-    print("\n  Befund (aus den paarweisen CIs, nicht aus den Punktschätzern):")
-    for name, summary, excludes_zero in comparisons:
-        if not excludes_zero:
-            print(f"    {winner} und {name} sind bei k=5 Folds NICHT unterscheidbar: das")
-            print(f"    95%-CI der paarweisen Differenz "
-                  f"([{summary['ci_low']:+.3f}, {summary['ci_high']:+.3f}]) enthält 0.")
-            continue
-        margin = summary["ci_low"] if summary["ci_low"] > 0 else -summary["ci_high"]
-        print(f"    {winner} schlägt {name}: das 95%-CI der paarweisen Differenz "
-              f"([{summary['ci_low']:+.3f}, {summary['ci_high']:+.3f}]) schließt 0 aus.")
-        if margin < FRAGILE_MARGIN:
-            print(f"    Aber die CI-Grenze liegt nur {margin:.3f} von 0 entfernt – bei k=5")
-            print("    Folds ist das ein knappes, fragiles Ergebnis, kein robuster Beleg.")
+    # Rewrite the conclusion from the corrected intervals – do not assume a
+    # fixed narrative. The naive interval assumes independent folds and is
+    # only printed for comparison.
+    print("\n  Befund (aus den korrigierten Intervallen, nicht aus den Punktschätzern):")
+    for name, summary in comparisons:
+        corrected_excludes_zero = summary["nb_low"] > 0 or summary["nb_high"] < 0
+        naive_excludes_zero = summary["ci_low"] > 0 or summary["ci_high"] < 0
+        if corrected_excludes_zero:
+            print(f"    {winner} vor {name}: auch das korrigierte Intervall schließt 0 aus –")
+            print("    ein deutlicher Hinweis auf einen echten Unterschied, kein exakter Beweis.")
+        elif naive_excludes_zero:
+            print(f"    {winner} vs. {name}: nur das naive Intervall schließt 0 aus. Weil die")
+            print("    Folds korreliert sind, ist das kein belastbarer Beleg – nicht unterscheidbar.")
         else:
-            print(f"    Die CI-Grenze liegt {margin:.3f} von 0 entfernt – trotz kleiner")
-            print("    Fold-Zahl ein vergleichsweise klarer Unterschied.")
+            print(f"    {winner} und {name} sind bei k=5 Folds NICHT unterscheidbar.")
     print("  MLPs need large datasets to justify their parameter count; on")
     print("  small clinical tables, simpler models are often at least on par.")
 
@@ -248,8 +244,8 @@ def main() -> None:
 
     print(f"\nDone. Honest finding on this {len(X)}-patient dataset ({y.sum()} events):")
     print(f"  {winner} had the highest mean CV-AUC ({winner_auc:.3f}), but only the")
-    print("  gap(s) whose paired 95%-CI excludes 0 (printed above) are actually")
-    print("  established at this sample size – see per-model output for which.")
+    print("  gap(s) whose corrected paired interval excludes 0 (printed above) are")
+    print("  supported at this sample size – see per-model output for which.")
     print("  In any case: deep learning does not automatically win on small")
     print("  tabular clinical data – a fixed-architecture MLP needs far more than")
     print(f"  {len(X)} rows to reliably beat a well-regularised linear or")

@@ -66,24 +66,28 @@ fold_aucs <- function(res, colname) {
     select(id, !!colname := .estimate)
 }
 
-# summarise_folds(): mean, sample SD and a 95% t-based CI (df = k-1). A
-# single point estimate hides fold-to-fold noise, so every model AND every
-# paired difference between models gets this treatment below.
+# summarise_folds(): mean, sample SD and two approximate 95% t-intervals
+# (df = k-1). The naive one treats the folds as independent; they are not
+# (training sets overlap), so it is too narrow (Bengio & Grandvalet 2004).
+# The corrected one inflates the variance by the Nadeau-Bengio factor
+# 1/k + n_test/n_train = 1/k + 1/(k-1). Both are descriptive approximations.
 summarise_folds <- function(x) {
   k  <- length(x)
   m  <- mean(x)
   sd_ <- sd(x)
-  se <- sd_ / sqrt(k)
-  hw <- qt(0.975, df = k - 1) * se
-  list(k = k, mean = m, sd = sd_, ci_low = m - hw, ci_high = m + hw)
+  t_crit <- qt(0.975, df = k - 1)
+  hw <- t_crit * sd_ * sqrt(1 / k)
+  hw_nb <- t_crit * sd_ * sqrt(1 / k + 1 / (k - 1))
+  list(k = k, mean = m, sd = sd_, ci_low = m - hw, ci_high = m + hw,
+       nb_low = m - hw_nb, nb_high = m + hw_nb)
 }
 
 print_summary <- function(label, x) {
   s <- summarise_folds(x)
   cat(sprintf("  %s\n", label))
   cat(sprintf("    Folds (k=%d): %s\n", s$k, paste(sprintf("%.3f", x), collapse = ", ")))
-  cat(sprintf("    Mean = %.3f  SD = %.3f  95%%-CI = [%.3f, %.3f]\n",
-              s$mean, s$sd, s$ci_low, s$ci_high))
+  cat(sprintf("    Mean = %.3f  SD = %.3f  naive 95%%-CI = [%.3f, %.3f]  corrected = [%.3f, %.3f]\n",
+              s$mean, s$sd, s$ci_low, s$ci_high, s$nb_low, s$nb_high))
 }
 
 # ── Cross-validation: logistic regression ────────────────────────────────────
@@ -130,34 +134,26 @@ winner <- names(sorted_means)[1]
 winner_col <- c("Logistische Regression" = "lr", "Gradient Boosting" = "gb", "MLP (nnet)" = "mlp")[[winner]]
 cat(sprintf("\n  Highest mean CV-AUC (point estimate only): %s (%.3f)\n", winner, sorted_means[1]))
 
-# Paired per-fold differences vs. the winner, with 95% CI. A CI that
-# excludes 0 is not automatically "robust" at k=5 folds – flag CIs whose
-# bound sits within FRAGILE_MARGIN of 0 as fragile rather than established.
-FRAGILE_MARGIN <- 0.03
+# Paired per-fold differences vs. the winner. The conclusion comes from the
+# corrected interval; the naive one is printed for comparison only.
 cat(sprintf("\n  Paired per-fold differences vs. %s (same folds for every model):\n", winner))
 other_names <- setdiff(names(sorted_means), winner)
 for (name in other_names) {
   col <- c("Logistische Regression" = "lr", "Gradient Boosting" = "gb", "MLP (nnet)" = "mlp")[[name]]
   diff <- fold_tbl[[winner_col]] - fold_tbl[[col]]
   s <- summarise_folds(diff)
-  excludes_zero <- s$ci_low > 0 || s$ci_high < 0
   cat(sprintf("    %s - %s: %s\n", winner, name,
               paste(sprintf("%+.3f", diff), collapse = ", ")))
-  cat(sprintf("      Mean diff = %+.3f  SD = %.3f  95%%-CI = [%+.3f, %+.3f]  -> %s\n",
-              s$mean, s$sd, s$ci_low, s$ci_high,
-              if (excludes_zero) "CI excludes 0" else "CI includes 0"))
-  if (!excludes_zero) {
-    cat(sprintf("      %s und %s sind bei k=%d Folds NICHT unterscheidbar (CI enthaelt 0).\n",
-                winner, name, s$k))
+  cat(sprintf("      Mean diff = %+.3f  SD = %.3f  naive 95%%-CI = [%+.3f, %+.3f]  corrected = [%+.3f, %+.3f]\n",
+              s$mean, s$sd, s$ci_low, s$ci_high, s$nb_low, s$nb_high))
+  if (s$nb_low > 0 || s$nb_high < 0) {
+    cat("      Auch das korrigierte Intervall schliesst 0 aus -> deutlicher Hinweis, kein exakter Beweis.\n")
+  } else if (s$ci_low > 0 || s$ci_high < 0) {
+    cat("      Nur das naive Intervall schliesst 0 aus -> bei korrelierten Folds nicht belastbar.\n")
   } else {
-    margin <- if (s$ci_low > 0) s$ci_low else -s$ci_high
-    if (margin < FRAGILE_MARGIN) {
-      cat(sprintf("      CI-Grenze nur %.3f von 0 entfernt -> knappes, fragiles Ergebnis bei k=%d Folds.\n", margin, s$k))
-    } else {
-      cat(sprintf("      CI-Grenze %.3f von 0 entfernt -> vergleichsweise klarer Unterschied.\n", margin))
-    }
+    cat(sprintf("      %s und %s sind bei k=%d Folds NICHT unterscheidbar.\n", winner, name, s$k))
   }
 }
-cat("\n  Befund: nur Unterschiede, deren paarweises 95%-CI 0 ausschliesst, sind bei\n")
-cat("  dieser Fold-Zahl ueberhaupt belegt – und selbst dann kann das Ergebnis knapp sein.\n")
+cat("\n  Befund: nur Unterschiede, deren korrigiertes paarweises Intervall 0 ausschliesst,\n")
+cat("  sind bei dieser Fold-Zahl gestuetzt. Beide Intervalle sind Naeherungen.\n")
 cat("  Deep Learning gewinnt auf kleinen klinischen Tabellendaten nicht automatisch.\n")

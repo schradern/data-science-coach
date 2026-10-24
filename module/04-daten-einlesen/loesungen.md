@@ -13,7 +13,7 @@ cohort = pd.read_csv(
            "hypertonie": int, "verstorben_30d": int},
     na_values=["", "NA", "N/A", "-"],
 )
-print(cohort.shape)                                    # (500, 16)
+print(cohort.shape)                                    # (500, 17)
 missing = cohort.isna().sum()
 print(missing[missing > 0])                           # bmi, gewicht_kg have missing values
 ```
@@ -24,7 +24,7 @@ cohort <- read_csv("{{DATEN}}kohorte.csv",
                    hypertonie=col_integer(), verstorben_30d=col_integer()),
   na = c("", "NA", "N/A", "-"),
   show_col_types = FALSE)
-dim(cohort)  # 500 16
+dim(cohort)  # 500 17
 missing <- colSums(is.na(cohort))
 print(missing[missing > 0])
 ```

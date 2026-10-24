@@ -16,21 +16,33 @@ source(file.path(root, "lib", "helpers.R"))
 set.seed(SEED)
 
 # ---- Data -------------------------------------------------------------------
-# Median-impute all numeric predictors with missingness (incl. bmi) instead of
-# listwise-dropping rows – mirrors python.py's SimpleImputer(strategy="median").
 data <- load_cohort() |>
-  left_join(load_labs(), by = "patient_id") |>
-  mutate(across(c(bmi, leukozyten_g_l, haemoglobin_g_dl, kreatinin_mg_dl,
-                  laktat_mmol_l, natrium_mmol_l), ~ ifelse(is.na(.), median(., na.rm=TRUE), .)))
+  left_join(load_labs(), by = "patient_id")
 
 features <- c("alter", "sofa_score", "crp_mg_l", "bmi",
               "leukozyten_g_l", "kreatinin_mg_dl", "laktat_mmol_l",
               "diabetes", "hypertonie")
+imputed <- c("bmi", "leukozyten_g_l", "haemoglobin_g_dl", "kreatinin_mg_dl",
+             "laktat_mmol_l", "natrium_mmol_l")
 
-# 75/25 split (stratified by event)
-idx_train <- sample(nrow(data), floor(0.75 * nrow(data)))
+# 75/25 split, stratified by event (like python.py's stratify=events)
+idx_train <- unlist(lapply(split(seq_len(nrow(data)), data$status),
+                           function(rows) sample(rows, floor(0.75 * length(rows)))))
 train <- data[idx_train, ]
 test  <- data[-idx_train, ]
+
+# Median-impute numeric predictors with missingness (incl. bmi) instead of
+# listwise-dropping rows – mirrors python.py's SimpleImputer(strategy="median").
+# The medians come from the TRAINING set only and are then applied to both
+# sets: a median computed on all rows would let the test set leak into
+# the preprocessing.
+train_medians <- sapply(train[imputed], median, na.rm = TRUE)
+impute_with <- function(df, medians) {
+  for (col in names(medians)) df[[col]][is.na(df[[col]])] <- medians[[col]]
+  df
+}
+train <- impute_with(train, train_medians)
+test  <- impute_with(test, train_medians)
 
 # ---- 1) Cox proportional hazards (baseline) ---------------------------------
 cat("=== 1) Cox proportional hazards ===\n")

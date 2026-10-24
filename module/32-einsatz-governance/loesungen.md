@@ -1,5 +1,18 @@
 # Musterlösungen · Modelleinsatz, Monitoring und Governance
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+from sklearn.model_selection import train_test_split
+
+lesson = runpy.run_path("module/32-einsatz-governance/code/python.py")
+SEED = lesson["SEED"]
+X_train, X_test, y_train, y_test = lesson["prepare_data"]()
+pipe = lesson["build_text_pipeline"]().fit(X_train, y_train)
+```
+
 ## Aufgabe 1 – Modell speichern und laden
 ```python
 import joblib, sklearn, tempfile

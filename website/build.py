@@ -204,7 +204,7 @@ BESCHREIBUNG = {
     "18-longitudinal-mixed-models": "Längsschnittdaten analysieren: Random Intercept/Slope, Mixed-Effects Models und GEE.",
     "19-propensity-score-causal": "Selektionsbias reduzieren: Propensity Score Matching, Weighting (IPW) und SMD-Balance.",
     "20-competing-risks-timevariant": "Konkurrierende Risiken (Fine-Gray) und Cox-Regression mit zeitabhängigen Kovariaten.",
-    "33-rag-llm-pipelines": "Lokale Leitlinien-Q&A: PDFs parsen, ChromaDB/FAISS Vektordatenbanken und LLM-RAG.",
+    "33-rag-llm-pipelines": "Leitlinien-Q&A: Text in Chunks teilen, per TF-IDF und Cosinus-Ähnlichkeit abrufen, Retrieval-Güte messen.",
     "07-fhir-omop-praxis": "Datenextraktion aus APIs: Patient/Observation FHIR-Ressourcen parsen und OMOP-Konzept.",
     "34-design-ki-studien": "Translationale Studien planen: Silent Deployment, Spectrum Bias und klinische KI-Validierung.",
 }
@@ -241,7 +241,7 @@ ERGEBNIS = {
     "18-longitudinal-mixed-models": "Du modellierst wiederholte Patient:innenmessungen mit Mixed Models und GEE.",
     "19-propensity-score-causal": "Du korrigierst Selektionsbias mittels Matching/Weighting und prüfst die Balance.",
     "20-competing-risks-timevariant": "Du analysierst konkurrierende Risiken und zeitabhängige Effekte ohne Bias.",
-    "33-rag-llm-pipelines": "Du baust eine lokale Leitlinien-Q&A-Pipeline mittels RAG und Vektordatenbank.",
+    "33-rag-llm-pipelines": "Du baust den Retrieval-Schritt einer Leitlinien-Q&A-Pipeline und misst seine Trefferqualität; die Generierung durch ein LLM bleibt Konzept.",
     "07-fhir-omop-praxis": "Du fragst FHIR-APIs ab, extrahierst Patient:innendaten und verstehst OMOP.",
     "34-design-ki-studien": "Du konzipierst prospektive KI-Validierungsstudien und antizipierst klinischen Bias.",
 }
@@ -316,6 +316,14 @@ def highlight_block(lang: str, code: str) -> str:
     kern = highlight(code, lexer, HtmlFormatter(cssclass="codehilite", nowrap=False))
     label = {"python": "Python", "r": "R", "sql": "SQL", "bash": "Shell",
              "markdown": "Quarto / Markdown", "text": "Text"}.get(lang, lang.upper() or "Code")
+    # Auszüge und Vorlagen sehen sonst aus wie eigenständige Blöcke – und
+    # Modul 01 verspricht, dass jeder Block direkt in die Konsole passt. Die
+    # erste Kommentarzeile markiert sie; der Kopf macht das sichtbar.
+    erste_zeile = code.lstrip().split("\n", 1)[0]
+    if erste_zeile.startswith("# Excerpt"):
+        label += " · Auszug"
+    elif erste_zeile.startswith("# Template"):
+        label += " · Vorlage"
     # data-lang steuert den Sprachfilter (Python/R/Beide); nur py und r werden
     # gefiltert, alles andere (SQL, Shell …) bleibt immer sichtbar.
     dlang = {"python": "py", "r": "r"}.get(lang, "x")
@@ -1772,6 +1780,22 @@ def baue_quellcode_seite(quelle: Path, subtitle: str) -> str:
              seite(quelle.name, tb, body, "", 1, klass="codepage"))
 
 
+def pfad_laengen() -> dict[str, int]:
+    """Modulzahl je Lernpfad, gelesen aus PFADE in website/app.js.
+
+    `all` steht dort als null und zählt die Modulordner. Dieselbe Quelle prüft
+    tools/check_repo.py gegen Modul 01 und docs/LEHRPLAN.md.
+    """
+    quelle = (WURZEL / "website" / "app.js").read_text(encoding="utf-8")
+    start = quelle.index("var PFADE = {")
+    block = quelle[start:quelle.index("};", start)]
+    laengen = {name: len(re.findall(r'"\d\d"', liste))
+               for name, liste in re.findall(r"(\w+): \[([^\]]*)\]", block)}
+    laengen["all"] = sum(1 for d in (WURZEL / "module").iterdir()
+                         if d.is_dir() and re.match(r"\d\d-", d.name))
+    return laengen
+
+
 def uebersicht_kopf(r: str = "") -> str:
     """Klarer Wiedereinstieg über der Modulübersicht mit interaktiver Pfadauswahl.
 
@@ -1806,29 +1830,33 @@ def uebersicht_kopf(r: str = "") -> str:
     # Sieben Pfade, wie in docs/LEHRPLAN.md. `paper` ist der kurze Shortcut,
     # `forschung` der vollständige Publikationsweg – vorher fehlte der zweite
     # Knopf, und die Pfadwahl fiel stillschweigend auf den Shortcut zurück.
+    # Beschriftungen und Reihenfolge exakt wie die kanonische Liste in
+    # docs/LEHRPLAN.md; das `title` nennt Länge und Zweck. Die Längen kommen
+    # aus PFADE in app.js und aus den Modulordnern – fest eingetragene Zahlen
+    # waren schon einmal veraltet („33 Module“ bei 34).
+    laengen = pfad_laengen()
+    knoepfe = [
+        ("all", "Vollständig", f"Alle {laengen['all']} Module in didaktischer Reihenfolge"),
+        ("basis", "Schnell zur Auswertung", "schnell zu einer ersten Auswertung"),
+        ("daten", "Datenextraktion", "CSV, SQL, FHIR – Daten beschaffen und zusammenführen"),
+        ("paper", "Mein erstes Paper", "der kürzeste Weg zu Table 1, Regression und Bericht"),
+        ("forschung", "Klinische Forschung",
+         "der vollständige Publikationsweg inkl. Kausalität und Survival"),
+        ("statistik", "Statistik-Vertiefung", "medizinische Statistik in der Tiefe"),
+        ("ki", "Machine Learning / KI", "Machine Learning und KI in der Medizin"),
+    ]
+    buttons = []
+    for key, name, zweck in knoepfe:
+        titel = zweck if key == "all" else f"{laengen[key]} Module: {zweck}"
+        zustand = ' class="on" aria-pressed="true"' if key == "all" else ' aria-pressed="false"'
+        buttons.append(f'<button type="button" data-path="{key}"{zustand} '
+                       f'title="{titel}">{name}</button>')
     picker_html = (
         '<div class="pfad-picker">'
         '<span class="resume-label">Fokus</span>'
         '<div class="pfad-buttons" id="pfadPicker" aria-label="Lernpfad auswählen">'
-        # Beschriftungen und Reihenfolge exakt wie die kanonische Liste in
-        # docs/LEHRPLAN.md. Vorher hießen die Knöpfe anders als der Lehrplan,
-        # und „Erstes Paper“ ließ sich nicht von „Klinische Forschung“
-        # unterscheiden – das `title` nennt jetzt Länge und Zweck.
-        '<button type="button" data-path="all" class="on" aria-pressed="true" '
-        'title="Alle 33 Module in didaktischer Reihenfolge">Vollständig</button>'
-        '<button type="button" data-path="basis" aria-pressed="false" '
-        'title="6 Module: schnell zu einer ersten Auswertung">Schnell zur Auswertung</button>'
-        '<button type="button" data-path="daten" aria-pressed="false" '
-        'title="5 Module: CSV, SQL, FHIR – Daten beschaffen und zusammenführen">Datenextraktion</button>'
-        '<button type="button" data-path="paper" aria-pressed="false" '
-        'title="7 Module: der kürzeste Weg zu Table 1, Regression und Bericht">Mein erstes Paper</button>'
-        '<button type="button" data-path="forschung" aria-pressed="false" '
-        'title="14 Module: der vollständige Publikationsweg inkl. Kausalität und Survival">Klinische Forschung</button>'
-        '<button type="button" data-path="statistik" aria-pressed="false" '
-        'title="12 Module: medizinische Statistik in der Tiefe">Statistik-Vertiefung</button>'
-        '<button type="button" data-path="ki" aria-pressed="false" '
-        'title="12 Module: Machine Learning und KI in der Medizin">Machine Learning / KI</button>'
-        '</div></div>'
+        + "".join(buttons)
+        + '</div></div>'
     )
     tools_html = (
         '<details class="pfad-details" id="pfadDetails">'

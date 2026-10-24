@@ -75,8 +75,11 @@ Ergebnisse liefern, ohne dass ein Fehler vorliegt.
 - `data/aufbereitet/ergebnisse.csv`, Regel `*.csv` (**das ist der Fehler**)
 - `berichte/tabelle1.xlsx`, Regel `*.xlsx`
 
-Git erfasst dagegen `code/analyse.py` (Python-Skripte enthalten keine PHI und
-gehören ins Repository).
+Git erfasst dagegen `code/analyse.py`. Analyse-Code gehört ins Repository,
+aber nur, wenn er selbst keine Patientendaten enthält: keine eingefügten
+Datenauszüge, keine Patienten-IDs oder Namen in Kommentaren, keine Pfade oder
+Zugangsdaten zu Klinikservern. Prüfe das vor jedem Commit, ein Skript ist nicht
+automatisch frei von schützenswerten Gesundheitsdaten.
 
 **Das Problem:** Die pauschale Regel `*.csv` ignoriert **jede** CSV, also auch die
 aufbereiteten Ergebnisse in `data/aufbereitet/`, die laut Projektstruktur bewusst
@@ -153,7 +156,7 @@ und anzeigbar, aber standardmäßig eingeklappt.
 
 - Python mit denselben Paketversionen (ideal: virtuelle Umgebung + `anforderungen.txt`)
 - Quarto installiert (`quarto.org`) und `jupyter` in der Python-Umgebung (README Abschnitt 6)
-- Den Datensatz erzeugt: `python data/generate_data.py`
+- Die Daten: im Repository unter `data/` enthalten (neu erzeugen nur bei Bedarf mit `python data/generate_data.py`)
 - Den Bericht aus der Projektwurzel rendern:
  `quarto render module/22-reproduzierbare-berichte/code/bericht_beispiel.qmd`
 
@@ -166,6 +169,7 @@ den Code nicht aus:
 ```python
 #| label: tbl-stay-duration
 #| tbl-cap: "Mediane Verweildauer je Aufnahmegrund"
+# Excerpt for bericht_beispiel.qmd: uses the `df` loaded there.
 
 stay_summary = (
     df

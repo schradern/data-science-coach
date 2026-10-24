@@ -24,17 +24,22 @@ print(diff.describe())
 print("Schiefe:", round(stats.skew(diff), 2))
 print(stats.ttest_rel(wide[3], wide[0]))
 print(stats.wilcoxon(wide[3], wide[0]))
+print(stats.binomtest(int((diff > 0).sum()), int((diff != 0).sum())))  # Vorzeichentest
 ```
 
 Wenn die Differenzen ungefähr symmetrisch sind, ist der gepaarte t-Test gut
-vertretbar. Bei klarer Schiefe oder Ausreißern ist Wilcoxon robuster. Wichtig:
+vertretbar. Bei symmetrischen Differenzen mit Ausreißern ist Wilcoxon robuster;
+bei klarer Schiefe beantwortet der Vorzeichentest (oder ein Bootstrap-KI) die
+Frage nach dem Median der Differenzen, denn Wilcoxon setzt für eine Aussage über
+die Lage Symmetrie voraus (README, Abschnitt 2). Wichtig:
 kein unabhängiger t-Test, weil Tag 0 und Tag 3 pro Patient:in zusammengehören.
 Einen Shapiro-Test brauchst du dafür nicht: Bei 408 Paaren wird er schon bei
 harmlosen Abweichungen signifikant (siehe README, Abschnitt 4).
 
 In diesen Daten sind die Differenzen symmetrisch (Median 0, IQR −7 bis 7 mmHg,
 Schiefe 0,07). Ergebnis: mittlere Differenz −0,01 mmHg (95-%-KI −1,06 bis 1,05),
-gepaarter t-Test p = 0,99; Wilcoxon kommt zum selben Schluss (p = 0,90).
+gepaarter t-Test p = 0,99; Wilcoxon (p = 0,90) und Vorzeichentest (p = 1,0)
+kommen zum selben Schluss.
 
 ## Aufgabe 3 – Mehr als zwei Gruppen
 

@@ -65,6 +65,7 @@ Ohne installierte Vektordatenbank lässt sich das Prinzip einer solchen DB berei
 Um die Funktionsweise transparent zu zeigen, nutzen wir TF-IDF-Vektoren aus `scikit-learn` und einen `NearestNeighbors`-Index als minimalen Vektor-Store. Als Korpus dient ein kurzer, **synthetischer** Sepsis-Leitlinienauszug mit sechs Empfehlungen in `code/python.py`: an internationale Empfehlungen angelehnt, aber kein Originaltext einer Leitlinie und nicht für klinische Entscheidungen gedacht. Das Skript braucht weder Internet noch API-Schlüssel.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
 
@@ -121,6 +122,7 @@ Schwelle und wählt die mit dem besten F1 für die Entscheidung „Antwort ist i
 Kontext“.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 # similarity = top-1 score of the question; schwelle comes from calibrate_threshold()
 if similarity < schwelle:
     print("Information in den bereitgestellten Leitlinien nicht enthalten.")

@@ -24,7 +24,11 @@ Patient B, der am Tag 29 stirbt, bekommen dieselbe Label-1, obwohl ihr Risikopro
 zu Tag 7 fundamental verschieden ist. Noch gravierender: Patient C, der am Tag 10
 lebend aus der Nachbeobachtung fällt (z. B. Verlegung ohne weitere Rückmeldung),
 ist **zensiert**, er hatte keine 30 Tage Beobachtungszeit, und ein Klassifikator
-kodiert ihn falsch als Nicht-Ereignis.
+kodiert ihn falsch als Nicht-Ereignis. In der Kurskohorte betrifft das 41
+Patient:innen (`fu_vollstaendig_30d == 0`). Sie stehen in `verstorben_30d` mit
+`0`, die Klassifikationsmodule 23–27 und 30 übernehmen diese Vereinfachung
+bewusst. Ein Survival-Modell nutzt dagegen genau die Zeit, die sie beobachtet
+wurden.
 
 <!-- excerpt-note -->
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/28-survival-ml/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
@@ -51,6 +55,7 @@ berücksichtigt. Jeder Baum gibt eine **kumulative Hazardfunktion** pro
 Patient:in zurück; der Forest mittelt diese Schätzungen.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 # scikit-survival (sksurv) – preferred
 try:
     from sksurv.ensemble import RandomSurvivalForest
@@ -82,6 +87,7 @@ der ROC-Kurve für jeden Zeitpunkt t, sie zeigt, ob das Modell auch an Tag 7,
 14 oder 21 noch gut diskriminiert, nicht nur am Ende des Beobachtungsfensters.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 # With sksurv:
 times = [7, 14, 21, 28]
 auc_values, mean_auc = cumulative_dynamic_auc(survival_y_train,
@@ -146,6 +152,7 @@ mit **Kaplan-Meier** visualisiert. Das erlaubt einen klinisch
 intuitiven Vergleich: Trennen die Risikogruppen die Überlebenskurven klar?
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from lifelines import KaplanMeierFitter
 
 for label, mask in [("Niedrig", risk_low), ("Mittel", risk_mid), ("Hoch", risk_high)]:

@@ -1,5 +1,24 @@
 # Musterlösungen · Neuronale Netze und Deep Learning
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+from sklearn.model_selection import StratifiedKFold, train_test_split
+
+lesson = runpy.run_path("module/30-deep-learning/code/python.py")
+SEED, build_data, build_preprocessor, make_lr, make_gb, make_mlp, make_mlp_es = (
+    lesson[name] for name in ("SEED", "build_data", "build_preprocessor",
+                              "make_lr", "make_gb", "make_mlp", "make_mlp_es"))
+X, y = build_data()
+pre = build_preprocessor()
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=SEED)
+mlp_pipe = make_mlp_es(build_preprocessor())   # early-stopping variant from section 2
+```
+
 ## Aufgabe 1 – Pipeline mit MLP
 
 ```python
@@ -89,59 +108,64 @@ from scipy import stats
 import numpy as np
 
 def summarise_folds(scores):
+    """Mean, SD, naive and Nadeau-Bengio-corrected t-interval (approximations)."""
     k, mean, sd = len(scores), scores.mean(), scores.std(ddof=1)
-    half_width = stats.t.ppf(0.975, df=k - 1) * sd / np.sqrt(k)
-    return mean, sd, mean - half_width, mean + half_width
+    t_crit = stats.t.ppf(0.975, df=k - 1)
+    naive = t_crit * sd * np.sqrt(1 / k)                     # assumes independent folds
+    corrected = t_crit * sd * np.sqrt(1 / k + 1 / (k - 1))   # n_test/n_train = 1/(k-1)
+    return mean, sd, (mean - naive, mean + naive), (mean - corrected, mean + corrected)
 
 fold_scores = {
-    "Logistische Regression": cross_val_score(make_lr(), X, y, cv=cv, scoring="roc_auc"),
-    "Gradient Boosting":      cross_val_score(make_gb(), X, y, cv=cv, scoring="roc_auc"),
-    "MLP":                    cross_val_score(make_mlp(), X, y, cv=cv, scoring="roc_auc"),
+    "Logistische Regression": cross_val_score(make_lr(build_preprocessor()), X, y, cv=cv, scoring="roc_auc"),
+    "Gradient Boosting":      cross_val_score(make_gb(build_preprocessor()), X, y, cv=cv, scoring="roc_auc"),
+    "MLP":                    cross_val_score(make_mlp(build_preprocessor()), X, y, cv=cv, scoring="roc_auc"),
 }
 for name, scores in fold_scores.items():
-    mean, sd, lo, hi = summarise_folds(scores)
-    print(f"  {name:<28} Mean={mean:.3f} SD={sd:.3f} 95%-CI=[{lo:.3f}, {hi:.3f}]")
+    mean, sd, naive, corrected = summarise_folds(scores)
+    print(f"  {name:<24} Mean={mean:.3f} SD={sd:.3f} "
+          f"naiv=[{naive[0]:.3f}, {naive[1]:.3f}] korrigiert=[{corrected[0]:.3f}, {corrected[1]:.3f}]")
 
 # Paired comparison – same folds for every model.
 for other in ("Gradient Boosting", "MLP"):
     diff = fold_scores["Logistische Regression"] - fold_scores[other]
-    mean, sd, lo, hi = summarise_folds(diff)
-    print(f"  LR - {other}: Mean diff={mean:+.3f}  95%-CI=[{lo:+.3f}, {hi:+.3f}]")
+    mean, sd, naive, corrected = summarise_folds(diff)
+    print(f"  LR - {other}: Mean diff={mean:+.3f}  naiv=[{naive[0]:+.3f}, {naive[1]:+.3f}] "
+          f"korrigiert=[{corrected[0]:+.3f}, {corrected[1]:+.3f}]")
 ```
 
 Ausgeführt auf diesem Datensatz (n=500, 78 Ereignisse) liefert das:
 
-| Modell | Mean | SD | 95-%-CI |
-|---|---|---|---|
-| Logistische Regression | 0,775 | 0,037 | [0,729; 0,821] |
-| Gradient Boosting | 0,735 | 0,036 | [0,691; 0,780] |
-| MLP | 0,656 | 0,047 | [0,598; 0,714] |
+| Modell | Mean | SD | naives 95-%-Intervall | korrigiert (Nadeau-Bengio) |
+|---|---|---|---|---|
+| Logistische Regression | 0,775 | 0,037 | [0,729; 0,821] | [0,706; 0,844] |
+| Gradient Boosting | 0,735 | 0,036 | [0,691; 0,780] | [0,669; 0,802] |
+| MLP | 0,656 | 0,047 | [0,598; 0,714] | [0,569; 0,743] |
 
 Und die gepaarten Fold-Differenzen (LR minus jeweils anderes Modell):
 
-- LR − Gradient Boosting: Mean-Diff +0,040, 95-%-CI [+0,012; +0,067] – CI schließt 0 nur **knapp** aus (k=5 Folds), ein fragiles, kein robustes Ergebnis.
-- LR − MLP: Mean-Diff +0,119, 95-%-CI [+0,072; +0,166] – CI schließt 0 deutlich aus, ein vergleichsweise klarer Unterschied.
+- LR − Gradient Boosting: Mean-Diff +0,040, naiv [+0,012; +0,067], korrigiert [−0,002; +0,081] – nur das naive Intervall schließt 0 aus, das reicht bei korrelierten Folds nicht.
+- LR − MLP: Mean-Diff +0,119, naiv [+0,072; +0,166], korrigiert [+0,048; +0,189] – auch das korrigierte Intervall schließt 0 aus, ein deutlicher Hinweis auf einen echten Unterschied.
 
 Führe den Code selbst aus, deine genauen Zahlen können je nach installierter
-sklearn-Version leicht abweichen. Wichtig ist die ehrliche Einordnung,
+sklearn-Version leicht abweichen. Wichtig ist die vorsichtige Einordnung,
 nicht ein bestimmtes Modell als „Sieger“ zu verkünden: Ohne Streuungsmaß
 sähe die Mittelwert-Rangfolge (0,775 > 0,735 > 0,656) nach einem klaren,
-dreistufigen Sieg von LR über GB über MLP aus. Die gepaarte CI-Betrachtung
-zeigt aber, dass nur der Abstand zum MLP robust belegt ist. Der Abstand
-zwischen den beiden Klassikern ist zwar statistisch von 0 verschieden, aber
-so knapp (CI-Untergrenze 0,012, nur 5 Fold-Differenzen), dass er nicht als
-verlässliche Rangfolge zwischen Gradient Boosting und logistischer
-Regression zählt. Die ehrliche Aussage: **das MLP ist auf diesem Datensatz
-eindeutig schwächer; welcher der beiden Klassiker besser ist, lässt sich bei
-dieser Stichprobengröße nicht robust entscheiden.** Beide Klassiker sind
-dateneffizient (Gradient Boosting braucht keine Skalierung und nutzt
-Nichtlinearitäten implizit über Splits; logistische Regression hat wenige
-Parameter und überpasst kaum), während das MLP Tausende von Beispielen
-bräuchte, um seine Parameterzahl sinnvoll zu schätzen. Das zentrale
-Ergebnis, mehr Modellkomplexität hilft auf kleinen klinischen Tabellendaten
-nicht automatisch, gilt unabhängig davon, welcher der beiden einfacheren
-Klassiker im Einzelfall knapp vorn liegt, nur eben mit der tatsächlich
-belegten Unsicherheit statt einer scheinbar sauberen Rangfolge.
+dreistufigen Sieg von LR über GB über MLP aus. Beide Intervalle sind aber
+nur Näherungen: Die fünf Fold-Werte sind nicht unabhängig, und die Varianz
+einer k-fachen Kreuzvalidierung lässt sich nicht unverzerrt schätzen (Bengio
+und Grandvalet 2004). Das naive t-Intervall ist deshalb zu schmal, das
+korrigierte nach Nadeau und Bengio vorsichtiger. Gestützt ist damit nur der
+Abstand zum MLP. Der Abstand zwischen den beiden Klassikern verschwindet im
+korrigierten Intervall und zählt nicht als Rangfolge. Die vorsichtige Aussage:
+**Das MLP schneidet auf diesem Datensatz deutlich schlechter ab; welcher der
+beiden Klassiker besser ist, lässt sich bei dieser Stichprobengröße nicht
+entscheiden.** Beide Klassiker sind dateneffizient (Gradient Boosting braucht
+keine Skalierung und nutzt Nichtlinearitäten implizit über Splits; logistische
+Regression hat wenige Parameter und überpasst kaum), während das MLP Tausende
+von Beispielen bräuchte, um seine Parameterzahl sinnvoll zu schätzen. Das
+zentrale Ergebnis, mehr Modellkomplexität hilft auf kleinen klinischen
+Tabellendaten nicht automatisch, gilt unabhängig davon, welcher der beiden
+einfacheren Klassiker im Einzelfall knapp vorn liegt.
 
 ## Bonus – Netzarchitektur variieren
 

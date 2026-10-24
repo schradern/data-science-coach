@@ -1,9 +1,12 @@
 # Übungen · Fehlende Werte und Imputation
 
+> Die Zeiten kommen zur Lektionsdauer (~150 min) hinzu.
+>
 > **Grundpfad (Aufgabe 1–6, ~45 min).** Handwerk (1–2), Entscheidung (3–4),
 > Verfahren und Imputationsmodell (5–6). Wer nur §1–§6 der Lektion gelesen hat,
-> hört hier auf – das reicht, um fehlende Werte in einer Publikation korrekt zu
-> behandeln.
+> hört hier auf – das reicht für die üblichen Entscheidungen zu fehlenden Werten
+> in einer Publikation. Bei Verdacht auf MNAR oder komplexen Mustern hol
+> zusätzlich methodische Beratung.
 >
 > **Vertiefung (Aufgabe 7–11, ~75 min).** Rubins Regeln von Hand (7), Wahl von
 > `m` (8), eine Methode überführen (9), MNAR beziffern (10), Bericht (11).

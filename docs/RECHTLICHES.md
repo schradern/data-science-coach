@@ -113,7 +113,7 @@ Website-Daten in deinem Browser, werden auch diese Einstellungen zurückgesetzt.
 
 Da diese Speicherung für die von dir ausdrücklich gewünschte Funktion
 (Fortschrittsanzeige, Sprachwahl, Ansichtseinstellungen) unbedingt erforderlich ist, ist sie nach § 25
-Abs. 2 Nr. 2 TDDG einwilligungsfrei.
+Abs. 2 Nr. 2 TDDDG einwilligungsfrei.
 
 ### 4.6 Deine Rechte
 

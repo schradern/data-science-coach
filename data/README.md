@@ -35,13 +35,36 @@ Modul 20, s. u.).
 | `verweildauer_tage` | Krankenhaus-Verweildauer (**deskriptiv**, keine Ereigniszeit) | int |
 | `fu_zeit_tage` | Nachbeobachtungszeit bis Ereignis/Zensierung, gekappt bei 30 Tagen | int |
 | `status` | Ereignisindikator: `1` = verstorben (Ereignis), `0` = zensiert | int |
-| `verstorben_30d` | 30-Tage-Mortalität (Outcome, 0/1) – **abgeleitet** aus `status`/`fu_zeit_tage` | int |
+| `verstorben_30d` | 30-Tage-Mortalität (Outcome, 0/1) – **abgeleitet** aus `status`/`fu_zeit_tage`, zählt nur **beobachtete** Todesfälle | int |
+| `fu_vollstaendig_30d` | `1` = 30-Tage-Status bekannt (bis Tag 30 nachverfolgt oder vorher verstorben), `0` = Kontakt vor Tag 30 verloren | int |
 
 `verstorben_30d` ist keine eigenständige Ziehung, sondern folgt
 zwangsläufig aus `status` und `fu_zeit_tage` (`verstorben_30d = 1`, wenn
 `status == 1` und `fu_zeit_tage <= 30`). Klassifikations- und
 Survival-Module sind damit per Konstruktion konsistent: Module 12, 16, 23–27
 nutzen `verstorben_30d`, Module 17/28/20 nutzen `fu_zeit_tage`/`status`.
+
+**Unvollständige Nachbeobachtung.** `verstorben_30d` ist ein Indikator für ein
+*beobachtetes* Ereignis, kein über den ganzen Horizont bekannter Outcome. 41
+Patient:innen haben `fu_vollstaendig_30d == 0`: 39 mit `fu_zeit_tage < 30` und
+2, deren Kontakt kurz vor Tag 30 abriss und deren Zeit auf 30 Tage gerundet ist.
+Alle 41 stehen mit `verstorben_30d = 0` im Datensatz. Ein Abgleich mit dem
+latenten Ereigniszeitprozess zeigt, dass bei Seed 42 keine:r von ihnen vor Tag 30
+verstorben ist. Bei einem anderen Seed ginge das schief (Seed 1: 78 echte
+Todesfälle, 72 beobachtet), und in echten Daten weißt du es nie. So gehen die
+Module damit um:
+
+| Analyse | Module | Umgang mit unvollständiger Nachbeobachtung |
+|---------|--------|--------------------------------------------|
+| Survival | 17, 20, 28 | korrekt: `fu_zeit_tage`/`status` behandeln die 41 als zensiert |
+| Logistische Regression | 12 | Vereinfachung `0`, plus Sensitivitätsanalyse nur mit `fu_vollstaendig_30d == 1` |
+| Klassifikation/ML | 16, 23–27, 30 | Vereinfachung `0`, ausdrücklich benannt in Modul 24 und 28 |
+| Übrige Module | z. B. 01–11, 13–15, 19, 21, 22 | `verstorben_30d` als Beispiel-Outcome, Vereinfachung `0` |
+
+Auch die „wahren“ Odds Ratios aus `lib/ground_truth.py` sind für dieses
+beobachtete Label definiert, Schätzung und Wahrheit messen also dasselbe.
+`fu_vollstaendig_30d` ist rein abgeleitet und verbraucht keine Zufallszahl,
+alle anderen Spalten und Dateien bleiben unverändert.
 
 ### `vitalwerte.csv`, long format (mehrere Messungen je Patient:in)
 `patient_id`, `tag` (0–3), `herzfrequenz`, `map_mmhg`, `temperatur_c`, `spo2_prozent`.

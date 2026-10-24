@@ -1,5 +1,16 @@
 # Musterlösungen · Unüberwachtes Lernen und Phänotypisierung von Patient:innen
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+
+lesson = runpy.run_path("module/29-unueberwacht-phenotyping/code/python.py")
+SEED, NUMERIC = lesson["SEED"], lesson["NUMERIC"]
+X, df = lesson["build_features"]()
+```
+
 ## Aufgabe 1 – k wählen und begründen
 
 ```python

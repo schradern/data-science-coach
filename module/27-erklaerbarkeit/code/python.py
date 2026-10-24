@@ -105,14 +105,29 @@ def explain_shap(model, X_train: pd.DataFrame,
         print("  compare patient feature values against the PDP baseline (section 3).")
         return False
 
-    # TreeExplainer is exact and fast for gradient-boosted trees.
-    # check_additivity=False: HistGradientBoostingClassifier + class_weight=
-    # "balanced" produces raw-margin outputs where shap's strict floating-point
-    # additivity check (sum of SHAP values == model output, to ~1e-6) can fail
-    # by a tiny amount without the explanation being wrong; this is a known
-    # shap/HistGradientBoosting interaction, not a bug in this script.
-    explainer = shap.Explainer(model, X_train)
-    shap_values = explainer(X_test.iloc[:100], check_additivity=False)  # first 100 patients for speed
+    # Path-dependent TreeSHAP is exact for tree models: per patient, the SHAP
+    # values plus the base value add up to the model's log-odds output, and
+    # shap verifies that (check_additivity, on by default).
+    explained = X_test.iloc[:100]  # first 100 patients for speed
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer(explained)
+    log_odds = model.decision_function(explained)
+    gap = np.abs(shap_values.values.sum(axis=1) + shap_values.base_values - log_odds).max()
+    print(f"  Additivity (path-dependent TreeSHAP): max |sum(SHAP) + base - log-odds| = {gap:.1e}")
+
+    # The interventional variant (with a background sample) does NOT add up
+    # here: several measured values sit exactly on HistGradientBoosting split
+    # thresholds, and shap's tree traversal at reduced precision sends some of
+    # them down the other branch. Quantify that instead of hiding it.
+    interventional = shap.Explainer(model, X_train)(explained, check_additivity=False)
+    gap_int = (interventional.values.sum(axis=1) + interventional.base_values - log_odds)
+    worst = np.abs(gap_int).argmax()
+    prob_shift = np.abs(1 / (1 + np.exp(-(log_odds + gap_int))) - 1 / (1 + np.exp(-log_odds)))
+    print(f"  Interventional SHAP (background sample): max gap {abs(gap_int[worst]):.3f} log-odds "
+          f"(SHAP sum {log_odds[worst] + gap_int[worst]:.3f} vs. model {log_odds[worst]:.3f}); "
+          f"largest shift in risk {100 * prob_shift.max():.2f} percentage points")
+    print("  SHAP values depend on the variant and background chosen: an explanation of")
+    print("  the model, not an exact fact about the patient.")
 
     mean_abs = np.abs(shap_values.values).mean(axis=0)
     print("  Mean |SHAP| per feature (global summary):")
@@ -127,7 +142,8 @@ def explain_shap(model, X_train: pd.DataFrame,
     )
 
     # Local explanation for the patient with the highest predicted risk.
-    highest_risk_idx = model.predict_proba(X_test)[:, 1].argmax()
+    # argmax over the explained rows only: shap_values covers the first 100.
+    highest_risk_idx = model.predict_proba(explained)[:, 1].argmax()
     print(f"\n  Local SHAP for the highest-risk patient (index {highest_risk_idx}):")
     sv = shap_values[highest_risk_idx].values
     base = shap_values[highest_risk_idx].base_values

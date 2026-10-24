@@ -48,6 +48,7 @@ Bevor eine KI Patient:innen beeinflusst, sollte sie im **Schattenbetrieb (Silent
 > **Hinweis – die Codeblöcke unten sind Auszüge.** Sie zeigen die entscheidenden Schritte, nicht jede Import-Zeile. Das vollständige, am Stück lauffähige Skript ist [`code/python.py`](code/python.py) (im Browser über den **Python**-Reiter oben). In Colab führst du das ganze Modul mit einer Zeile aus: `!python module/34-design-ki-studien/code/python.py` – siehe das [in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb).
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 # Fit once on the development patients and freeze the model; then the true
 # risk drifts: log-odds of death +0.15 per month at every feature profile,
 # simulated by giving each observed death the weight exp(delta).

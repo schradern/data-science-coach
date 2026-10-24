@@ -35,28 +35,48 @@ def build_longitudinal_data() -> pd.DataFrame:
 
 
 def report_incomplete_series(data: pd.DataFrame) -> None:
-    """Break incomplete measurement series down by cause: early discharge
-    (a patient still alive who simply left before day 4 -- MAR/MCAR-style
-    missingness, an LMM handles this fine) vs. death within the 30-day
-    follow-up (the day-3/day-4 MAP does not exist for that patient -- this
-    is truncation by death, not missingness; see README section 4).
+    """Break incomplete measurement series down by what actually ended them.
+
+    A series is cut short by death only if the patient died inside the
+    measurement window (death day < the day the series would have reached).
+    A patient who left on day 2 and died on day 22 has an ordinary early-
+    discharge gap, not truncation by death.
     """
-    cohort = load_cohort()[["patient_id", "verweildauer_tage", "verstorben_30d"]]
+    cohort = load_cohort()[["patient_id", "verweildauer_tage", "fu_zeit_tage", "status"]]
     n_per_patient = data.groupby("patient_id").size()
     n_max = n_per_patient.max()
-    incomplete_ids = n_per_patient[n_per_patient < n_max].index
-    incomplete = cohort[cohort["patient_id"].isin(incomplete_ids)]
-    n_incomplete = len(incomplete)
-    n_died = int(incomplete["verstorben_30d"].sum())
-    n_discharged = n_incomplete - n_died
+    incomplete = cohort.set_index("patient_id").loc[n_per_patient[n_per_patient < n_max].index]
+    died = incomplete[incomplete["status"] == 1]
+    died_in_window = died[died["fu_zeit_tage"] < n_max]
+    n_short_stay = int((incomplete["verweildauer_tage"] < n_max).sum())
     print(f"Rows: {len(data)} | patients: {data['patient_id'].nunique()} | "
           f"measurements per patient: {n_per_patient.min()}-{n_max} "
-          f"({n_incomplete} patients have fewer than {n_max})")
-    print(f"  Of these {n_incomplete} incomplete series: {n_discharged} are patients who "
-          f"survived (early discharge, verweildauer_tage < {n_max} -- ordinary MAR/MCAR-style "
-          "missingness) and")
-    print(f"  {n_died} are patients who died within 30 days (verstorben_30d == 1 -- "
-          "truncation by death, NOT missingness; see the pitfall in the README).")
+          f"({len(incomplete)} patients have fewer than {n_max})")
+    print(f"  {n_short_stay} of these {len(incomplete)} series belong to a short stay "
+          f"(verweildauer_tage < {n_max}); {len(died)} of the patients died "
+          "within 30 days,")
+    print(f"  but only {len(died_in_window)} died inside the measurement window "
+          f"(death days of the others: {sorted(died['fu_zeit_tage'].drop(died_in_window.index))}).")
+    print("  The vital-sign series here are simulated independently of the death "
+          "time, so they cannot")
+    print("  serve as evidence of truncation by death; the README explains the "
+          "concept.")
+
+
+def check_measurements_after_death(data: pd.DataFrame) -> None:
+    """Plausibility check: a measurement dated after the recorded death day.
+
+    Real records contain such contradictions too (wrong date, a late
+    documentation entry, a mistyped death date). Find them and clarify them
+    at the source; do not silently delete or cap them.
+    """
+    cohort = load_cohort()[["patient_id", "fu_zeit_tage", "status"]]
+    merged = data.merge(cohort, on="patient_id")
+    after = merged[(merged["status"] == 1) & (merged["tag"] > merged["fu_zeit_tage"])]
+    print(f"\nPlausibility check: {len(after)} measurements in "
+          f"{after['patient_id'].nunique()} patients are dated after the recorded death day:")
+    print(after[["patient_id", "tag", "fu_zeit_tage"]]
+          .rename(columns={"fu_zeit_tage": "death_day"}).to_string(index=False))
 
 
 def main() -> None:
@@ -65,6 +85,7 @@ def main() -> None:
     print("=== Repeated MAP measurements (long format) ===")
     print(data.head())
     report_incomplete_series(data)
+    check_measurements_after_death(data)
 
     ols = smf.ols(FORMULA, data=data).fit()
     mixed = smf.mixedlm(FORMULA, data=data, groups=data["patient_id"]).fit(reml=True)
@@ -96,10 +117,10 @@ def main() -> None:
     print("Either way, the mixed model's SE is the trustworthy one because it is derived from the")
     print("correct error structure instead of assuming independence it doesn't have.")
     print("\nEstimand caveat: this model is fit on whoever HAS a MAP measurement on a given day.")
-    print("For patients who died before day 3, that measurement does not exist -- so what the")
-    print("model actually estimates is the mean MAP trajectory among patients still alive and")
-    print("in hospital, not among everyone admitted. No missing-data assumption (MCAR/MAR) fixes")
-    print("that; it is a truncation-by-death problem, not a missingness problem.")
+    print("In real ICU data, a patient who dies on day 2 has no day-3 MAP at all -- the model")
+    print("then estimates the mean MAP trajectory among patients still alive and in hospital,")
+    print("not among everyone admitted. No missing-data assumption (MCAR/MAR) fixes that; it is")
+    print("truncation by death. This toy dataset does not simulate it (see above).")
 
     print("\n=== Random slope: does the MAP trend over time also vary by patient? ===")
     with warnings.catch_warnings(record=True) as caught:

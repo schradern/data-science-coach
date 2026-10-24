@@ -108,7 +108,7 @@ vollständige Fälle   N=401   30-Tage-Mortalität 11,5 %
 | volle Daten (Wahrheit) | −10,14 | 3,00 | 2,76 | 0,106 |
 | Complete Case | −9,82 | 3,77 | 2,67 | 0,076 |
 | Median-Imputation | −5,76 | **3,21** | **1,78** | 0,115 |
-| Multiple Imputation (m = 20) | −9,62 | 3,63 | 2,62 | 0,107 |
+| Multiple Imputation (m = 20) | −9,57 | 3,60 | 2,60 | 0,107 |
 
 **Der Widerspruch:** Die Median-Imputation setzt 99 Patient:innen auf exakt
 denselben pH-Wert. Damit
@@ -121,20 +121,28 @@ denselben pH-Wert. Damit
 
 Der SE ist also nicht kleiner, weil mehr Information vorläge, sondern weil die
 Methode so tut. Rubins Regeln addieren die **Between-Imputation-Varianz** wieder
-hinzu: der MI-Standardfehler (3,63) ist ehrlich größer als der der
+hinzu: der MI-Standardfehler (3,60) ist ehrlich größer als der der
 Median-Imputation und kleiner als der der Complete-Case-Analyse (3,77), die
 ganze Fälle verwirft.
 
 ## Aufgabe 6 – Das Imputationsmodell sabotieren
 
 ```python
+modell = "verstorben_30d ~ bga_ph + alter + sofa_score"
+np.random.seed(42)
+work = df[["verstorben_30d", "bga_ph", "alter", "sofa_score"]].copy()
+imputer = mice.MICEData(work)
 imputer.set_imputer("bga_ph", "alter + sofa_score")   # without verstorben_30d
+mi = mice.MICE(modell, sm.Logit, imputer, fit_kwds={"disp": 0}).fit(
+    n_imputations=20, n_burnin=10)
+b_ph = np.asarray(mi.params)[1]                        # order: Intercept, bga_ph, ...
+print(f"OR je -0,1 pH, Outcome weggelassen: {np.exp(-0.1 * b_ph):.2f}")
 ```
 
 | | OR je −0,1 pH | Risiko (Referenz) |
 |---|---|---|
 | volle Daten (Wahrheit) | 2,76 | 0,106 |
-| MI, Outcome **im** Imputationsmodell | 2,62 | 0,107 |
+| MI, Outcome **im** Imputationsmodell | 2,60 | 0,107 |
 | MI, Outcome **weggelassen** | **1,75** | 0,114 |
 
 **Es bricht das Odds Ratio, nicht das absolute Risiko** – das Spiegelbild von
@@ -158,25 +166,25 @@ Vollständig in [`code/rubin.py`](code/rubin.py) / [`code/rubin.R`](code/rubin.R
 **1.** Aus den m = 20 Fits (Python, `statsmodels`):
 
 ```text
-Q̄  = -9,9641      Ū = 9,1880      B = 1,6824
-T  = Ū + (1 + 1/20)·B = 9,1880 + 1,7665 = 10,9544
-SE = √T = 3,3098
+Q̄  = -9,9426      Ū = 9,1799      B = 1,6273
+T  = Ū + (1 + 1/20)·B = 9,1799 + 1,7087 = 10,8886
+SE = √T = 3,2998
 ```
 
 `MICE.combine()` auf **denselben** vervollständigten Datensätzen liefert exakt
-`Q̄ = -9,964097`, `SE = 3,309751` – bis auf Gleitkommarauschen identisch. Rubins
+`Q̄ = -9,942579`, `SE = 3,299795` – bis auf Gleitkommarauschen identisch. Rubins
 Regeln sind keine Blackbox, sondern vier Zeilen Arithmetik.
 
 **2.**
 
 ```text
-r  = (1 + 1/20)·B / Ū = 0,1923
-λ  = (1 + 1/20)·B / T = 0,1613
-RE = 1 / (1 + λ/m)    = 0,9920
+r  = (1 + 1/20)·B / Ū = 0,1861
+λ  = (1 + 1/20)·B / T = 0,1569
+RE = 1 / (1 + λ/m)    = 0,9922
 ```
 
-**λ = 0,161** heißt: **16,1 % der Unsicherheit** über den pH-Koeffizienten
-entstehen daraus, dass 99 Werte fehlen; die übrigen 83,9 % hätte man auch bei
+**λ = 0,157** heißt: **15,7 % der Unsicherheit** über den pH-Koeffizienten
+entstehen daraus, dass 99 Werte fehlen; die übrigen 84,3 % hätte man auch bei
 vollständigen Daten. `RE = 0,992` heißt: `m = 20` schöpft 99,2 % der Effizienz
 von `m = ∞` aus – für den **Punktschätzer**. Für den **Standardfehler** gilt das
 nicht (siehe Aufgabe 8).
@@ -184,7 +192,7 @@ nicht (siehe Aufgabe 8).
 **3.**
 
 ```text
-ν_alt = (m − 1)/λ² = 19 / 0,0260 = 730,7
+ν_alt = (m − 1)/λ² = 19 / 0,0246 = 771,6
 n − k                            = 496
 ```
 
@@ -194,47 +202,47 @@ Formel von 1987 nimmt implizit `n → ∞` an. Barnard & Rubin (1999) korrigiere
 
 ```text
 ν_com = 496
-ν_obs = ((496+1)/(496+3)) · 496 · (1 − 0,1613) = 414,3
-ν_BR  = (730,7 · 414,3)/(730,7 + 414,3)        = 264,4
+ν_obs = ((496+1)/(496+3)) · 496 · (1 − 0,1569) = 416,5
+ν_BR  = (771,6 · 416,5)/(771,6 + 416,5)        = 270,5
 ```
 
-Ergebnis: `t = −3,011`, `p = 0,0029`, 95-%-KI `[−16,48; −3,45]`.
+Ergebnis: `t = −3,013`, `p = 0,0028`, 95-%-KI `[−16,44; −3,45]`.
 
 **Stolperstein:** `statsmodels` rechnet für MI gar keine Freiheitsgrade, sondern
 einen Wald-**z**-Test (df = ∞). Auf denselben 20 Datensätzen ergäbe das
-`p = 0,0026` statt 0,0029, also etwas zu liberal. Ein frischer
-`mice.MICE(...).fit()`-Lauf meldet `p = 0,0043`, aber nur, weil er andere
+`p = 0,0026` statt 0,0028, also etwas zu liberal. Ein frischer
+`mice.MICE(...).fit()`-Lauf meldet `p = 0,0041`, aber nur, weil er andere
 Datensätze zieht (`code/rubin.py`, Abschnitt 4b). `mice::pool()` implementiert
 Barnard–Rubin korrekt.
 
 **4.** Mit `B = 0`:
 
 ```text
-T  = Ū = 9,1880      SE = 3,0312      (statt 3,3098)
+T  = Ū = 9,1799      SE = 3,0298      (statt 3,2998)
 ```
 
 Das ist genau das, was eine **Einfachimputation** berichtet: sie behandelt die
 99 geratenen Werte als gemessen und lässt die Between-Varianz weg. Der
-Standardfehler fällt um 8,4 %, ohne dass ein einziges Datum hinzugekommen wäre.
+Standardfehler fällt um 8,2 %, ohne dass ein einziges Datum hinzugekommen wäre.
 `B` **ist** die Unsicherheit der Imputation. Sie wegzulassen ist der gesamte
 Fehler der Einfachimputation.
 
 ## Aufgabe 8 – Wie viele Imputationen?
 
-**1.** `m ≳ 100 · λ = 100 · 0,1613 = 16,1`. Mit `m = 20` ist die Faustregel
+**1.** `m ≳ 100 · λ = 100 · 0,1569 = 15,7`. Mit `m = 20` ist die Faustregel
 (White, Royston & Wood 2011) **gerade erfüllt** – kein Spielraum.
 
 **2./3.** `code/rubin.py` wiederholt die gesamte Pipeline über 10 Seeds je `m`:
 
 | m | mittlerer SE | sd(SE) | cv(SE) |
 |---|---|---|---|
-| 2 | 3,55 | 0,821 | **23,1 %** |
-| 5 | 3,63 | 0,283 | 7,8 % |
-| 10 | 3,68 | 0,277 | 7,5 % |
+| 2 | 3,50 | 0,723 | **20,7 %** |
+| 5 | 3,63 | 0,289 | 8,0 % |
+| 10 | 3,68 | 0,268 | 7,3 % |
 | 20 | 3,49 | 0,136 | 3,9 % |
-| 50 | 3,69 | 0,123 | 3,3 % |
+| 50 | 3,68 | 0,120 | 3,3 % |
 
-Bei `m = 2` schwankt der **berichtete Standardfehler** um 23 % – allein je nach
+Bei `m = 2` schwankt der **berichtete Standardfehler** um 21 % – allein je nach
 Zufallsseed. Bei `m = 5` sind es noch ~8 %.
 
 > **Merksatz:** Die alte Regel „m = 5“ zielt auf die Effizienz des
@@ -298,10 +306,10 @@ Skript prüft das per Assertion):
 | δ | OR je −0,1 pH | 95-%-KI | Schluss hält? |
 |---|---|---|---|
 | −0,02 | 3,31 | (1,56; 6,99) | ja |
-| 0,00 (MAR) | 2,40 | (1,12; 5,13) | ja |
+| 0,00 (MAR) | 2,40 | (1,12; 5,14) | ja |
 | +0,01 | 2,21 | (1,05; 4,65) | ja, knapp |
-| **+0,02** | 1,83 | (0,93; 3,62) | **nein – Kipppunkt** |
-| +0,05 | 1,33 | (0,70; 2,53) | nein |
+| **+0,02** | 1,83 | (0,93; 3,59) | **nein – Kipppunkt** |
+| +0,05 | 1,32 | (0,69; 2,50) | nein |
 
 Der Kipppunkt liegt bei **δ = +0,02**.
 
@@ -341,7 +349,7 @@ ohnehin nicht erklären kann.
 > SOFA-Score und das Outcome. Die Fraktion fehlender Information für den
 > pH-Koeffizienten betrug λ = 0,16, womit m = 20 die Empfehlung m ≳ 100·λ erfüllt.
 > Eine Complete-Case-Analyse als Sensitivitätsanalyse lieferte vergleichbare Odds
-> Ratios (2,67 vs. 2,62 je 0,1 pH-Abfall), aber systematisch zu niedrige absolute
+> Ratios (2,67 vs. 2,60 je 0,1 pH-Abfall), aber systematisch zu niedrige absolute
 > Risiken (−28 % am Referenzpatienten), da vollständige Fälle die Verstorbenen
 > unterrepräsentieren. Eine Delta-Adjustment-Analyse zeigte, dass die
 > Schlussfolgerung bestehen bleibt, solange die angenommene systematische

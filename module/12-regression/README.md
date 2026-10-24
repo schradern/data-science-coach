@@ -63,7 +63,7 @@ der Residuen; VIF-Werte (> 10: Warnsignal) messen Multikollinearität.
 > ![Abbildung: Gegenüberstellung von residuendiagnostischen Plots zur Prüfung auf Homoskedastizität und Heteroskedastizität. Ein Trichter deutet auf eine verletzte Varianzannahme hin.](assets/residual_diagnostics.png)
 
 **Stolperstein:** Verweildauer ist rechtsschief, wenige Patient:innen liegen
-extrem lange. Die OLS-Koeffizienten bleiben dabei unverzerrt, aber die Residuen
+extrem lange. Die OLS-Koeffizienten bleiben dabei unverzerrt, solange das Mittelwertmodell stimmt (Schiefe allein verzerrt sie nicht), aber die Residuen
 sind schief und meist heteroskedastisch; KI und p-Werte werden unzuverlässig, und
 der Mittelwert beschreibt die typische Verweildauer schlecht. Abhilfe: log-transformierter Outcome oder ein Gamma-GLM, das die Schiefe explizit
 modelliert.
@@ -101,6 +101,19 @@ bereits über der 10-%-Schwelle: OR und RR laufen hier spürbar auseinander, und
 die OR überschätzt das tatsächliche relative Risiko. Genau deshalb in
 Publikationen immer explizit „Odds Ratio“ schreiben, nie „Risiko“ oder
 „Wahrscheinlichkeit“.
+
+**Was `verstorben_30d` genau zählt.** Das Label heißt „30-Tage-Mortalität“, ist
+aber ein **beobachteter** Todesfall innerhalb der Nachbeobachtung. 41
+Patient:innen wurden nicht bis Tag 30 nachverfolgt (z. B. Verlegung ohne
+Rückmeldung) und stehen mit `0` im Datensatz, obwohl ein späterer Tod
+unbemerkt geblieben wäre. Die Spalte `fu_vollstaendig_30d` markiert, bei wem
+der 30-Tage-Status tatsächlich bekannt ist. Das Skript rechnet das Modell zur
+Sensitivität noch einmal nur mit diesen 459 Patient:innen. Die ORs verschieben
+sich kaum (SOFA 1,496 → 1,476, Sepsis 1,980 → 1,921), die Null-Kodierung trägt
+das Ergebnis hier also nicht. Auch der Ausschluss ist keine saubere Lösung, denn
+er wirft Menschen hinaus, die bis zum Kontaktverlust nachweislich gelebt haben.
+Die Methode, die unvollständige Nachbeobachtung korrekt verarbeitet, ist die
+Survival-Analyse (Abschnitt 3, Modul 17, Modul 28).
 
 ### Kalibrierung
 

@@ -18,8 +18,10 @@ Wähle für jede Frage eine Methode und begründe sie in einem Satz:
 ## Aufgabe 2 – Gepaarte Daten
 
 Berechne die Veränderung der mittleren arteriellen Druckwerte (`map_mmhg`) von
-Tag 0 zu Tag 3. Prüfe die Differenzen grafisch oder numerisch und entscheide
-zwischen gepaartem t-Test und Wilcoxon-Vorzeichen-Rang-Test.
+Tag 0 zu Tag 3. Lege zuerst fest, ob du die mittlere oder die mediane
+Differenz berichten willst. Prüfe die Differenzen grafisch oder numerisch auf
+Symmetrie und entscheide dann zwischen gepaartem t-Test,
+Wilcoxon-Vorzeichen-Rang-Test und Vorzeichentest.
 
 Berichte: mittlere oder mediane Differenz, 95-%-KI oder IQR, p-Wert.
 

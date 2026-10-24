@@ -21,10 +21,15 @@ reproduzierbar und prüfbar.
 ## Zwei Wege durch den Kurs – wähle einen
 
 **(A) Im Browser lernen – der Standard.** Installiere nur **Python _oder_ R**.
-Jeden Codeblock kopierst du direkt in deine Konsole; die Daten liest er über
-eine Web-Adresse (`https://…/data/kohorte.csv`) – du musst **nichts
-herunterladen, klonen oder erzeugen**. Welche Pakete du brauchst, sagt dir das
-nächste Modul.
+Die Codeblöcke der Module kopierst du der Reihe nach in deine Konsole; die
+Daten liest der erste Block eines Abschnitts über eine Web-Adresse
+(`https://…/data/kohorte.csv`) – du musst **nichts herunterladen, klonen oder
+erzeugen**. Welche Pakete du brauchst, sagt dir das nächste Modul.
+In den Vertiefungsmodulen zeigen manche Blöcke nur den entscheidenden
+Ausschnitt eines längeren Skripts. Sie tragen im Kopf den Zusatz **„Auszug“**
+und laufen nicht für sich allein; das vollständige Skript ist jeweils
+`code/python.py` bzw. `code/r.R`. Lösungsseiten, die darauf aufbauen, beginnen
+mit einem Vorbereitungsblock für den Projektordner (Weg B).
 
 **(B) Mit dem Repository arbeiten – optional, für volle Reproduzierbarkeit.**
 Klonst du das Projekt, stehen `data/`, die Hilfsfunktionen in `lib/` und die
@@ -76,13 +81,19 @@ Kurs ein eigenes Modul (Modul 06).
 
 **Empfohlene Lernpfade:**
 
-- **Mein erstes Paper (statistischer Shortcut)** · 7 Module: 02–03 → 06 → 09–10 → 12 → 22
-- **Schnell zur Auswertung** · 6 Module: 02–03 → 06 → 08–10
-- **Datenextraktion im Fokus** · 5 Module: 02 → 04–07
-- **Klinische Forschung / Publikation** · 15 Module: 06 → 09–22
+- **Mein erstes Paper (statistischer Shortcut)** · 9 Module: 02–04 → 06 → 08–10 → 12 → 22
+- **Schnell zur Auswertung** · 7 Module: 02–04 → 06 → 08–10
+- **Datenextraktion im Fokus** · 6 Module: 02–07
+- **Klinische Forschung / Publikation** · 16 Module: 06 → 08–22
+  - Setzt Module 02–04 voraus (Umgebung, Grundlagen, Daten einlesen).
 - **Statistik-Vertiefung** · 13 Module: 09–21
+  - Setzt Module 02–04, 06 und 08 voraus, also den Pfad „Schnell zur Auswertung“ bis Modul 08.
 - **Machine Learning / KI** · 12 Module: 23–34
+  - Setzt Module 10 und 12 voraus (Inferenz, Regression), für Modul 28 zusätzlich Modul 17 (Survival).
 - **Vollständig** · 34 Module: 01–34 in didaktischer Reihenfolge
+
+Jeder Pfad enthält die Voraussetzungen seiner Module, die Vertiefungspfade nennen
+ihr Vorwissen darunter. Welche Module ein Modul voraussetzt, steht oben in jeder Lektion.
 
 ## 4 Wie du mit dem Material arbeitest
 
@@ -90,8 +101,8 @@ Jedes Modul folgt demselben Bogen:
 
 1. **Klinischer Aufhänger**: eine ärztliche Frage motiviert das Konzept.
 2. **Konzept vor Code**: erst das Prinzip, dann das lauffähige Beispiel.
-3. **Python und R nebeneinander**: beide Sprachen zeigen dasselbe Ergebnis.
-4. **Übungen** (`uebungen.md`) zum Selbst-Ausprobieren.
+3. **Python und R nebeneinander**: beide Sprachen zeigen dasselbe Ergebnis. In einigen Vertiefungsmodulen ist die R-Spur kürzer, welche Abschnitte dort fehlen, steht im [Lehrplan](../../docs/LEHRPLAN.md#r-abdeckung).
+4. **Übungen** (`uebungen.md`) zum Selbst-Ausprobieren. Die Dauer im Kopf jedes Moduls gilt für die Lektion; die Übungen kommen zeitlich hinzu, ihr Aufwand steht oben in der Übungsdatei.
 5. **Lösungen** (`loesungen.md`), erst nach eigenem Versuch.
 
 Alle Module nutzen denselben Datensatz: eine synthetische Intensivkohorte mit 500
@@ -129,7 +140,7 @@ print(f"30-day mortality: {cohort['verstorben_30d'].mean():.1%}")
 
 Ausgabe (synthetische Daten):
 ```
-Dataset: (500, 16)
+Dataset: (500, 17)
 30-day mortality: 15.6%
 ```
 

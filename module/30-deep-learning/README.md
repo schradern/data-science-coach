@@ -125,7 +125,7 @@ In R:
 
 ## 3 AUC-Vergleich: MLP vs. Logistische Regression vs. Gradient Boosting
 
-Das zentrale Experiment: Schlagen neuronale Netze die Klassiker auf kleinen klinischen Tabellendaten? Eine einzelne AUC-Zahl pro Modell verschweigt aber die Streuung zwischen den Folds, bei nur 5 Folds auf ~500 Patient:innen kann diese Streuung genauso groß sein wie der Abstand zwischen den Modellen. Deshalb: pro Modell alle Fold-AUCs, Mittelwert, Standardabweichung und ein 95-%-Konfidenzintervall (t-Verteilung, k = 5 Folds) ausgeben, und zusätzlich den **gepaarten** Unterschied pro Fold, weil jedes Modell auf denselben 5 Folds ausgewertet wird.
+Das zentrale Experiment: Schlagen neuronale Netze die Klassiker auf kleinen klinischen Tabellendaten? Eine einzelne AUC-Zahl pro Modell verschweigt aber die Streuung zwischen den Folds, bei nur 5 Folds auf ~500 Patient:innen kann diese Streuung genauso groß sein wie der Abstand zwischen den Modellen. Deshalb: pro Modell alle Fold-AUCs, Mittelwert, Standardabweichung und ein ungefähres 95-%-Intervall ausgeben, und zusätzlich den **gepaarten** Unterschied pro Fold, weil jedes Modell auf denselben 5 Folds ausgewertet wird. Die Intervalle sind **Näherungen zur Beschreibung**, keine exakten Konfidenzintervalle: Die fünf Fold-Werte sind nicht unabhängig (die Trainingsmengen überlappen zu drei Vierteln), und für die Varianz einer k-fachen Kreuzvalidierung gibt es keinen unverzerrten Schätzer (Bengio und Grandvalet 2004). Ein naives t-Intervall fällt deshalb zu schmal aus. Das Skript gibt zusätzlich ein korrigiertes Intervall nach Nadeau und Bengio aus, das die Varianz um den Faktor (1/k + n_Test/n_Training) statt 1/k aufbläht, und zieht seine Schlüsse aus diesem.
 
 ```python
 from sklearn.linear_model import LogisticRegression
@@ -157,9 +157,12 @@ def make_mlp():
                                            random_state=SEED))])
 
 def summarise_folds(scores):
+    """Mean, SD, naive and Nadeau-Bengio-corrected t-interval (approximations)."""
     k, mean, sd = len(scores), scores.mean(), scores.std(ddof=1)
-    half_width = stats.t.ppf(0.975, df=k - 1) * sd / np.sqrt(k)
-    return mean, sd, mean - half_width, mean + half_width
+    t_crit = stats.t.ppf(0.975, df=k - 1)
+    naive = t_crit * sd * np.sqrt(1 / k)                     # assumes independent folds
+    corrected = t_crit * sd * np.sqrt(1 / k + 1 / (k - 1))   # n_test/n_train = 1/(k-1)
+    return mean, sd, (mean - naive, mean + naive), (mean - corrected, mean + corrected)
 
 fold_scores = {
     "Logistische Regression": cross_val_score(make_lr(), X, y, cv=cv, scoring="roc_auc"),
@@ -167,34 +170,36 @@ fold_scores = {
     "MLP":                    cross_val_score(make_mlp(), X, y, cv=cv, scoring="roc_auc"),
 }
 for name, scores in fold_scores.items():
-    mean, sd, lo, hi = summarise_folds(scores)
-    print(f"  {name:<28} Mean={mean:.3f} SD={sd:.3f} 95%-CI=[{lo:.3f}, {hi:.3f}]")
+    mean, sd, naive, corrected = summarise_folds(scores)
+    print(f"  {name:<28} Mean={mean:.3f} SD={sd:.3f} "
+          f"naiv=[{naive[0]:.3f}, {naive[1]:.3f}] korrigiert=[{corrected[0]:.3f}, {corrected[1]:.3f}]")
 
 # Paired per-fold difference – the right comparison, since every model was
 # evaluated on the exact same 5 folds.
 diff_lr_gb = fold_scores["Logistische Regression"] - fold_scores["Gradient Boosting"]
-mean, sd, lo, hi = summarise_folds(diff_lr_gb)
-print(f"  LR - GB  Mean diff={mean:+.3f}  95%-CI=[{lo:+.3f}, {hi:+.3f}]")
+mean, sd, naive, corrected = summarise_folds(diff_lr_gb)
+print(f"  LR - GB  Mean diff={mean:+.3f}  naiv=[{naive[0]:+.3f}, {naive[1]:+.3f}] "
+      f"korrigiert=[{corrected[0]:+.3f}, {corrected[1]:+.3f}]")
 ```
 
-![AUC-Vergleich (Punktschätzer, 5-fache Kreuzvalidierung): Logistische Regression 0,775, Gradient Boosting 0,735, MLP 0,656. Die Balken zeigen nur die Mittelwerte, die Streuung zwischen Folds ist hier nicht abgebildet – siehe Text und Skript für die 95-%-Konfidenzintervalle.](assets/auc_vergleich.png)
+![AUC-Vergleich (Punktschätzer, 5-fache Kreuzvalidierung): Logistische Regression 0,775, Gradient Boosting 0,735, MLP 0,656. Die Balken zeigen nur die Mittelwerte, die Streuung zwischen Folds ist hier nicht abgebildet – siehe Text und Skript für die ungefähren Intervalle.](assets/auc_vergleich.png)
 
 Ausgeführt auf diesem Datensatz (n=500, 78 Ereignisse, k=5 Folds) liefert das:
 
-| Modell | Mean | SD | 95-%-CI |
-|---|---|---|---|
-| Logistische Regression | 0,775 | 0,037 | [0,729; 0,821] |
-| Gradient Boosting | 0,735 | 0,036 | [0,691; 0,780] |
-| MLP | 0,656 | 0,047 | [0,598; 0,714] |
+| Modell | Mean | SD | naives 95-%-Intervall | korrigiert (Nadeau-Bengio) |
+|---|---|---|---|---|
+| Logistische Regression | 0,775 | 0,037 | [0,729; 0,821] | [0,706; 0,844] |
+| Gradient Boosting | 0,735 | 0,036 | [0,691; 0,780] | [0,669; 0,802] |
+| MLP | 0,656 | 0,047 | [0,598; 0,714] | [0,569; 0,743] |
 
 Und die gepaarten Differenzen pro Fold (Logistische Regression minus jeweils anderes Modell):
 
-| Vergleich | Mean-Diff | 95-%-CI | Befund |
-|---|---|---|---|
-| LR − Gradient Boosting | +0,040 | [+0,012; +0,067] | CI schließt 0 knapp aus – bei k=5 Folds ein fragiles, kein robustes Ergebnis |
-| LR − MLP | +0,119 | [+0,072; +0,166] | CI schließt 0 deutlich aus – vergleichsweise klarer Unterschied |
+| Vergleich | Mean-Diff | naives 95-%-Intervall | korrigiert | Befund |
+|---|---|---|---|---|
+| LR − Gradient Boosting | +0,040 | [+0,012; +0,067] | [−0,002; +0,081] | nur das naive Intervall schließt 0 aus – nicht unterscheidbar |
+| LR − MLP | +0,119 | [+0,072; +0,166] | [+0,048; +0,189] | auch das korrigierte Intervall schließt 0 aus – deutlicher Hinweis |
 
-**Stolperstein:** Eine bloße Rangfolge der Mittelwerte (0,775 > 0,735 > 0,656) suggeriert einen klaren Sieger, verschweigt aber, dass bei nur k=5 Folds die Fold-zu-Fold-Streuung (SD ≈ 0,03–0,05) in der Größenordnung des LR-GB-Abstands (0,040) liegt. Erst die **gepaarte** Betrachtung pro Fold zeigt, wie belastbar ein Unterschied wirklich ist: Der LR-GB-Vorsprung ist zwar statistisch von 0 verschieden, aber nur knapp (CI-Untergrenze 0,012) und beruht auf gerade einmal 5 Wertepaaren, kein robuster Beleg. Hinzu kommt: Die fünf Fold-Werte sind nicht unabhängig (die Trainingsmengen überlappen), solche t-Intervalle fallen daher eher zu schmal aus. Der Abstand MLP zu den beiden Klassikern (≈ 0,12 AUC-Punkte, CI-Untergrenze 0,072) ist dagegen klar und deutet auf einen echten Unterschied hin. Die ehrliche Aussage lautet daher: **Das MLP ist auf diesem Datensatz eindeutig schwächer; ob logistische Regression oder Gradient Boosting das bessere der beiden Klassiker-Modelle ist, lässt sich bei dieser Stichprobengröße nicht zuverlässig entscheiden.** Das stützt weiterhin die Kernaussage des Moduls, mehr Modellkomplexität bringt auf kleinen klinischen Tabellendaten keinen verlässlichen Vorteil, nur eben mit der tatsächlich belegten Unsicherheit statt einer scheinbar sauberen Rangfolge.
+**Stolperstein:** Eine bloße Rangfolge der Mittelwerte (0,775 > 0,735 > 0,656) suggeriert einen klaren Sieger, verschweigt aber, dass bei nur k=5 Folds die Fold-zu-Fold-Streuung (SD ≈ 0,03–0,05) in der Größenordnung des LR-GB-Abstands (0,040) liegt. Erst die **gepaarte** Betrachtung pro Fold zeigt, wie belastbar ein Unterschied ist. Der LR-GB-Vorsprung schließt im naiven Intervall 0 knapp aus, im korrigierten nicht mehr: Er hängt an der Annahme unabhängiger Folds, die nicht stimmt. Der Abstand MLP zu den Klassikern (≈ 0,12 AUC-Punkte) bleibt auch im korrigierten Intervall von 0 entfernt (Untergrenze 0,048) und ist ein deutlicher Hinweis auf einen echten Unterschied. Ein Beweis ist auch das nicht, denn beide Intervalle sind Näherungen aus fünf Werten. Die vorsichtige Aussage lautet: **Das MLP schneidet auf diesem Datensatz deutlich schlechter ab; ob logistische Regression oder Gradient Boosting besser ist, lässt sich bei dieser Stichprobengröße nicht entscheiden.** Wer den Vergleich belastbarer machen will, wiederholt die Kreuzvalidierung mit mehreren Zufallsaufteilungen oder prüft auf einem unabhängigen Testdatensatz.
 **Darüber hinaus:** Ob spezialisierte Architekturen wie **TabNet** oder **FT-Transformer** Gradient Boosting auf sehr großen Registerdaten (>100 000 Zeilen) übertreffen, ist in Vergleichsstudien uneinheitlich. Vortrainierte Tabellen-Foundation-Modelle (z. B. **TabPFN**) erzielen inzwischen auch auf kleinen Datensätzen konkurrenzfähige Ergebnisse, sind für klinische Fragestellungen aber noch kaum extern validiert. Bis dahin lohnt es sich, mit dem einfacheren Modell zu starten.
 
 In R:
@@ -266,14 +271,14 @@ In der Praxis nutzt du für die Röntgenklassifikation **vortrainierte Modelle**
 
 ## Fallstricke und Merksätze
 - **Skalierung ist bei MLP zwingend**, nicht optional. Ohne StandardScaler konvergiert das Netz kaum.
-- **Eine CV-AUC-Rangfolge ohne Streuungsmaß ist Kaffeesatzleserei.** Bei k=5 Folds vergleiche immer die (gepaarten) 95-%-Konfidenzintervalle, nicht nur die Mittelwerte, ein optisch klarer Abstand kann innerhalb der Fold-zu-Fold-Streuung liegen.
-- **Mehr Parameter ≠ besseres Modell** auf kleinen klinischen Datensätzen. Auf diesem Datensatz ist das MLP klar schwächer als die beiden Klassiker (CI schließt 0 deutlich aus); ob Gradient Boosting oder logistische Regression die Nase vorn hat, ist bei dieser Stichprobengröße dagegen nicht robust entscheidbar.
+- **Eine CV-AUC-Rangfolge ohne Streuungsmaß ist Kaffeesatzleserei.** Bei k=5 Folds vergleiche die gepaarten Differenzen mit einem korrigierten Intervall, nicht nur die Mittelwerte. Naive t-Intervalle über Folds sind zu schmal, weil die Folds korreliert sind.
+- **Mehr Parameter ≠ besseres Modell** auf kleinen klinischen Datensätzen. Auf diesem Datensatz schneidet das MLP deutlich schlechter ab als die beiden Klassiker (auch das korrigierte Intervall schließt 0 aus); ob Gradient Boosting oder logistische Regression die Nase vorn hat, ist bei dieser Stichprobengröße nicht entscheidbar.
 - **Early Stopping kostet Trainingsdaten**: bei kleinen Kohorten abwägen.
 - **torch gehört nicht zu den Kurs-Abhängigkeiten**: der CNN-Code ist nur illustrativ, nicht ausführbar.
 - **Transfer Learning > Training von Null** für medizinische Bildgebung, die Validierung der Übertragbarkeit bleibt Pflicht.
 
 ## Selbstcheck
-1. **Warum sind einfachere Modelle wie Gradient Boosting und logistische Regression dem MLP auf kleinen Tabellendaten oft ebenbürtig oder überlegen?** – Sie sind dateneffizient (Gradient Boosting kommt ohne Skalierung aus und nutzt Nichtlinearitäten implizit über Splits; logistische Regression hat wenige Parameter und überpasst kaum) und haben weniger Parameter zu schätzen. MLPs brauchen große Datenmengen, um ihre Parameterzahl sinnvoll zu nutzen, das ist bei einigen hundert klinischen Fällen selten gegeben. Wichtig ist dabei die gepaarte CI-Betrachtung: Auf unserem Datensatz ist der Abstand des MLP zu beiden Klassikern robust belegt (CI schließt 0 klar aus), während der Abstand zwischen Gradient Boosting und logistischer Regression selbst nur knapp signifikant und bei k=5 Folds nicht als verlässliche Rangfolge zu werten ist.
+1. **Warum sind einfachere Modelle wie Gradient Boosting und logistische Regression dem MLP auf kleinen Tabellendaten oft ebenbürtig oder überlegen?** – Sie sind dateneffizient (Gradient Boosting kommt ohne Skalierung aus und nutzt Nichtlinearitäten implizit über Splits; logistische Regression hat wenige Parameter und überpasst kaum) und haben weniger Parameter zu schätzen. MLPs brauchen große Datenmengen, um ihre Parameterzahl sinnvoll zu nutzen, das ist bei einigen hundert klinischen Fällen selten gegeben. Wichtig ist dabei die gepaarte Betrachtung mit korrigiertem Intervall: Auf unserem Datensatz bleibt der Abstand des MLP zu den Klassikern auch damit von 0 entfernt, ein deutlicher Hinweis, aber kein exakter Beweis. Der Abstand zwischen Gradient Boosting und logistischer Regression ist nur im naiven Intervall von 0 verschieden und damit keine verlässliche Rangfolge.
 2. **Was regelt `alpha` im MLPClassifier?** – L2-Regularisierung (Weight Decay): größeres alpha dämpft die Gewichte stärker und reduziert Überanpassung, kann aber zu Unteranpassung führen.
 3. **Warum ist Transfer Learning für medizinische Bildgebung oft besser als Training von Grund auf?** – Vortrainierte Modelle haben bereits generische Bild-Merkmale gelernt; vor allem die aufgabenspezifischen letzten Schichten müssen auf wenigen medizinischen Bildern angepasst werden.
 

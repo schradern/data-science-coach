@@ -126,5 +126,11 @@
     "numbers": [
       "0.109"
     ]
+  },
+  "14-fehlende-werte": {
+    "reason": "The risk column of Aufgabe 4 names its reference patient (64 Jahre, SOFA 4, pH 7,38) in the table header; 64 is that covariate value, not a result.",
+    "numbers": [
+      "64"
+    ]
   }
 }

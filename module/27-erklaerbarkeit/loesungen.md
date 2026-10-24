@@ -1,5 +1,23 @@
 # Musterlösungen · Erklärbarkeit von Machine-Learning-Modellen
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+lesson = runpy.run_path("module/27-erklaerbarkeit/code/python.py")
+SEED, FEATURES, build_data, train_model = (
+    lesson[name] for name in ("SEED", "FEATURES", "build_data", "train_model"))
+X, y = build_data()
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=SEED)
+model = train_model(X_train, y_train)
+```
+
 ## Aufgabe 1 – Permutation vs. Impurity
 ```python
 from sklearn.ensemble import RandomForestClassifier
@@ -55,10 +73,8 @@ es sie in der Realität gibt.
 import numpy as np
 import shap
 
-explainer = shap.Explainer(model, X_train)
-# check_additivity=False: needed for HistGradientBoostingClassifier +
-# class_weight="balanced" – see code/python.py for why.
-shap_values = explainer(X_test, check_additivity=False)
+explainer = shap.TreeExplainer(model)   # path-dependent TreeSHAP, exact for trees
+shap_values = explainer(X_test)
 # Highest-risk patients
 top5_idx = model.predict_proba(X_test)[:, 1].argsort()[-5:]
 for idx in top5_idx:
@@ -72,9 +88,10 @@ for idx in top5_idx:
 # Patient  71: stärkster Treiber = sofa_score
 ```
 Auf unserem Lauf ist `sofa_score` bei allen 5 Hochrisikopatient:innen der
-stärkste Einzeltreiber, konsistent mit der globalen SHAP-Zusammenfassung
-(`assets/shap_beeswarm.png`) und der Permutation Importance (Abschnitt 2), wo
-`sofa_score` ebenfalls vorne liegt.
+stärkste Einzeltreiber. Global (`assets/shap_beeswarm.png`) liegen Alter, CRP
+und SOFA-Score vorn; bei den Hochrisikofällen dominiert der SOFA-Score, weil
+hohe Werte dort den Score am stärksten nach oben schieben. Lokale und globale
+Rangfolge müssen nicht übereinstimmen.
 
 Ohne SHAP: Man vergleicht den Merkmalswert der/des Patient:in gegen die PDP-Kurve und
 identifiziert, bei welchem Merkmal der individuelle Wert im steilsten Teil der

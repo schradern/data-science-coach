@@ -1,7 +1,7 @@
 # Installs every R package the course uses. See DEPENDENCIES-R.md.
 #   Rscript tools/install_r_packages.R
 #
-# Core = modules 01–10, 12–25, 32, 34. Extras = modules 26–31, 33.
+# Core = modules 01–10, 12–25, 34. Extras = modules 26–33.
 # Extras are optional: the core path runs without them, and each module that
 # needs one aborts with an explicit message (never a silent success).
 
@@ -14,7 +14,7 @@ core <- c(
 extras <- c(
   "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
   "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
-  "tidytext", "nnet", "recipes", "ranger"
+  "tidytext", "nnet", "recipes", "ranger", "glmnet"
 )
 
 # Rscript runs non-interactively and cannot ask for a mirror; without one,

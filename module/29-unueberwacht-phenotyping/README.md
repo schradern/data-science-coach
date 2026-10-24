@@ -72,6 +72,7 @@ X_scaled <- rec |> prep() |> bake(new_data = NULL) |> as.matrix()
 k-Means minimiert die Intra-Cluster-Varianz. Die Anzahl k lernt das Modell nicht, sie ist eine **Wahl des Analysten**.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -142,6 +143,7 @@ df$cluster_hier <- cutree(hc, k = 3)
 Hochdimensionale Daten lassen sich nicht direkt visualisieren. PCA und UMAP projizieren auf zwei Dimensionen, aber grundverschieden.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 from sklearn.decomposition import PCA
 
 # PCA: linear, preserves global variance
@@ -193,6 +195,7 @@ tryCatch({
 Cluster erhalten Bedeutung erst durch die **Inhalte** ihrer Mitglieder, nicht durch ihre Nummer.
 
 ```python
+# Excerpt from code/python.py: runs inside the full script, not on its own.
 import pandas as pd
 
 profile = df.groupby("cluster")[NUMERIC + ["verweildauer_tage", "verstorben_30d"]].mean().round(2)

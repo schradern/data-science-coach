@@ -33,25 +33,36 @@ cat(sprintf(
   n_incomplete, n_max
 ))
 
-# Break the incomplete series down by cause: early discharge (still alive --
-# ordinary MAR/MCAR-style missingness, an LMM handles this fine) vs. death
-# within the 30-day follow-up (the day-3/day-4 MAP does not exist for that
-# patient -- truncation by death, not missingness; see README section 4).
-death_info <- load_cohort()[, c("patient_id", "verweildauer_tage", "verstorben_30d")]
-incomplete_ids <- names(n_per_patient)[n_per_patient < n_max]
-incomplete <- death_info[death_info$patient_id %in% as.integer(incomplete_ids), ]
-n_died <- sum(incomplete$verstorben_30d)
-n_discharged <- n_incomplete - n_died
+# Break the incomplete series down by what actually ended them. A series is
+# cut short by death only if the patient died inside the measurement window;
+# a patient who left on day 2 and died on day 22 has an ordinary
+# early-discharge gap, not truncation by death.
+death_info <- load_cohort()[, c("patient_id", "verweildauer_tage", "fu_zeit_tage", "status")]
+incomplete_ids <- as.integer(names(n_per_patient)[n_per_patient < n_max])
+incomplete <- death_info[death_info$patient_id %in% incomplete_ids, ]
+died <- incomplete[incomplete$status == 1, ]
+in_window <- died$fu_zeit_tage < n_max
 cat(sprintf(
-  "  Of these %d incomplete series: %d are patients who survived (early discharge,\n",
-  n_incomplete, n_discharged
+  "  %d of these %d series belong to a short stay (verweildauer_tage < %d); %d of the patients died within 30 days,\n",
+  sum(incomplete$verweildauer_tage < n_max), n_incomplete, n_max, nrow(died)
 ))
-cat("  verweildauer_tage < 4 -- ordinary MAR/MCAR-style missingness) and\n")
 cat(sprintf(
-  "  %d are patients who died within 30 days (verstorben_30d == 1 -- truncation by\n",
-  n_died
+  "  but only %d died inside the measurement window (death days of the others: %s).\n",
+  sum(in_window), paste(sort(died$fu_zeit_tage[!in_window]), collapse = ", ")
 ))
-cat("  death, NOT missingness; see the pitfall in the README).\n")
+cat("  The vital-sign series here are simulated independently of the death time, so they cannot\n")
+cat("  serve as evidence of truncation by death; the README explains the concept.\n")
+
+# Plausibility check: a measurement dated after the recorded death day. Real
+# records contain such contradictions too (wrong date, late documentation, a
+# mistyped death date) - find them and clarify them, do not silently delete.
+checked <- merge(vitals, death_info, by = "patient_id")
+after <- checked[checked$status == 1 & checked$tag > checked$fu_zeit_tage,
+                 c("patient_id", "tag", "fu_zeit_tage")]
+names(after)[3] <- "death_day"
+cat(sprintf("\nPlausibility check: %d measurements in %d patients are dated after the recorded death day:\n",
+            nrow(after), length(unique(after$patient_id))))
+print(after[order(after$patient_id, after$tag), ], row.names = FALSE)
 
 ols <- lm(map_mmhg ~ tag + diabetes, data = data)
 mixed <- lmer(map_mmhg ~ tag + diabetes + (1 | patient_id), data = data, REML = TRUE)
@@ -86,11 +97,11 @@ cat("(pseudo-replication), so its SE for diabetes is too small - the mixed model
 cat("For the time-varying predictor tag, the naive SE is not automatically too small; whether\n")
 cat("OLS over- or understates it depends on how within-patient the variation is. Either way,\n")
 cat("the mixed model's SE is the trustworthy one because it reflects the correct error structure.\n")
-cat("\nEstimand caveat: this model is fit on whoever HAS a MAP measurement on a given day. For\n")
-cat("patients who died before day 3, that measurement does not exist -- so what the model\n")
-cat("actually estimates is the mean MAP trajectory among patients still alive and in hospital,\n")
-cat("not among everyone admitted. No missing-data assumption (MCAR/MAR) fixes that; it is a\n")
-cat("truncation-by-death problem, not a missingness problem.\n")
+cat("\nEstimand caveat: this model is fit on whoever HAS a MAP measurement on a given day.\n")
+cat("In real ICU data, a patient who dies on day 2 has no day-3 MAP at all -- the model\n")
+cat("then estimates the mean MAP trajectory among patients still alive and in hospital,\n")
+cat("not among everyone admitted. No missing-data assumption (MCAR/MAR) fixes that; it is\n")
+cat("truncation by death. This toy dataset does not simulate it (see above).\n")
 
 cat("\n=== Random slope: does the MAP trend over time also vary by patient? ===\n")
 mixed_slope <- suppressWarnings(

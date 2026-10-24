@@ -16,9 +16,9 @@
 Im geteilten Kohortendatensatz wird der mittlere arterielle Druck (MAP) nicht nur einmal, sondern an
 bis zu vier aufeinanderfolgenden Tagen pro Patient:in gemessen (`vitalwerte.csv`). 92 von 500
 Patient:innen haben weniger als vier Messungen, die Daten sind also **unbalanciert**, wie in der echten
-Intensivmedizin üblich. Der Grund ist aber **nicht bei allen 92 derselbe**: 86 wurden planmäßig früh
-entlassen (kürzere Verweildauer, aber überlebt), nur 6 sind innerhalb von 30 Tagen verstorben. Diese
-beiden Ursachen sind statistisch nicht dasselbe, mehr dazu im Stolperstein am Ende dieses Moduls. Eine
+Intensivmedizin üblich. Alle 92 Lücken entstehen hier durch eine kurze Verweildauer. Ob eine Messreihe
+endet, weil jemand entlassen wurde oder weil jemand gestorben ist, ist statistisch aber nicht dasselbe,
+mehr dazu im Stolperstein am Ende dieses Moduls. Eine
 gewöhnliche lineare Regression (OLS) ignoriert außerdem, dass mehrere Messungen derselben Person nicht
 unabhängig voneinander sind. Ein Mixed Model erlaubt es, die individuelle Baseline jeder Person als
 „Random Effect“ zu modellieren.
@@ -162,7 +162,7 @@ sie erst bei binären oder Zähl-Outcomes (logistisches Mixed Model gegen GEE); 
 Odds Ratio betragsmäßig größer als das populationsgemittelte.
 
 **Praxis:** GEE braucht eine Arbeitskorrelationsmatrix (z. B. *austauschbar*
-oder *autoregressiv*); die robusten Standardfehler bleiben gültig, auch wenn diese Wahl nicht genau stimmt – in Python über `statsmodels.genmod.generalized_estimating_equations.GEE`,
+oder *autoregressiv*); die robusten Standardfehler bleiben bei genügend vielen Patient:innen (Clustern) gültig, auch wenn diese Wahl nicht genau stimmt. Fehlende Messungen darf Standard-GEE dabei nur als MCAR verkraften, bei MAR verzerrt es die Schätzer – in Python über `statsmodels.genmod.generalized_estimating_equations.GEE`,
 in R über das Paket `geepack`. Für Fragestellungen zur Ätiologie/Mechanismus („Wie reagiert eine einzelne
 Person?“) bleibt das Mixed Model die richtige Wahl.
 
@@ -181,22 +181,36 @@ ist überparametrisiert, und das einfachere Random-Intercept-Modell ist die rich
 **Stolperstein: Fehlende Messung ≠ kein Patient mehr am Leben.** LMMs sind robust gegenüber echten
 fehlenden Messzeitpunkten (MCAR/MAR – die Messung existiert im Prinzip, wurde aber aus Gründen nicht
 erhoben, die mit dem unbeobachteten Wert selbst nichts zu tun haben), solange die Patient:innen
-mindestens eine Messung aufweisen. Das trifft in unserer Kohorte auf 86 der 92 unvollständigen Serien zu:
-planmäßig früh entlassene, überlebende Patient:innen. Du musst sie nicht ausschließen, nur weil ein
-Messtag fehlt.
+mindestens eine Messung aufweisen. Eine Lücke durch planmäßige frühe Entlassung ist so ein Fall. Du musst
+diese Patient:innen nicht ausschließen, nur weil ein Messtag fehlt.
 
-Für die übrigen **6** Patient:innen, die innerhalb von 30 Tagen verstorben sind, gilt das **nicht**. Der
-MAP-Wert an Tag 3 einer Person, die an Tag 2 gestorben ist, fehlt nicht zufällig, er **existiert nicht**.
-Das ist **Truncation by Death** (Verkürzung durch Tod), kein Missing-Data-Problem, und keine MCAR/MAR-
-Annahme repariert das. Ein LMM, das nur auf den beobachteten Daten fittet, schätzt in Wahrheit die
-mittlere MAP-Verlaufskurve **unter den noch lebenden, noch hospitalisierten** Patient:innen, nicht unter
-allen aufgenommenen. Das Estimand selbst hat sich verschoben, nicht nur die Präzision der Schätzung.
+Endet die Messreihe dagegen, **weil** die Person gestorben ist, gilt das **nicht**. Der MAP-Wert an Tag 3
+einer Person, die an Tag 2 gestorben ist, fehlt nicht zufällig, er **existiert nicht**. Das ist
+**Truncation by Death** (Verkürzung durch Tod), kein Missing-Data-Problem, und keine MCAR/MAR-Annahme
+repariert das. Ein LMM, das nur auf den beobachteten Daten fittet, schätzt in Wahrheit die mittlere
+MAP-Verlaufskurve **unter den noch lebenden, noch hospitalisierten** Patient:innen, nicht unter allen
+aufgenommenen. Das Estimand selbst hat sich verschoben, nicht nur die Präzision der Schätzung. In echten
+Intensivdaten ist das häufig, gerade weil kränkere Patient:innen sowohl eher sterben als auch eher aus
+der Messreihe fallen.
 
-In dieser synthetischen Kohorte ist der Effekt klein (nur 6 von 92 unvollständigen Serien betreffen einen
-Todesfall, `verweildauer_tage` wird hier unabhängig vom Überlebensstatus simuliert). In echten
-Intensivdaten ist der Anteil der Todesfälle an den unvollständigen Verläufen oft deutlich größer, und die
-Falle greift entsprechend stärker, gerade weil kränkere Patient:innen sowohl eher sterben als auch eher
-frühzeitig aus der Messreihe fallen.
+**Unsere Kohorte zeigt dieses Problem nicht, und das Skript prüft das nach.** Die Vitalwerte sind ein
+vereinfachter Spielzeugprozess: Wie viele Messungen jemand hat, hängt nur von `verweildauer_tage` ab, und
+die Verweildauer wird unabhängig vom Sterbezeitpunkt simuliert. Der Abgleich mit dem Todestag
+(`fu_zeit_tage` bei `status == 1`) ergibt:
+
+- Von den 92 unvollständigen Serien gehören 6 zu Patient:innen, die innerhalb von 30 Tagen verstorben
+  sind. Nur eine davon (Patient:in 404) stirbt im Messfenster der Tage 0–3, die anderen fünf erst an den
+  Tagen 13 bis 30, lange nach der Entlassung. Diese Serien sind also **kein** Beleg für Truncation by
+  Death.
+- **Plausibilitätsprüfung:** 8 Messungen bei 6 Patient:innen tragen einen Messtag **nach** dem
+  dokumentierten Todestag (z. B. Patient:in 139: verstorben an Tag 1, Messungen an Tag 2 und 3).
+
+Solche Widersprüche gibt es auch in echten Routinedaten: ein falsch erfasstes Sterbedatum, ein
+nachträglich dokumentierter Wert, ein vertauschter Zeitstempel. Die richtige Reaktion ist, sie zu finden,
+zu zählen und an der Quelle zu klären. Stilles Löschen oder Abschneiden der Zeilen versteckt das
+Problem nur. Hier ist die Ursache bekannt (der Generator kennt den Todeszeitpunkt beim Simulieren der
+Vitalwerte nicht), deshalb rechnet das Modul mit allen Zeilen weiter und nutzt den Datensatz nur für
+die Frage, für die er taugt: korrelierte Messungen innerhalb einer Person.
 
 **Standard-Abhilfen:** Joint Models für longitudinale und Survival-Daten (gemeinsame Modellierung von
 MAP-Verlauf und Sterbezeit), Principal Stratification / Survivor-Average Causal Effects (Schätzung

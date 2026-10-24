@@ -295,6 +295,7 @@ Forschungsdatenbanken.
 Seine REST-API exportiert Daten direkt nach Python/R:
 
 ```python
+# Template: needs your own REDCap server and API token; not runnable as is.
 import pandas as pd
 import requests   # pinned in requirements.txt (otherwise: uv pip install requests)
 

@@ -24,7 +24,7 @@ stattdessen in einem Schritt dieselbe Liste installieren:
 source("tools/install_r_packages.R")
 ```
 
-Oder von Hand – **Kernpfad** (Module 01–10, 12–25, 32, 34):
+Oder von Hand – **Kernpfad** (Module 01–10, 12–25, 34):
 
 ```r
 install.packages(c(
@@ -34,13 +34,13 @@ install.packages(c(
 ))
 ```
 
-**Vertiefungen** (Module 26–31, 33 – der Kernpfad läuft ohne sie):
+**Vertiefungen** (Module 26–33 – der Kernpfad läuft ohne sie):
 
 ```r
 install.packages(c(
   "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
   "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
-  "tidytext", "nnet", "recipes", "ranger"
+  "tidytext", "nnet", "recipes", "ranger", "glmnet"
 ))
 ```
 
@@ -87,8 +87,8 @@ install.packages(c("fhircrackr", "pwr", "MatchIt", "rms", "dcurves", "PRROC"))
 | 28 Survival-ML | `tidyverse`, `survival`, `randomForestSRC`, `timeROC` |
 | 29 Unüberwacht / Phänotypisierung | `tidyverse`, `recipes`, `cluster`, `factoextra`, `umap` |
 | 30 Deep Learning | `tidyverse`, `tidymodels`, `nnet`, `xgboost` |
-| 31 Klinische Texte / LLM | `tidyverse`, `tidymodels`, `tidytext` |
-| 32 Einsatz & Governance | `tidyverse` |
+| 31 Klinische Texte / LLM | `tidyverse`, `tidymodels`, `tidytext`, `glmnet` |
+| 32 Einsatz & Governance | `tidyverse`, `tidytext`, `glmnet`, `yardstick` (aus `tidymodels`) |
 | 33 RAG / LLM-Pipelines | – (reines Base R) |
 | 34 Design von KI-Studien | – (reines Base R) |
 

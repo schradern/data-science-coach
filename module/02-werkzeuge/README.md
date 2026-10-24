@@ -230,7 +230,7 @@ RStudio die empfohlene Entwicklungsumgebung.
 
 Benötigte Basispakete in R installieren (einmalig, in der R-Konsole). Kopiere
 diesen Block – er funktioniert immer, auch ohne das Repository. Der **Kernpfad**
-(Module 01–10, 12–25, 32, 34) braucht:
+(Module 01–10, 12–25, 34) braucht:
 
 ```r
 install.packages(c(
@@ -266,20 +266,20 @@ zum Schreiben von Excel-Dateien, `httr2` für den API-Zugriff in Modul 04, `mice
 für die multiple Imputation in Modul 14, `sandwich`/`lmtest` für robuste
 Standardfehler in Modul 15 und 19, `cmprsk` für konkurrierende Risiken in Modul 20.
 
-Für die **Vertiefungen** (Module 26–31, 33) kommen später hinzu:
+Für die **Vertiefungen** (Module 26–33) kommen später hinzu:
 
 ```r
 install.packages(c(
   "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
   "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
-  "tidytext", "nnet", "recipes", "ranger"
+  "tidytext", "nnet", "recipes", "ranger", "glmnet"
 ))
 ```
 
 <div class="code-verbalization" markdown="1">
 **Zeile für Zeile:**
 
-* `install.packages(...)`: Lädt diese weiteren Pakete einmalig vom CRAN herunter – sie werden erst für die Vertiefungsmodule (26–31, 33) gebraucht, nicht für den Kernpfad.
+* `install.packages(...)`: Lädt diese weiteren Pakete einmalig vom CRAN herunter – sie werden erst für die Vertiefungsmodule (26–33) gebraucht, nicht für den Kernpfad.
 * `c("xgboost", "vip", ...)`: Der Vektor der Paketnamen, die installiert werden sollen.
 </div>
 
@@ -506,7 +506,7 @@ zwei Spezialdateien: `konkurrenz_risiken.csv` (Modul 20) und
 
 ```text
 Generated (seed 42):
-  kohorte.csv       500 rows, 16 cols
+  kohorte.csv       500 rows, 17 cols
   vitalwerte.csv   1873 rows, 6 cols
   labor.csv         500 rows, 7 cols
   notizen.csv       500 rows, 3 cols

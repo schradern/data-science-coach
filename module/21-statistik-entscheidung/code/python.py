@@ -39,6 +39,17 @@ def main() -> None:
     print(diff.describe().round(2))
     print("Paired t:", stats.ttest_rel(wide[3], wide[0]))
     print("Wilcoxon:", stats.wilcoxon(wide[3], wide[0]))
+    print("Sign test:", stats.binomtest(int((diff > 0).sum()), int((diff != 0).sum())))
+
+    print("\n2b) Stress case: skewed differences with median exactly 0")
+    # 50 small negative and 50 growing positive differences: the median
+    # difference is 0, but the distribution is asymmetric. The signed-rank
+    # test assumes symmetry for a statement about location and rejects anyway.
+    skewed = np.r_[-np.ones(50), np.linspace(1, 50, 50)]
+    print(f"median={np.median(skewed):.1f}, positive={int((skewed > 0).sum())}, "
+          f"negative={int((skewed < 0).sum())}")
+    print(f"Signed-rank p={stats.wilcoxon(skewed).pvalue:.6f} | "
+          f"sign test p={stats.binomtest(int((skewed > 0).sum()), len(skewed)).pvalue:.3f}")
 
     print("\n3) More than two groups: lactate by top four admission reasons")
     top = df["aufnahmegrund"].value_counts().head(4).index

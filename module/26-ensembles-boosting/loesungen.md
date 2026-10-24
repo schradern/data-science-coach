@@ -6,6 +6,20 @@
 > genau wie in Modul 24. Zahlen unten aus einem Lauf auf der aktuellen Kohorte
 > (N=500, 78 Ereignisse, 15,6 %).
 
+**Vorbereitung.** Die Lösungen setzen auf den Bausteinen aus [`code/python.py`](code/python.py) auf. Führe diesen Block einmal im Projektordner aus, lokal oder in Colab nach dem Klonen ([in Colab öffnen](https://colab.research.google.com/github/schradern/data-science-coach/blob/main/notebooks/start.ipynb)). Danach laufen die Blöcke dieser Seite der Reihe nach. `runpy` lädt nur die Definitionen des Skripts, `main()` läuft dabei nicht.
+
+```python
+# Setup: run once from the project folder.
+import runpy
+
+lesson = runpy.run_path("module/26-ensembles-boosting/code/python.py")
+SEED, load_data, build_preprocessor, build_pipeline, build_native_missing_pipeline = (
+    lesson[name] for name in ("SEED", "load_data", "build_preprocessor", "build_pipeline",
+                              "build_native_missing_pipeline"))
+X, y = load_data()
+pre = build_preprocessor()
+```
+
 ## Aufgabe 1 – Overfitting beim einzelnen Baum
 ```python
 from sklearn.tree import DecisionTreeClassifier
