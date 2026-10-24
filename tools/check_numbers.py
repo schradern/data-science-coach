@@ -20,7 +20,7 @@ The pattern is always the same, so stop finding it by hand.
 
 For each module we run `code/python.py`, capture stdout, and collect every
 number it prints. Then we collect every number that the module's markdown
-asserts *as a result* — that is, numbers inside markdown **tables** and inside
+asserts *as a result* – that is, numbers inside markdown **tables** and inside
 ```text fences, which is where computed values live. Prose numbers are ignored:
 they are usually thresholds, years, module numbers or formula constants.
 
@@ -35,7 +35,7 @@ markdown tables and ```text fences, so a stale number in prose, in a ```python
 fence, or in an image caption passes unnoticed. It compares magnitudes, so a
 flipped sign passes. It matches any printed number anywhere in the module's
 output, so a value that happens to coincide with an unrelated one passes. And
-it says nothing at all about whether the numbers are *right* — only that the
+it says nothing at all about whether the numbers are *right* – only that the
 code and the prose still agree.
 
 ## Escape hatch
@@ -43,7 +43,7 @@ code and the prose still agree.
 Numbers that legitimately do not come from the module's own script (values from
 `lib/ground_truth.py`, from a sibling script such as `benchmark.py`, from the
 literature, or from R) are declared per module in `tools/numbers_allow.json`.
-Keep that file small and justified — every entry is a number nobody re-checks.
+Keep that file small and justified – every entry is a number nobody re-checks.
 
 Exit code 0 = clean.
 """
@@ -63,21 +63,26 @@ ALLOW_FILE = Path(__file__).resolve().parent / "numbers_allow.json"
 # Locally everyone runs ./.venv/bin/python. CI installs into the runner's own
 # interpreter and never creates a .venv, so hardcoding that path made this tool
 # die with FileNotFoundError before checking a single number.
+# DSC_PYTHON overrides both, so a second environment (say, a candidate
+# dependency stack) can be validated without moving ./.venv out of the way.
 _VENV_PYTHON = ROOT / ".venv" / "bin" / "python"
-PYTHON = _VENV_PYTHON if _VENV_PYTHON.exists() else Path(sys.executable)
+if os.environ.get("DSC_PYTHON"):
+    PYTHON = Path(os.environ["DSC_PYTHON"])
+else:
+    PYTHON = _VENV_PYTHON if _VENV_PYTHON.exists() else Path(sys.executable)
 
 HAVE_RSCRIPT = shutil.which("Rscript") is not None
 
 # A number as the lessons write it: German decimal comma, optional sign,
 # optional thousands separator. We deliberately do not match integers with
-# fewer than 2 digits — "3 Mechanismen" is not a result.
+# fewer than 2 digits – "3 Mechanismen" is not a result.
 _NUM = re.compile(r"(?<![\w.,])([+-]?\d{1,3}(?:[  ]\d{3})*(?:[.,]\d+)?)(?![\w])")
 # Table rows, including rows nested inside a blockquote (`> | a | b |`), which
 # the solutions use to quote expected output.
 _TABLE_ROW = re.compile(r"^\s*>?\s*\|.*\|\s*$")
 _TEXT_FENCE = re.compile(r"```text\n(.*?)```", re.DOTALL)
-# `benchmark.py` takes ~5 minutes. Skipping it would leave its numbers — the
-# whole of module 14 §9 — unverified, which is exactly the drift we are hunting.
+# `benchmark.py` takes ~5 minutes. Skipping it would leave its numbers – the
+# whole of module 14 §9 – unverified, which is exactly the drift we are hunting.
 # So run it, and let the caller opt out explicitly.
 SKIP_SLOW = os.environ.get("DSC_SKIP_SLOW") == "1"
 _SLOW_SCRIPTS = {"benchmark.py"}
@@ -189,7 +194,7 @@ def run_module(slug: str) -> tuple[str, list[str]]:
     chunks: list[str] = []
     broken: list[str] = []
     # Inherit the real environment. A stripped env silently broke the scripts,
-    # and a script that fails prints nothing — so every number it should have
+    # and a script that fails prints nothing – so every number it should have
     # produced looked like drift. The checker must not manufacture its own
     # false positives.
     env = dict(os.environ, MPLBACKEND="Agg")
@@ -231,7 +236,7 @@ def shared_output() -> str:
     and `data/README.md` documents it. Both belong in every module's corpus.
 
     Both scripts rewrite files (`data/*`, `lib/ground_truth.json`). Both are
-    deterministic down to the byte — the workbook's timestamps are frozen — so
+    deterministic down to the byte – the workbook's timestamps are frozen – so
     running this checker leaves the working tree exactly as it found it. Two
     concurrent runs would still race on those writes; don't do that.
     """
@@ -252,7 +257,7 @@ def main(argv: list[str]) -> int:
             if slug.startswith("_"):
                 continue
             if not entry.get("reason"):
-                print(f"tools/numbers_allow.json: '{slug}' has no reason — refusing it.")
+                print(f"tools/numbers_allow.json: '{slug}' has no reason – refusing it.")
                 return 2
             allow[slug] = entry["numbers"]
 
@@ -285,7 +290,7 @@ def main(argv: list[str]) -> int:
                     unmatched.append(f"{md.relative_to(ROOT)}:{lineno}  {token}")
 
         # A script that did not run cannot be the source of a number, so its
-        # absence explains any leftovers — but only if there ARE leftovers. Most
+        # absence explains any leftovers – but only if there ARE leftovers. Most
         # modules assert nothing that only their R script prints, and those stay
         # fully verified even when R is missing. Only module 20 truly needs it.
         if unmatched and broken:
@@ -310,10 +315,10 @@ def main(argv: list[str]) -> int:
         print()
     # An unrunnable script is an environment problem. Reporting its lesson's
     # numbers as "drift" would send a contributor hunting for a prose bug that
-    # does not exist — so say what actually happened, and use a distinct exit
+    # does not exist – so say what actually happened, and use a distinct exit
     # code so CI can tell a stale number from a missing R package.
     if unverifiable:
-        print(f"{len(unverifiable)} module(s) could NOT be checked — a script did not run,")
+        print(f"{len(unverifiable)} module(s) could NOT be checked – a script did not run,")
         print("and the numbers it should have printed are exactly the ones left over:")
         for slug, reasons in sorted(unverifiable.items()):
             for reason in reasons:

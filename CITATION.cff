@@ -3,7 +3,7 @@ message: "Wenn du diesen Kurs verwendest, zitiere ihn bitte wie folgt."
 title: "Data Science für Ärztinnen und Ärzte"
 abstract: >-
   Ein deutschsprachiger, reproduzierbarer Kurs, der Ärztinnen und Ärzte von der
-  Rohdatei zur belastbaren, publikationsreifen Auswertung führt — mit Python, R
+  Rohdatei zur belastbaren, publikationsreifen Auswertung führt – mit Python, R
   und SQL an einer synthetischen Intensivkohorte.
 type: dataset
 authors:

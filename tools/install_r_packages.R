@@ -8,14 +8,20 @@
 core <- c(
   "tidyverse", "gtsummary", "broom", "survival",
   "DBI", "duckdb", "readxl", "writexl", "jsonlite", "httr2",
-  "tidymodels", "pROC", "lme4", "sandwich", "lmtest", "mice"
+  "tidymodels", "pROC", "lme4", "sandwich", "lmtest", "mice", "cmprsk"
 )
 
 extras <- c(
   "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
-  "randomForestSRC", "cmprsk", "umap", "factoextra", "cluster",
-  "tidytext", "nnet", "recipes", "timeROC"
+  "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
+  "tidytext", "nnet", "recipes", "ranger"
 )
+
+# Rscript runs non-interactively and cannot ask for a mirror; without one,
+# install.packages() stops with "trying to use CRAN without setting a mirror".
+if (is.null(getOption("repos")) || getOption("repos")[["CRAN"]] %in% c("@CRAN@", "")) {
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+}
 
 install_missing <- function(pkgs, label) {
   missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]

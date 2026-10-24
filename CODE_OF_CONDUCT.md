@@ -1,6 +1,6 @@
 # Verhaltenskodex
 
-Dieses Projekt soll ein respektvoller, sachlicher Ort für alle sein — unabhängig
+Dieses Projekt soll ein respektvoller, sachlicher Ort für alle sein – unabhängig
 von Erfahrung, Fachrichtung, Herkunft oder Identität.
 
 **Erwünscht:** sachliche Kritik, hilfreiche Korrekturen, Geduld mit Einsteiger:innen.

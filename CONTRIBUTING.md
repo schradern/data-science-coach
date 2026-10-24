@@ -1,7 +1,7 @@
 # Mitwirken
 
 Danke für dein Interesse. Korrekturen (fachlich, sprachlich, Code) sind sehr
-willkommen — besonders von Ärztinnen und Ärzten und von Statistiker:innen.
+willkommen – besonders von Ärztinnen und Ärzten und von Statistiker:innen.
 
 ## Fehler melden
 
@@ -30,7 +30,7 @@ Modul und Abschnitt, was falsch ist, und (bei fachlichen Punkten) eine Quelle.
 
 ## Grundregeln des Kurses
 
-Diese sind maschinell geprüft — bitte einhalten:
+Diese sind maschinell geprüft – bitte einhalten:
 
 - **Jede Zahl in einer Lektion wird vom Code des Moduls erzeugt.** Keine
   handgeschriebenen Ergebnisse (Ausnahmen mit Begründung in `tools/numbers_allow.json`).

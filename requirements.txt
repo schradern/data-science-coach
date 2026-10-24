@@ -1,9 +1,9 @@
-# Course environment (Python) — core path. Install:
+# Course environment (Python) – core path. Install:
 #   pip install -r requirements.txt
 # See Modul 02 for the full setup (Python via uv, R, VS Code, Git).
 #
 # The core path (Teil 1–4) runs entirely on these packages. The advanced
-# ML/AI modules (Teil 5) need a few heavier extras — those live in a separate
+# ML/AI modules (Teil 5) need a few heavier extras – those live in a separate
 # file so this install stays light:
 #   pip install -r requirements-ml.txt   # xgboost, lightgbm, umap-learn, shap, scikit-survival
 

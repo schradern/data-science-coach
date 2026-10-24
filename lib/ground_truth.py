@@ -1,4 +1,4 @@
-"""The cohort's true effects — on the scale you are actually estimating.
+"""The cohort's true effects – on the scale you are actually estimating.
 
 `data/generate_data.py` draws survival times from a **Weibull proportional-
 hazards** model. Its coefficients therefore live on the **log-hazard** scale:
@@ -25,7 +25,7 @@ prevent:
 Everything here is deterministic given SEED_TRUTH, but "deterministic" is not
 "exact": these are Monte-Carlo estimates of the truth and they carry a
 Monte-Carlo error. Order of magnitude, as relative standard deviation across
-seeds — bounds rounded UP, because a bound measured on five seeds is itself an
+seeds – bounds rounded UP, because a bound measured on five seeds is itself an
 estimate and quoting it to three digits would be the very false precision this
 module exists to prevent:
 
@@ -39,8 +39,8 @@ The binary predictors (diabetes, sepsis, active_smoker) converge slowly at a
 binary predictor's hazard ratio is therefore noise, not signal.
 
 That is acceptable here and nowhere else. Every lesson uses these numbers for
-exactly one purpose: to ask whether an N = 500 confidence interval — 20 to 40 %
-wide — covers the truth. A 2 % error in the target cannot change that answer.
+exactly one purpose: to ask whether an N = 500 confidence interval – 20 to 40 %
+wide – covers the truth. A 2 % error in the target cannot change that answer.
 Do not reuse them where 2 % matters.
 """
 from __future__ import annotations
@@ -107,8 +107,8 @@ BGA_MISS_DEAD = 1.4     # extra logit of missingness among the deceased
 #
 # They did drift once: the replay drew age ~ N(64, 14) clipped to [18, 95] with
 # a Sepsis share of 0.20, while the generator used N(64, 16) clipped to [18, 98]
-# and 0.18. A logistic odds ratio is **not collapsible** — it depends on the
-# covariate distribution — so the "true ORs" handed to Module 12 were wrong by
+# and 0.18. A logistic odds ratio is **not collapsible** – it depends on the
+# covariate distribution – so the "true ORs" handed to Module 12 were wrong by
 # up to ~3.7 %. Silently. Constants now live here and only here.
 # ---------------------------------------------------------------------------
 AGE_MEAN, AGE_SD, AGE_MIN, AGE_MAX = 64, 16, 18, 98
@@ -139,7 +139,7 @@ def _replay_dgp(n: int, seed: int) -> pd.DataFrame:
     weight and hypertension do not). The RNG stream therefore differs from the
     generator's, which is irrelevant: this function is seeded independently and
     is used only to estimate *population* quantities, never to reproduce the
-    seed-42 sample. What must match — and now does, by construction — are the
+    seed-42 sample. What must match – and now does, by construction – are the
     marginal distributions of every covariate that enters `eta`.
     """
     rng = np.random.default_rng(seed)
@@ -295,7 +295,7 @@ def write_snapshot() -> Path:
 
     # Auf 6 Nachkommastellen runden. Die Modellfits stimmen über Plattformen
     # hinweg nur bis etwa zur 14. Stelle überein (macOS/Accelerate vs.
-    # Linux/OpenBLAS in der CI). Der Byte-Abgleich in numbers.yml würde an diesem
+    # Linux/OpenBLAS). Ein Byte-Vergleich der Datei würde an diesem
     # Gleitkomma-Rauschen scheitern, obwohl jede genutzte Stelle (Prosa und R
     # nutzen ≤3, check_repo prüft mit Toleranz 0,0005) identisch ist. 6 Stellen
     # liegen weit über jedem Bedarf und weit über dem Rauschen.

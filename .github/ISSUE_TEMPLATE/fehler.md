@@ -7,7 +7,7 @@ assignees: ""
 ---
 
 **Modul und Abschnitt**
-z. B. Modul 14, Abschnitt 5 „In Python"
+z. B. Modul 14, Abschnitt 5 „In Python“
 
 **Was ist falsch / unklar / kaputt?**
 Kurz beschreiben. Bei Code: welchen Block, welche Fehlermeldung.

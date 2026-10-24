@@ -19,16 +19,20 @@ website/site/
 # Ausgaben der Übungslösungen. Die Lösungen schreiben ihre Abbildungen ins
 # aktuelle Verzeichnis (`fig.savefig("residualplot.png")`), also dorthin, wo die
 # Lernenden gerade stehen. Werden sie aus dem Repo-Wurzelverzeichnis ausgeführt,
-# landen die Dateien hier — sie gehören nicht ins Repository.
+# landen die Dateien hier – sie gehören nicht ins Repository.
 /*.png
 
 # NOTE: data/*.csv and module/*/assets/*.png ARE committed on purpose, so the
 # site and downloads build in CI without running the data/figure generators.
 #
 # lib/ground_truth.json is committed on purpose too, and must stay that way.
-# pages.yml installs only markdown + pygments, so it cannot regenerate the file,
-# yet tools/check_repo.py needs it to verify Modul 12's hardcoded R constants.
-# Ignore it and every push turns red. Regenerate it with
+# tools/check_repo.py needs it to verify Modul 12's hardcoded R constants, and
+# pages.yml never regenerates it. Ignore it and every push turns red.
+# Regenerate it with
 #     python lib/ground_truth.py
-# whenever a coefficient of the data-generating process changes; numbers.yml
-# fails if the committed copy no longer matches the code.
+# whenever a coefficient of the data-generating process changes, and commit
+# the result together with that change.
+
+# Quarto-Renderausgaben, wenn ein Bericht direkt im Modulordner gerendert wird
+module/*/code/*.html
+module/*/code/*_files/

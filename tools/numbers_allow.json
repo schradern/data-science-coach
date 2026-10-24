@@ -8,7 +8,7 @@
     "check_numbers.py and must NOT be listed here."
   ],
   "12-regression": {
-    "reason": "Aufgabe 2 fits a five-term model (without active_smoker) that the lesson script deliberately does not fit — printing it would give away the exercise. Estimated ORs are reproducible by running the solution's own snippet; the true ORs come from lib.ground_truth.true_odds_ratios_for on that same five-term spec. '64' is the age-centring constant, not a result.",
+    "reason": "Aufgabe 2 fits a five-term model (without active_smoker) that the lesson script deliberately does not fit – printing it would give away the exercise. Estimated ORs are reproducible by running the solution's own snippet; the true ORs come from lib.ground_truth.true_odds_ratios_for on that same five-term spec. '64' is the age-centring constant, not a result.",
     "numbers": [
       "1,486",
       "1,75",
@@ -38,7 +38,7 @@
     ]
   },
   "26-ensembles-boosting": {
-    "reason": "Hyperparameter grid values quoted in a table (n_estimators 100 and 2000, learning rate 0.5) — configuration, not results.",
+    "reason": "Hyperparameter grid values quoted in a table (n_estimators 100 and 2000, learning rate 0.5) – configuration, not results.",
     "numbers": [
       "100",
       "2 000",
@@ -119,6 +119,12 @@
     "numbers": [
       "0,10",
       "0,35"
+    ]
+  },
+  "27-erklaerbarkeit": {
+    "reason": "Aufgabe 4 refits the lesson model without leukozyten_g_l; the lesson script deliberately does not, since that would give away the exercise. The value is reproduced by running the solution's own snippet (same model, split and permutation settings as code/python.py).",
+    "numbers": [
+      "0.109"
     ]
   }
 }

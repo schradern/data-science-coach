@@ -2,7 +2,9 @@ name: Build and Deploy Course Website
 
 # Builds the static course site from the Markdown sources and publishes it to
 # GitHub Pages. Figures (PNG) are committed under module/*/assets and rendered
-# as-is, so the build only needs markdown + pygments — fast and reliable.
+# as-is; the build itself only needs markdown + pygments. The course packages
+# are installed anyway so that tools/check_repo.py can verify every lesson
+# snippet against the real library APIs instead of skipping that check.
 
 on:
   push:
@@ -28,13 +30,18 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-ml.txt
 
-      - name: Install build dependencies
-        run: pip install markdown pygments
+      - name: Install course packages
+        run: pip install -r requirements.txt -r requirements-ml.txt
 
       # Fängt genau die Fehler ab, die schon einmal ausgeliefert wurden:
       # tote interne Links, verletzter {{DATEN}}-Vertrag, fremde Seeds,
-      # Abbildungen unter code/, nicht konfigurierte URLs.
+      # Abbildungen unter code/, nicht konfigurierte URLs, Lektions-Snippets,
+      # die eine nicht existierende Bibliotheksfunktion aufrufen.
       - name: Repo-Konsistenz prüfen
         run: python tools/check_repo.py
 
@@ -51,7 +58,7 @@ jobs:
         with:
           path: website/site
           # Ab v5 werden Dateien mit führendem Punkt standardmäßig übersprungen.
-          # Der Build legt oben `.nojekyll` an — ohne diese Zeile fiele die Datei
+          # Der Build legt oben `.nojekyll` an – ohne diese Zeile fiele die Datei
           # stillschweigend aus dem Artefakt.
           include-hidden-files: true
 

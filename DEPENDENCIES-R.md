@@ -5,21 +5,18 @@ Das Gegenstück zu [`requirements.txt`](requirements.txt) für die R-Spur.
 > **Reine R-Nutzung braucht kein Python.** Die Kurs-Datensätze liegen fertig
 > unter `https://schradern.github.io/data-science-coach/data/`. Die Codeblöcke
 > der Lektionen lesen sie direkt über diese Web-Adresse, und `lib/helpers.R`
-> lädt sie bei Bedarf automatisch nach — du musst nichts erzeugen. Python wird
+> lädt sie bei Bedarf automatisch nach – du musst nichts erzeugen. Python wird
 > **nur** gebraucht, wenn du das komplette Repository klonst und die Daten
 > lokal neu erzeugen willst (`python data/generate_data.py`); zum Mitrechnen
 > ist das nicht nötig.
 
-> **Warum diese Datei existiert:** `lib/helpers.R` nannte früher vier Pakete
-> (`tidyverse, gtsummary, broom, survival`), während die Module tatsächlich 25
-> brauchen. Wer der alten Angabe folgte, bekam in sieben Modulen **keine
-> Ausgabe** — und trotzdem einen Erfolgs-Exitcode. Beides ist behoben:
-> `require_pkgs()` in `lib/helpers.R` bricht jetzt mit Exitcode 1 ab, und die
-> vollständige Liste steht hier.
+> **Fehlt ein Paket, bricht das Skript laut ab.** `require_pkgs()` in
+> `lib/helpers.R` nennt das fehlende Paket und beendet das Skript mit
+> Exitcode 1, statt still ohne Ausgabe durchzulaufen.
 
 ## Installation
 
-Kopiere den `install.packages(...)`-Block unten in deine R-Konsole — das
+Kopiere den `install.packages(...)`-Block unten in deine R-Konsole – das
 funktioniert immer, auch ohne das Repository. Wer den Kurs geklont hat, kann
 stattdessen in einem Schritt dieselbe Liste installieren:
 
@@ -27,24 +24,33 @@ stattdessen in einem Schritt dieselbe Liste installieren:
 source("tools/install_r_packages.R")
 ```
 
-Oder von Hand — **Kernpfad** (Module 01–10, 12–25, 32, 34):
+Oder von Hand – **Kernpfad** (Module 01–10, 12–25, 32, 34):
 
 ```r
 install.packages(c(
   "tidyverse", "gtsummary", "broom", "survival",
   "DBI", "duckdb", "readxl", "writexl", "jsonlite", "httr2",
-  "tidymodels", "pROC", "lme4", "sandwich", "lmtest", "mice"
+  "tidymodels", "pROC", "lme4", "sandwich", "lmtest", "mice", "cmprsk"
 ))
 ```
 
-**Vertiefungen** (Module 26–31, 33 — der Kernpfad läuft ohne sie):
+**Vertiefungen** (Module 26–31, 33 – der Kernpfad läuft ohne sie):
 
 ```r
 install.packages(c(
   "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
-  "randomForestSRC", "cmprsk", "umap", "factoextra", "cluster",
-  "tidytext", "nnet", "recipes", "timeROC"
+  "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
+  "tidytext", "nnet", "recipes", "ranger"
 ))
+```
+
+**Nur für einzelne optionale Snippets** (nicht für die Skripte unter `code/`):
+`fhircrackr` (Modul 07), `pwr` (Modul 10), `MatchIt` (Modul 19),
+`rms`, `dcurves` und `PRROC` (Modul 25). Installiere sie, wenn du genau diesen
+Abschnitt in R nachrechnen willst.
+
+```r
+install.packages(c("fhircrackr", "pwr", "MatchIt", "rms", "dcurves", "PRROC"))
 ```
 
 ## Pro Modul
@@ -76,15 +82,15 @@ install.packages(c(
 | 23 Machine Learning | `tidyverse`, `tidymodels` |
 | 24 Prädiktions-Workflow | `tidyverse`, `tidymodels` |
 | 25 Modellgüte & Validierung | `tidyverse`, `tidymodels`, `pROC` |
-| 26 Ensembles & Boosting | `tidyverse`, `tidymodels`, `xgboost` |
-| 27 Erklärbarkeit | `tidyverse`, `tidymodels`, `vip`, `pdp`, `DALEX`, `DALEXtra` |
+| 26 Ensembles & Boosting | `tidyverse`, `tidymodels`, `ranger`, `xgboost` |
+| 27 Erklärbarkeit | `tidyverse`, `tidymodels`, `ranger`, `vip`, `pdp`, `DALEX`, `DALEXtra` |
 | 28 Survival-ML | `tidyverse`, `survival`, `randomForestSRC`, `timeROC` |
 | 29 Unüberwacht / Phänotypisierung | `tidyverse`, `recipes`, `cluster`, `factoextra`, `umap` |
 | 30 Deep Learning | `tidyverse`, `tidymodels`, `nnet`, `xgboost` |
 | 31 Klinische Texte / LLM | `tidyverse`, `tidymodels`, `tidytext` |
 | 32 Einsatz & Governance | `tidyverse` |
-| 33 RAG / LLM-Pipelines | — (reines Base R) |
-| 34 Design von KI-Studien | — (reines Base R) |
+| 33 RAG / LLM-Pipelines | – (reines Base R) |
+| 34 Design von KI-Studien | – (reines Base R) |
 
 ## Versionen
 

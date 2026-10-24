@@ -55,7 +55,7 @@ class Report:
             print(f"ok    {name}")
 
     def warn(self, message: str) -> None:
-        """Not a failure — a state the maintainer must know about."""
+        """Not a failure – a state the maintainer must know about."""
         self.warnings.append(message)
         print(f"WARN  {message}")
 
@@ -132,7 +132,7 @@ def check_config() -> list[str]:
         bad.append("config.json: data_base_url must end with '/'")
 
     # Every URL in config.json restates owner/repo/branch. They are only a single
-    # source of truth if they agree — otherwise the 200+ file links the website
+    # source of truth if they agree – otherwise the 200+ file links the website
     # bakes into the lessons point at somebody else's repository.
     owner, repo = cfg.get("owner", ""), cfg.get("repo", "")
     branch = cfg.get("branch", "main")
@@ -149,7 +149,7 @@ def check_config() -> list[str]:
             if key in cfg and cfg[key] != soll:
                 bad.append(f"config.json: {key} is {cfg[key]!r}, but owner/repo/branch imply {soll!r}")
 
-        # notebooks/start.ipynb cannot read config.json — Colab has no repo clone.
+        # notebooks/start.ipynb cannot read config.json – Colab has no repo clone.
         # It therefore carries a copy of data_base_url, and a copy can go stale.
         nb = ROOT / "notebooks" / "start.ipynb"
         if nb.exists() and cfg.get("data_base_url", "") not in nb.read_text(encoding="utf-8"):
@@ -212,7 +212,7 @@ def check_conventions() -> list[str]:
 
 def check_code_figures() -> list[str]:
     return [
-        f"{p.relative_to(ROOT)} — figures belong in assets/, not code/"
+        f"{p.relative_to(ROOT)} – figures belong in assets/, not code/"
         for p in sorted((ROOT / "module").glob("*/code/*"))
         if p.suffix.lower() in {".png", ".svg", ".jpg"}
     ]
@@ -222,7 +222,7 @@ def check_dataset_docs() -> list[str]:
     """Every prose file that counts the generated data files must count right.
 
     This exists because `generate_data.py` grew from eight files to ten while
-    `docs/LEHRPLAN.md` and `module/02-werkzeuge/README.md` still said "acht" —
+    `docs/LEHRPLAN.md` and `module/02-werkzeuge/README.md` still said "acht" –
     and module 02 printed an "expected output" block the script no longer
     produced. A learner in the setup module saw output that contradicted the doc.
     """
@@ -290,7 +290,7 @@ def check_solution_api() -> list[str]:
 
     Exists because `module/12-regression/loesungen.md` shipped
     `smf.families.Gamma(...)` for who knows how long. `statsmodels.formula.api`
-    has no `families` attribute — the block raised AttributeError at runtime and
+    has no `families` attribute – the block raised AttributeError at runtime and
     nobody noticed, because solution snippets are never executed.
 
     We do not execute them either (they depend on lesson context). We parse them
@@ -298,9 +298,9 @@ def check_solution_api() -> list[str]:
     *installed* library. That is enough to catch the whole class.
 
     It is not enough to conclude the snippet runs. This check is blind to:
-      * wrong keyword arguments — `pd.read_csv(..., encodings="utf-8")` resolves,
+      * wrong keyword arguments – `pd.read_csv(..., encodings="utf-8")` resolves,
         because `read_csv` exists and we never inspect its signature;
-      * methods on returned objects — `result.summary2()`, `df.group_by()`; the
+      * methods on returned objects – `result.summary2()`, `df.group_by()`; the
         roots `result`/`df` are locals, not import aliases;
       * wrong positional arguments, wrong dtypes, wrong anything at runtime.
     A green result means "no snippet names an attribute the library lacks".
@@ -317,7 +317,7 @@ def check_solution_api() -> list[str]:
 
         `from sklearn.inspection import PartialDependenceDisplay` binds a class,
         not a module, so import_module("sklearn.inspection.PartialDependenceDisplay")
-        raises. Falling back to getattr keeps the class checkable — and stops the
+        raises. Falling back to getattr keeps the class checkable – and stops the
         failure from being misreported as "sklearn is not installed".
         """
         if name in cache:
@@ -404,7 +404,7 @@ def check_r_ground_truth() -> list[str]:
     """Module 12's r.R hardcodes the true ORs and HRs. Keep them honest.
 
     R cannot import `lib/ground_truth.py`, so the numbers are copied. A copy is a
-    second chance to be wrong — and this one already went wrong once, when the
+    second chance to be wrong – and this one already went wrong once, when the
     replayed data-generating process drifted from the generator. Diff the copy
     against `lib/ground_truth.json`, which `python lib/ground_truth.py` writes.
     """
@@ -413,7 +413,7 @@ def check_r_ground_truth() -> list[str]:
     if not r_file.exists():
         return []
     if not snapshot.exists():
-        return [f"lib/ground_truth.json is missing — run: python lib/ground_truth.py"]
+        return [f"lib/ground_truth.json is missing – run: python lib/ground_truth.py"]
 
     truth = json.loads(snapshot.read_text(encoding="utf-8"))
     text = r_file.read_text(encoding="utf-8")
@@ -433,7 +433,7 @@ def check_r_ground_truth() -> list[str]:
         for pred, value in literal.findall(m.group(1)):
             # R's `vec["x"]` returns the FIRST match, so a duplicate key with a
             # correct value appended would hide a wrong one. Keep the first, and
-            # refuse the vector outright — a duplicate is never intentional.
+            # refuse the vector outright – a duplicate is never intentional.
             if pred in pairs:
                 problems.append(f"r.R `{r_name}` names '{pred}' twice; R would use the first value")
                 continue
@@ -454,13 +454,13 @@ def check_r_ground_truth() -> list[str]:
 
 
 def check_copyable_blocks() -> list[str]:
-    """Copy-paste lesson blocks must run as pasted — no repo scaffolding, no
+    """Copy-paste lesson blocks must run as pasted – no repo scaffolding, no
     syntax errors.
 
     A block that reads its data via {{DATEN}} is meant for a browser learner who
     pastes it into a bare console. Lines like `Path(__file__)`, `sys.path.insert`,
     `commandArgs()` or `source(file.path(...))` do nothing there (or throw) and
-    are pure confusion. The browserification once left such lines behind — and
+    are pure confusion. The browserification once left such lines behind – and
     once left orphaned `))))))` debris that broke two R blocks outright.
     """
     import ast
@@ -519,7 +519,7 @@ def check_learning_paths() -> list[str]:
 
     `website/app.js` holds the authoritative module lists (PFADE); Modul 01 and
     docs/LEHRPLAN.md restate them for the reader. After the renumbering most of
-    them collapsed into runs ("09–20"), so the prose writes ranges — which is
+    them collapsed into runs ("09–20"), so the prose writes ranges – which is
     only safe if a machine checks that the range still expands to the same set.
     The prose drifted once already: it kept the pre-renumbering chain.
     """
@@ -578,7 +578,7 @@ def check_markdown_lists() -> list[str]:
     """Lists must render as lists.
 
     Two silent failures, both invisible in the source and both shipped:
-      * a list that starts immediately after a paragraph line — Python-Markdown
+      * a list that starts immediately after a paragraph line – Python-Markdown
         needs a blank line, otherwise the `*` land as literal characters inside
         the paragraph ("… (Abhängigkeits-Hölle): * Modell A benötigt …");
       * a sub-list indented three spaces under `1. `, which needs four.
@@ -614,7 +614,7 @@ def check_markdown_lists() -> list[str]:
             if re.search(r"(?:^|\s)\*\s+\S", klartext) and klartext.count("*") >= 2:
                 vorschau = " ".join(klartext.split())[:70]
                 problems.append(
-                    f"{md.relative_to(ROOT)}: a list did not render as a list — "
+                    f"{md.relative_to(ROOT)}: a list did not render as a list – "
                     f"'{vorschau}…'. Add a blank line before it, or indent a "
                     "sub-list by four spaces."
                 )
@@ -625,7 +625,7 @@ def check_module_numbering() -> list[str]:
     """The chapter numbers must BE the reading order.
 
     They drifted once: modules 29–34 were written last, numbered last, and then
-    slotted into earlier parts. The menu read 04, 05, 06, 32, 07 — and every
+    slotted into earlier parts. The menu read 04, 05, 06, 32, 07 – and every
     "siehe Modul 13" pointed at whichever module happened to own that number.
 
     Reading order is `TEILE` in website/build.py. Directory number == position in
@@ -664,12 +664,12 @@ def check_module_numbering() -> list[str]:
 
 
 def check_figure_sources() -> list[str]:
-    """Every displayed figure links to the code that draws it — or to nothing.
+    """Every displayed figure links to the code that draws it – or to nothing.
 
     The site used to point each figure at its whole generating file, and every
     `.svg` at `lib/diagrams.py`, including five diagrams drawn by hand that it
     never produced. Now each figure links to its own function or section. That
-    mapping is derived by parsing the generators, so it cannot drift — but a new
+    mapping is derived by parsing the generators, so it cannot drift – but a new
     image with no generator would silently lose its link, and a hand-drawn one
     that later gains a generator would keep a stale exemption. Catch both.
     """
@@ -731,19 +731,19 @@ def main() -> int:
     rep.check("no figures committed under code/", check_code_figures())
 
     # A check that cannot run must never look like a check that passed. With only
-    # markdown + pygments installed (pages.yml), every import fails and the API
-    # check inspects nothing at all.
+    # markdown + pygments installed, every import fails and the API check
+    # inspects nothing at all.
     if _UNRESOLVED:
         fehlend = ", ".join(sorted(_UNRESOLVED))
         rep.warn(
             "the lesson-snippet API check could not import: " + fehlend + ".\n"
             "        Snippets using them were NOT checked. Install requirements.txt\n"
-            "        (+ requirements-ml.txt) for the full check; the numbers.yml\n"
-            "        workflow does exactly that."
+            "        (+ requirements-ml.txt) for the full check; pages.yml\n"
+            "        does exactly that."
         )
 
     # Deliberately a warning, not a failure: an unpublished course is a valid
-    # state. But the maintainer must not be surprised when CI goes red — the
+    # state. But the maintainer must not be surprised when CI goes red – the
     # website build refuses to bake placeholder URLs into 200 pages.
     if config_is_placeholder():
         rep.warn(

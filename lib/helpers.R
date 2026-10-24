@@ -26,9 +26,9 @@ SEED <- 42
 #   2. If this file was loaded via `source()`, use sys.frame(1)$ofile /
 #      ofile of the sourcing call, but only when it actually resolves to an
 #      existing file.
-#   3. Otherwise, we do NOT guess via getwd() — .root is left NA and .load()
+#   3. Otherwise, we do NOT guess via getwd() – .root is left NA and .load()
 #      falls through to the URL fallback below.
-# Walk upward from a starting directory until we hit the repo root — the only
+# Walk upward from a starting directory until we hit the repo root – the only
 # directory that contains BOTH `lib/` and `module/`. This is correct at any
 # nesting depth (repo root, `lib/`, or a deeply nested `module/<slug>/code/`),
 # unlike a fixed number of dirname() calls.
@@ -46,7 +46,7 @@ SEED <- 42
 }
 
 .find_root <- function() {
-  # Case 1: Rscript invocation — resolve the script's own directory.
+  # Case 1: Rscript invocation – resolve the script's own directory.
   cmd_args <- commandArgs(trailingOnly = FALSE)
   file_arg <- grep("^--file=", cmd_args, value = TRUE)
   if (length(file_arg) > 0) {
@@ -57,7 +57,7 @@ SEED <- 42
     }
   }
 
-  # Case 2: source()'d — look for an enclosing frame with an $ofile.
+  # Case 2: source()'d – look for an enclosing frame with an $ofile.
   for (i in rev(seq_len(sys.nframe()))) {
     ofile <- tryCatch(sys.frame(i)$ofile, error = function(e) NULL)
     if (!is.null(ofile) && is.character(ofile) && file.exists(ofile)) {
@@ -66,7 +66,7 @@ SEED <- 42
     }
   }
 
-  # Case 3: no script path — try walking up from the working directory. This
+  # Case 3: no script path – try walking up from the working directory. This
   # only ever accepts a dir that actually has lib/ + module/, so it cannot
   # silently point at the wrong place; otherwise NA -> URL fallback.
   .walk_to_root(getwd())
