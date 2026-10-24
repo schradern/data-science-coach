@@ -272,7 +272,7 @@ for ax, (var, label) in zip(axes, variables):
 
     # Mann-Whitney p-value
     _, p = stats.mannwhitneyu(group0, group1, alternative="two-sided")
-    p_txt = f"p = {p:.3f}" if p >= 0.001 else "p < 0.001"
+    p_txt = f"p = {p:.3f}".replace(".", ",") if p >= 0.001 else "p < 0,001"
     ax.text(0.97, 0.95, p_txt, transform=ax.transAxes,
             ha="right", va="top", fontsize=9, color="#444444")
 
@@ -948,10 +948,10 @@ ax.text(target_median + 0.15, 0.58, f"Median = {target_median:.2f}\n(identisch i
 
 # Add text for MWU p-value
 u_stat, p_val = stats.mannwhitneyu(group_a, group_b, alternative='two-sided')
-ax.text(8.5, 0.40, f"Mann-Whitney-U\np < 0.001", color="#16181C", fontsize=12, fontweight="bold")
+ax.text(8.5, 0.40, "Mann-Whitney-U\np < 0,001", color="#16181C", fontsize=12, fontweight="bold")
 
 # Title and subtitles (bold title, smaller sub)
-ax.set_title("Gleicher Median. Signifikanter Mann-Whitney-Test.\nDer Test prüft stochastische Dominanz, nicht den Unterschied der Mediane.", fontsize=11, fontweight="semibold", pad=12, loc="left")
+ax.set_title("Gleicher Median. Signifikanter Mann-Whitney-Test.\nDer Test prüft stochastische Überlegenheit, nicht den Unterschied der Mediane.", fontsize=11, fontweight="semibold", pad=12, loc="left")
 
 ax.set_xlabel("Messwert (Value)")
 ax.set_ylabel("Wahrscheinlichkeitsdichte (Density)")

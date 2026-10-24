@@ -1,4 +1,4 @@
-"""Generate the synthetic course datasets — reproducible (seed 42).
+"""Generate the synthetic course datasets – reproducible (seed 42).
 
 Run:
     ./.venv/bin/python data/generate_data.py
@@ -11,20 +11,20 @@ Creates, in this folder:
                        values in laktat_mmol_l)
     notizen.csv       synthetic free-text clinical notes (for NLP)
     konkurrenz_risiken.csv  coherent competing-risks (death vs. discharge) +
-                       time-varying vasopressor exposure — Modul 20
+                       time-varying vasopressor exposure – Modul 20
     kohorte_de.csv    the cohort in "German hospital export" format
-                       (sep=";", encoding="latin-1", decimal comma) — Modul 04
+                       (sep=";", encoding="latin-1", decimal comma) – Modul 04
     einschluss.xlsx   a 3-sheet inclusion-list workbook (Kohorte/Labor/Klinik)
-                       — Modul 04
-    beispiel.json     a small flat JSON array (REDCap-like export) — Modul 04
-    fhir_bundle.json  a minimal, fictitious FHIR R4 Bundle — Modul 04
+                       – Modul 04
+    beispiel.json     a small flat JSON array (REDCap-like export) – Modul 04
+    fhir_bundle.json  a minimal, fictitious FHIR R4 Bundle – Modul 04
 
-The data is entirely FICTITIOUS — no real patient data. It mimics an
+The data is entirely FICTITIOUS – no real patient data. It mimics an
 internal-medicine / intensive-care cohort so the lessons stay clinically
 plausible. Code is English; the column names and categories are German (the
 dataset schema of a German hospital).
 
-Ground truth (by construction — used across the course to check learners'
+Ground truth (by construction – used across the course to check learners'
 estimates against the true data-generating process):
   - `sofa_score` is an intermediate / mediator on the diabetes -> death and
     sepsis -> death paths (comorbidity/admission reason raise SOFA, which
@@ -319,7 +319,7 @@ def _bga_ph_truth_and_observed(cohort: pd.DataFrame) -> tuple[np.ndarray, np.nda
 
 
 def write_bga_truth(cohort: pd.DataFrame) -> Path:
-    """Ground truth for `bga_ph` — the values before missingness was applied.
+    """Ground truth for `bga_ph` – the values before missingness was applied.
 
     Only exists because the cohort is synthetic. Module 14 uses it to *show*
     what complete-case analysis and median imputation get wrong, instead of
@@ -372,7 +372,7 @@ def _generate_competing_risks(cohort: pd.DataFrame) -> pd.DataFrame:
             - discharged (state 2) if D_i < min(fu_zeit_tage, 30), else
             - administratively censored (state 0) at min(fu_zeit_tage, 30).
         Administrative censoring at day 30 is preserved, and the risk set at
-        day 30 stays non-degenerate (~100 patients), unlike the old
+        day 30 stays non-degenerate (~90 patients), unlike the old
         `verweildauer_tage`-based hack that emptied it by day 20.
 
     Consequence taught in Module 20: 1 - Kaplan-Meier (discharge treated as
@@ -495,7 +495,7 @@ def generate_notes(rng: np.random.Generator, cohort: pd.DataFrame) -> pd.DataFra
             "Elektrolytstörung bei Aufnahme", "Exsikkose bei verminderter Trinkmenge",
         ],
     }
-    # Worsening-signal phrases — strong positive signal but not exclusive.
+    # Worsening-signal phrases – strong positive signal but not exclusive.
     worsening_phrases = [
         "Im Verlauf zunehmende Dyspnoe.", "Laktat steigend, Kreislauf instabil.",
         "Sauerstoffbedarf zunehmend.", "Vigilanz im Verlauf gemindert.",
@@ -503,14 +503,14 @@ def generate_notes(rng: np.random.Generator, cohort: pd.DataFrame) -> pd.DataFra
         "Steigender Katecholaminbedarf.", "Zunehmende Somnolenz.",
         "Azidose progredient.", "Kreislauf zunehmend katecholaminpflichtig.",
     ]
-    # Stable-signal phrases — strong negative signal but not exclusive.
+    # Stable-signal phrases – strong negative signal but not exclusive.
     stable_phrases = [
         "Im Verlauf stabil.", "Gutes Ansprechen auf Therapie.",
         "Kreislauf stabil, kein zusätzlicher O2-Bedarf.", "Mobilisation problemlos.",
         "Kardiopulmonal stabil.", "Sauerstoff reduzierbar.", "Afebril im Verlauf.",
         "Gute Rekonvaleszenz.", "Beschwerdefreiheit im Tagesverlauf.",
     ]
-    # Ambiguous phrases — appear in both classes, add noise.
+    # Ambiguous phrases – appear in both classes, add noise.
     ambiguous_phrases = [
         "Weitere Beobachtung erforderlich.", "Engmaschige Kontrolle geplant.",
         "Verlauf abwartend.", "Befundkonstellation komplex.", "Rücksprache mit Oberarzt.",
@@ -559,10 +559,16 @@ def generate_notes(rng: np.random.Generator, cohort: pd.DataFrame) -> pd.DataFra
 # ---------------------------------------------------------------------------
 
 def write_german_csv(cohort: pd.DataFrame) -> Path:
-    """German hospital export format: sep=';', latin-1, decimal comma."""
+    """German hospital export format: sep=';', latin-1, decimal comma.
+
+    A real KIS export spells umlauts out ("männlich", not "maennlich"). Without
+    them the file is pure ASCII, reads fine as UTF-8 too, and Modul 04's
+    encoding lesson has nothing to show.
+    """
     path = HERE / "kohorte_de.csv"
+    export = cohort.assign(geschlecht=cohort["geschlecht"].replace({"maennlich": "männlich"}))
     path.write_text(
-        cohort.to_csv(sep=";", decimal=",", index=False),
+        export.to_csv(sep=";", decimal=",", index=False),
         encoding="latin-1",
     )
     return path
@@ -601,7 +607,7 @@ def _freeze_workbook(path: Path) -> None:
     openpyxl stamps the current wall-clock time into every zip member header and
     overwrites <dcterms:modified> during save, so two runs of this script produce
     different bytes for identical data. Rewrite the archive with one fixed
-    timestamp. Everything else — member order, compression, permissions — is
+    timestamp. Everything else – member order, compression, permissions – is
     preserved, and the workbook stays readable by pandas, Excel and readxl.
     """
     stamp = XLSX_EPOCH.strftime("%Y-%m-%dT%H:%M:%SZ").encode()
