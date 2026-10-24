@@ -1,4 +1,4 @@
-/* Data Science Coach — Interaktionsschicht.
+/* Data Science Coach – Interaktionsschicht.
  *
  * Eine Datei, reines Vanilla-JS, keine Abhängigkeiten. Sie wird von jeder
  * Seite geladen (build.py setzt <script defer src=".../app.js">). Jede Funktion
@@ -24,8 +24,8 @@
 
   /* Nur EIN Topbar-Overlay gleichzeitig. Auf schmalen Viewports deckt die
      Navigations-Schublade die ganze Breite ab; ohne diese Regel blieb sie offen,
-     während sich das Einstellungs-Panel dahinter öffnete — der Klick auf
-     „Ansicht" schien das falsche Menü zu öffnen. Beim Öffnen eines Overlays
+     während sich das Einstellungs-Panel dahinter öffnete – der Klick auf
+     „Ansicht“ schien das falsche Menü zu öffnen. Beim Öffnen eines Overlays
      werden die anderen geschlossen. */
   function closeTopbarOverlays(keep) {
     if (keep !== "settings") {
@@ -68,7 +68,7 @@
     addEventListener("resize", function () { if (innerWidth > NAV_BREAK) set(false); });
   }
 
-  /* ---------- „Module ▾"-Dropdown (Desktop) ----------------------------- *
+  /* ---------- „Module ▾“-Dropdown (Desktop) ----------------------------- *
    * Kursweites Sprungmenü. Auf dem Desktop klappt es per Klick auf; Klick auf
    * einen Link, außerhalb, Escape oder Fensterbreite schließen. Auf schmalen
    * Viewports ist es dauerhaft in der Burger-Schublade sichtbar (CSS), daher
@@ -153,7 +153,7 @@
       });
       function apply(val) {
         // "system" heißt: gar keine Vorgabe. Nur ohne data-theme greift die
-        // prefers-color-scheme-Regel im Stylesheet — ein data-theme="system"
+        // prefers-color-scheme-Regel im Stylesheet – ein data-theme="system"
         // würde auf keinen der beiden Selektoren passen und die Seite bei
         // dunkler Systemeinstellung stumm hell lassen.
         if (val === "system") root.removeAttribute("data-" + target);
@@ -171,8 +171,8 @@
     syncTracks(root.getAttribute("data-level"));
   }
   // Zwei symmetrische Vertiefungsspuren (beide als <details>):
-  //   .adv   „Für Fortgeschrittene" → im Grundlagen-Modus zu, sonst offen.
-  //   .basis „Grundlage" (Einsteiger) → im Alles-Modus zu, sonst offen.
+  //   .adv   „Für Fortgeschrittene“ → im Grundlagen-Modus zu, sonst offen.
+  //   .basis „Grundlage“ (Einsteiger) → im Alles-Modus zu, sonst offen.
   function syncTracks(level) {
     doc.querySelectorAll("details.callout.adv").forEach(function (d) {
       if (!d.dataset.touched) d.open = level !== "grund";
@@ -182,7 +182,7 @@
     });
     // Ganze Abschnittsgruppen (z. B. Modul 14, §7–§11). Der Tiefen-Umschalter
     // konnte bisher nur einzelne Callouts einklappen, nie eine ganze
-    // Vertiefung — 90 Minuten Stoff blieben im Grundlagen-Modus sichtbar.
+    // Vertiefung – 90 Minuten Stoff blieben im Grundlagen-Modus sichtbar.
     doc.querySelectorAll("details.vertiefung").forEach(function (d) {
       if (!d.dataset.touched) d.open = level !== "grund";
     });
@@ -218,12 +218,12 @@
   /* ---------- Fortschritt: Modul als erledigt --------------------------- */
   function totalModules() {
     return doc.querySelectorAll("#navModulesPanel a[data-slug]").length ||
-      doc.querySelectorAll(".karte[data-slug]").length || 33;
+      doc.querySelectorAll(".karte[data-slug]").length || 34;
   }
   function doneSet() { return store.getJSON("dsc-done", []); }
   function initProgress() {
     var done = doneSet();
-    // „Erledigt"-Umschalter in der Kontrollzeile jeder Lektion
+    // „Erledigt“-Umschalter in der Kontrollzeile jeder Lektion
     doc.querySelectorAll(".done-toggle").forEach(function (btn) {
       var slug = btn.getAttribute("data-slug");
       setToggle(btn, done.indexOf(slug) !== -1);
@@ -293,7 +293,7 @@
 
   /* ---------- Lernpfad-Auswahl (Startseite) ----------------------------- *
    * PFADE_ALIAS migriert alte localStorage-Werte (vor einer Umbenennung) auf
-   * die aktuellen Schlüssel — jede Pfad-Modulliste existiert nur einmal.     */
+   * die aktuellen Schlüssel – jede Pfad-Modulliste existiert nur einmal.     */
   var PFADE = {
     all: null,
     basis: ["02", "03", "06", "08", "09", "10"],
@@ -305,7 +305,7 @@
   };
   // Migriert alte localStorage-Schlüssel. `forschung` ist seit der Ergänzung
   // des vollständigen Publikationspfads ein eigener Pfad und darf NICHT mehr
-  // auf `paper` (den kurzen Shortcut) zeigen — das hat ihn stillschweigend
+  // auf `paper` (den kurzen Shortcut) zeigen – das hat ihn stillschweigend
   // gegen die 7-Schritt-Abkürzung getauscht.
   var PFADE_ALIAS = { schnell: "basis", extraktion: "daten", ml: "ki" };
   function initPaths() {
@@ -386,8 +386,8 @@
     paintContinue(doneSet());
   }
   /* Der Fortsetzen-Link folgt dem GEWÄHLTEN Lernpfad. Vorher lief er stur die
-   * DOM-Reihenfolge aller 33 Module ab: wer den KI-Pfad wählte, sah die Zählung
-   * „0 / 12" und wurde trotzdem nach Modul 01 geschickt. */
+   * DOM-Reihenfolge aller Module ab: wer den KI-Pfad wählte, sah die Zählung
+   * „0 / 12“ und wurde trotzdem nach Modul 01 geschickt. */
   function pathCards(key) {
     var cards = Array.prototype.slice.call(doc.querySelectorAll(".karte[data-slug]"));
     var seq = PFADE[key];
@@ -451,7 +451,7 @@
     });
   }
 
-  /* ---------- „Wo eingeben?" – Hinweis je Codeblock --------------------- */
+  /* ---------- „Wo eingeben?“ – Hinweis je Codeblock --------------------- */
   function initWhere(root) {
     (root || doc).querySelectorAll(".wo-btn").forEach(function (btn) {
       if (btn.dataset.bound) return;
@@ -615,7 +615,7 @@
       im.setAttribute("role", "button");
       im.setAttribute("aria-haspopup", "dialog");
       var name = im.alt ? im.alt.slice(0, 60) : "Abbildung";
-      im.setAttribute("aria-label", name + " — vergrößern");
+      im.setAttribute("aria-label", name + " – vergrößern");
       im.addEventListener("click", function () { open(im); });
       im.addEventListener("keydown", function (e) {
         if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
@@ -644,7 +644,7 @@
    * Nimmt optional ein root-Element, damit dieselbe Logik auch auf ein per
    * fetch() nachgeladenes Ressourcen-Fragment angewendet werden kann. Der
    * Index ist innerhalb des jeweiligen Dokuments 0-basiert und damit über
-   * Standalone-Seite und nachgeladenes Fragment hinweg identisch — der
+   * Standalone-Seite und nachgeladenes Fragment hinweg identisch – der
    * localStorage-Zustand bleibt so zwischen beiden Ansichten synchron. */
   function initChecklist(root) {
     var scope = root || doc;
@@ -676,7 +676,7 @@
    * in build.py) per fetch() nachgeladen, ihr #body-Inhalt extrahiert, relative
    * Links/Bilder gegen die geladene URL aufgelöst und einmal pro Seitenaufruf
    * zwischengespeichert. Schlägt fetch() fehl (z. B. file://-Aufruf ohne CORS),
-   * navigiert der Klick stattdessen ganz normal zur eigenständigen Seite —
+   * navigiert der Klick stattdessen ganz normal zur eigenständigen Seite –
    * die Kacheln sind deshalb echte <a href>-Links, kein reines JS-Konstrukt. */
   function initResourcesOverlay() {
     var btn = doc.getElementById("resourcesBtn");
@@ -793,7 +793,7 @@
         detail.innerHTML = cache[key];
         enhance(detail);
       }).catch(function () {
-        // fetch nicht möglich (z. B. lokaler file://-Aufruf ohne CORS) —
+        // fetch nicht möglich (z. B. lokaler file://-Aufruf ohne CORS) –
         // auf die eigenständige Seite ausweichen statt leere Schublade zeigen.
         location.href = url;
       });
@@ -825,7 +825,7 @@
         e.preventDefault();
         lastClickedKey = b.getAttribute("data-target");
         // b.href (DOM-Property, nicht getAttribute) liefert die vom Browser
-        // bereits zu absolut aufgelöste URL — nötig als fetch()-Ziel und als
+        // bereits zu absolut aufgelöste URL – nötig als fetch()-Ziel und als
         // Basis, um relative Links/Bilder im geladenen Fragment aufzulösen.
         showDetail(lastClickedKey, b.href);
       });
@@ -872,7 +872,7 @@
      Das Inhaltsverzeichnis verlinkt auch Überschriften, die in einer
      zugeklappten <details>-Spur liegen (Modul 14, §7–§11). Chrome klappt beim
      Sprung von selbst auf, Firefox nicht: dort landet man wortlos am falschen
-     Ort. Also selbst aufklappen — für jeden Vorfahren, nicht nur den ersten. */
+     Ort. Also selbst aufklappen – für jeden Vorfahren, nicht nur den ersten. */
   function revealHashTarget() {
     var id = location.hash.slice(1);
     if (!id) return;
@@ -884,7 +884,7 @@
         el.open = true;
         // Wer gezielt hierher springt, will den Abschnitt sehen. Ohne diese
         // Markierung würde ihn der nächste Griff zum Tiefen-Schalter wieder
-        // zuklappen — und zwar den Abschnitt, den man gerade aufgerufen hat.
+        // zuklappen – und zwar den Abschnitt, den man gerade aufgerufen hat.
         el.dataset.touched = "1";
         offen = true;
       }

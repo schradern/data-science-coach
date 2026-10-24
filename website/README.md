@@ -43,15 +43,15 @@ bleibt einzige Quelle der Wahrheit, nichts wird doppelt gepflegt:
   Sprache aus. Seitenübergreifend gemerkt.
 - **Selbstcheck → Erinnerungskarten:** Fragen aus `## Selbstcheck` werden zu
   aufdeckbaren Karten (aktives Erinnern statt Mitlesen).
-- **Fortschritt:** „Modul als erledigt" wird pro Modul gespeichert; die
+- **Fortschritt:** „Modul als erledigt“ wird pro Modul gespeichert; die
   Übersicht zeigt Häkchen, einen Ring und eine Zähler-Pille (n / Gesamtzahl).
-- **Lernpfad-Auswahl** auf der Startseite hebt die Module eines Pfades hervor
+- **Lernpfad-Auswahl** in der Modulübersicht hebt die Module eines Pfades hervor
   und nummeriert die Schritte.
 - **Tastatur:** ← / → springt zum vorigen/nächsten Modul.
 
 - **Ruhige Oberfläche.** Navigation und Lern-Schalter liegen in einer Zeile;
   aktive Zustände sind dezent getönt statt vollflächig; das Inhaltsverzeichnis
-  ist einklappbar; lange Codeblöcke werden gekürzt gezeigt („Ganzen Code zeigen").
+  ist einklappbar; lange Codeblöcke werden gekürzt gezeigt („Ganzen Code zeigen“).
 
 Alles rein clientseitig (Vanilla-JS, keine Abhängigkeiten), `localStorage` für
 Einstellungen, `prefers-reduced-motion` respektiert. Verhalten ändern = nur
@@ -59,7 +59,7 @@ Einstellungen, `prefers-reduced-motion` respektiert. Verhalten ändern = nur
 
 ## Diagramme (SVG)
 Konzeptdiagramme entstehen **reproduzierbar aus einem Generator** mit einem
-gemeinsamen, minimalistischen Stil — Farben und Typografie liegen zentral in
+gemeinsamen, minimalistischen Stil – Farben und Typografie liegen zentral in
 `THEME`, Stil global ändern = dort anpassen und neu erzeugen:
 
 ```bash

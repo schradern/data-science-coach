@@ -3,7 +3,7 @@
 The lessons used to link each figure to the *whole* generating file. For
 `data/figures.py` that is 1000 lines covering sixteen modules, so "Code ansehen"
 answered a question nobody asked: it showed the reader everything except the
-twenty lines they wanted. Worse, every `.svg` linked to `lib/diagrams.py` —
+twenty lines they wanted. Worse, every `.svg` linked to `lib/diagrams.py` –
 including the five diagrams that were drawn by hand and appear nowhere in it.
 
 This module finds, for each image, the smallest piece of code that produces it:
@@ -297,7 +297,7 @@ def displayed_images(root: Path) -> set[str]:
 
     The alt texts are long and describe results, so they contain brackets:
     `![… (Weiblich 0,88 [0,79–0,95]) …](assets/subgruppen_auc.png)`. A `[^\\]]*`
-    pattern stops at the first `]` and misses the image entirely — which is how
+    pattern stops at the first `]` and misses the image entirely – which is how
     Modul 32 quietly lost its code link. Match up to the first `](` instead.
     """
     muster = re.compile(r"!\[.*?\]\(([^)\s]+)")
@@ -325,6 +325,6 @@ if __name__ == "__main__":
     for key in sorted(HANDMADE):
         print(f"  {key}")
     if ohne:
-        print(f"\n{len(ohne)} OHNE Zuordnung — weder Code noch HANDMADE:")
+        print(f"\n{len(ohne)} OHNE Zuordnung – weder Code noch HANDMADE:")
         for key in ohne:
             print(f"  {key}")

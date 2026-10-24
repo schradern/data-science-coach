@@ -1,6 +1,6 @@
-/* Data Science Coach — reading-first typeset.
+/* Data Science Coach – reading-first typeset.
    Centered single column, persistent slim top bar, paper aesthetic with a
-   clinical blue accent, light/dark mode. No sidebar — navigation lives in the
+   clinical blue accent, light/dark mode. No sidebar – navigation lives in the
    top bar, the contents page, the inline TOC and prev/next. */
 
 :root {
@@ -46,7 +46,7 @@ html[data-theme="dark"] {
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-/* Sichtbarer Tastatur-Fokus überall — auch dort, wo einzelne Komponenten den
+/* Sichtbarer Tastatur-Fokus überall – auch dort, wo einzelne Komponenten den
    nativen Fokusring per border/outline: none entfernt haben (Segmente,
    Pfad-Buttons, Karten, Ressourcen-Kacheln …). Maus-/Touch-Klicks bleiben ruhig. */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -101,11 +101,11 @@ body {
 .settings-title { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
   color: var(--muted); margin: .35rem .25rem .3rem; }
 /* Das Einstellungs-Panel enthält nur noch Einstellungen: drei .seg-Leisten.
-   Trennstrich und Aktionsknöpfe sind entfallen — „Material und Referenz" ist
+   Trennstrich und Aktionsknöpfe sind entfallen – „Material und Referenz“ ist
    ein Sprungziel und steht im Modulmenü, das Farbschema ist eine Ansichtsoption
    und steht bei den anderen beiden. */
 
-/* ---------- „Module ▾" – kursweites Sprungmenü ---------- */
+/* ---------- „Module ▾“ – kursweites Sprungmenü ---------- */
 .nav-modules { position: relative; display: flex; align-items: center; }
 .nm-btn { display: inline-flex; align-items: center; gap: .25rem; font-size: .86rem; font-weight: 560;
   color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 8px;
@@ -233,8 +233,9 @@ h1.title { font-size: clamp(2rem, 4.4vw, 2.7rem); line-height: 1.14; font-weight
 .sub-nav .sub-sep { width: 1px; height: 13px; background: var(--rule); }
 
 /* ---------- Abstract & TOC ---------- */
-.abstract { border-left: 4px solid var(--accent); background: var(--paper-2); border-radius: var(--radius-sm); padding: 1.25rem 1.6rem; margin: 0 0 2rem; }
-.abstract .block-title { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 .6rem; }
+/* Lernziele im selben ruhigen Satz wie die Callouts: Linie statt Kasten. */
+.abstract { border-left: 2px solid var(--accent); padding: .1rem 0 .1rem 1.15rem; margin: 0 0 2rem; }
+.abstract .block-title { font-size: 12.5px; font-weight: 650; letter-spacing: .01em; color: var(--accent); margin: 0 0 .35rem; }
 .abstract ul { margin: 0; padding-left: 1.1rem; }
 .abstract li { margin: .3rem 0; font-size: 15.5px; color: var(--ink-soft); }
 .toc-inline { border: 1px solid var(--rule); border-radius: var(--radius-sm); margin: 0 0 2.8rem; background: var(--paper-2); }
@@ -332,7 +333,7 @@ figcaption .fig-code:hover { border-color: var(--accent); }
   border-radius: 999px; transition: background .12s; }
 .lb-close:hover { background: rgba(255,255,255,.26); }
 .lb-close:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-/* Abbildungen sind jetzt Buttons — der Fokus muss sichtbar sein. */
+/* Abbildungen sind jetzt Buttons – der Fokus muss sichtbar sein. */
 figure img[role="button"] { cursor: zoom-in; }
 figure img[role="button"]:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
@@ -341,6 +342,10 @@ figure img[role="button"]:focus-visible { outline: 3px solid var(--accent); outl
   padding: .7rem 1.1rem; background: var(--accent); color: #fff; font-weight: 600;
   border-radius: 0 0 var(--radius-sm) 0; text-decoration: none; }
 .skip-link:focus { left: 0; }
+/* Auf dem hellen Dunkelmodus-Akzent trägt Weiß nicht (2,9:1) – wie die
+   übrigen Akzentflächen dunkle Schrift. */
+html[data-theme="dark"] .skip-link { color: #0d1117; }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) .skip-link { color: #0d1117; } }
 .lightbox img { max-width: min(92vw, 1400px); max-height: 84vh; width: auto; height: auto; border-radius: 10px; box-shadow: 0 30px 90px -20px rgba(0,0,0,.7); transform: scale(.965); transition: transform .22s cubic-bezier(.2,.7,.2,1); }
 .lightbox.show img { transform: none; }
 .lightbox .lb-caption { font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.8); text-align: center; max-width: 64ch; }
@@ -399,8 +404,8 @@ footer.seitenfuss a { color: var(--muted); text-decoration: none; } footer.seite
 /* ---------- Studybar (Tiefe / Codesprache) ---------- */
 .studybar { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; margin: 0; align-items: baseline; }
 /* Zwei Spalten: Beschriftung, Optionen. Die feste Breite der ersten Spalte ist
-   der ganze Punkt — sonst beginnt „Grundlagen" hinter LERNTIEFE an einer
-   anderen Kante als „Python" hinter CODEANSICHT, und die Liste franst aus. */
+   der ganze Punkt – sonst beginnt „Grundlagen“ hinter LERNTIEFE an einer
+   anderen Kante als „Python“ hinter CODEANSICHT, und die Liste franst aus. */
 .seg { display: grid; grid-template-columns: 6rem 1fr; align-items: center; column-gap: .75rem;
   border: none; background: transparent; padding: 0; }
 .seg-label { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -409,7 +414,7 @@ footer.seitenfuss a { color: var(--muted); text-decoration: none; } footer.seite
    Text exakt auf der Spaltenkante sitzt und nicht .4rem daneben. */
 .seg-opts { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem; row-gap: .1rem;
   margin-left: -.4rem; }
-/* Mindest-Trefferfläche 24×24 px (WCAG 2.2 §2.5.8). Vorher `padding: 0` —
+/* Mindest-Trefferfläche 24×24 px (WCAG 2.2 §2.5.8). Vorher `padding: 0` –
    auf dem Tablet praktisch nicht treffbar. */
 .seg button { font: inherit; font-size: .82rem; cursor: pointer; border: none; background: none;
   padding: .3rem .4rem; min-height: 24px; min-width: 24px; border-radius: var(--radius-sm);
@@ -425,23 +430,22 @@ html[data-lang="py"] .lang-section[data-lang="r"],
 html[data-lang="r"]  .lang-section[data-lang="py"],
 html[data-lang="py"] .lang-lead[data-lang="r"],
 html[data-lang="r"]  .lang-lead[data-lang="py"],
-/* Die Erklärung folgt ihrem Codeblock — sie verschwindet mit ihm. Sonst stünde
+/* Die Erklärung folgt ihrem Codeblock – sie verschwindet mit ihm. Sonst stünde
    in der R-Ansicht eine Verbalisierung von Python-Code ohne den Code dazu. */
 html[data-lang="py"] .code-verbalization[data-lang="r"],
 html[data-lang="r"]  .code-verbalization[data-lang="py"] { display: none; }
 .lang-section { display: block; }
-/* Quelltext-Seiten zeigen immer ihre eine Datei — Sprachfilter gilt hier nicht. */
+/* Quelltext-Seiten zeigen immer ihre eine Datei – Sprachfilter gilt hier nicht. */
 .page.codepage .code-wrap { display: block !important; }
 
 /* ---------- Didaktische Callouts: ruhige Rand-Notizen ---------- */
 /* Voraussetzungs-Hinweis über Code-Lektionen: ruhig, dezent, ausblendbar. */
 .prereq { display: flex; align-items: flex-start; gap: .7rem; margin: 0 0 2rem;
-  padding: .85rem 1rem; border: 1px solid var(--rule); border-left: 3px solid var(--accent);
-  border-radius: 10px; background: var(--accent-tint); }
+  padding: .7rem 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
 .prereq[hidden] { display: none; }
 .prereq .pq-ico { flex: none; color: var(--accent); margin-top: .05rem; }
 .prereq .pq-ico svg { width: 18px; height: 18px; }
-.prereq .pq-text { font-size: .88rem; line-height: 1.5; color: var(--ink); }
+.prereq .pq-text { font-size: .88rem; line-height: 1.5; color: var(--ink-soft); }
 .prereq .pq-text strong { font-weight: 640; }
 .prereq .pq-text a { color: var(--accent); font-weight: 560; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
 .prereq .pq-text a:hover { border-bottom-color: var(--accent); }
@@ -469,37 +473,54 @@ html[data-lang="r"]  .code-verbalization[data-lang="py"] { display: none; }
 .practice-num { flex: none; display: grid; place-items: center; width: 1.35rem; height: 1.35rem;
   border-radius: 50%; background: var(--accent-tint); color: var(--accent); font-size: .72rem; font-weight: 700; }
 
-/* Didaktische Callouts – elegante Blöcke mit weichem Hintergrund */
-.callout { margin: 1.6rem 0; border: none; border-left: 4px solid var(--rule); border-radius: 0 12px 12px 0;
-  padding: 1.1rem 1.4rem; background: var(--paper-2); transition: background .12s ease; }
-.callout .c-tag { display: inline-flex; align-items: center; gap: .38rem; font-size: 10.5px; font-weight: 700;
-  letter-spacing: .09em; text-transform: uppercase; margin-bottom: .4rem; }
-.callout .c-tag svg { width: 13px; height: 13px; }
+/* Didaktische Callouts – ruhig gesetzt statt als Kasten: eine dünne farbige
+   Linie, ein kleines Etikett, der Text bleibt Teil des Leseflusses. Die Farbe
+   trägt die Bedeutung (Fallstrick, Praxis, Merksatz, Vertiefung), nicht eine
+   Fläche. Aufeinanderfolgende Callouts rücken zusammen. */
+.callout { margin: 1.7rem 0; padding: .1rem 0 .1rem 1.15rem; border: none;
+  border-left: 2px solid var(--rule); border-radius: 0; background: none; }
+.callout + .callout { margin-top: -.3rem; }
+.callout .c-tag { display: inline-flex; align-items: center; gap: .4rem; font-size: 12.5px;
+  font-weight: 650; letter-spacing: .01em; text-transform: none; margin-bottom: .2rem; }
+.callout .c-tag svg { width: 14px; height: 14px; opacity: .9; }
 .callout .callout-body > :first-child { margin-top: 0; }
 .callout .callout-body > :last-child { margin-bottom: 0; }
-.callout .callout-body p { font-size: 15.5px; color: var(--ink-soft); line-height: 1.6; }
-.callout.fallstrick { background: var(--warn-tint); border-left-color: var(--warn); }
+.callout .callout-body p { font-size: 16.5px; color: var(--ink-soft); line-height: 1.65; }
+.callout.fallstrick { border-left-color: var(--warn); }
 .callout.fallstrick .c-tag { color: var(--warn); }
-.callout.praxis { background: var(--accent-tint); border-left-color: var(--accent); }
+.callout.praxis { border-left-color: var(--accent); }
 .callout.praxis .c-tag { color: var(--accent); }
-.callout.merksatz { background: var(--ok-tint); border-left-color: var(--ok); }
+/* Der Merksatz ist die Kernaussage: größer und in voller Schriftfarbe. */
+.callout.merksatz { border-left-width: 3px; border-left-color: var(--ok); padding-left: 1.25rem; }
 .callout.merksatz .c-tag { color: var(--ok); }
-.callout.merksatz .callout-body p { color: var(--ink); }
+.callout.merksatz .callout-body p { font-size: 18px; line-height: 1.6; color: var(--ink); font-weight: 450; }
 
-/* Einklappbare Spuren (natives <details>) */
-details.callout.adv { background: var(--adv-tint); border-left-color: var(--adv); border-radius: 12px; }
-details.callout.basis { background: var(--ok-tint); border-left-color: var(--ok); border-radius: 12px; }
-details.callout.adv summary, details.callout.basis summary { list-style: none; cursor: pointer; display: flex;
-  align-items: center; justify-content: space-between; gap: .8rem; padding: .1rem 0; }
+/* Einklappbare Spuren (natives <details>): zugeklappt eine einzige ruhige
+   Zeile – Pfeil, Etikett und der Anfang des Textes als Vorschau. Die farbige
+   Linie erscheint erst aufgeklappt. */
+details.callout.adv, details.callout.basis { border-left-color: transparent; }
+details.callout.adv[open] { border-left-color: var(--adv); }
+details.callout.basis[open] { border-left-color: var(--ok); }
+details.callout:not([open]) + details.callout:not([open]) { margin-top: -1.1rem; }
+details.callout.adv summary, details.callout.basis summary { list-style: none; cursor: pointer;
+  display: flex; align-items: center; gap: .55rem; padding: .2rem 0; min-width: 0; }
 details.callout.adv summary::-webkit-details-marker,
 details.callout.basis summary::-webkit-details-marker { display: none; }
-details.callout.adv summary .c-tag { margin: 0; color: var(--adv); }
-details.callout.basis summary .c-tag { margin: 0; color: var(--ok); }
-details.callout .c-hint { font-size: 10.5px; font-weight: 600; color: var(--muted); }
-details.callout .c-hint::after { content: " ▾"; }
-details.callout[open] .c-hint::after { content: " ▴"; }
-details.callout .callout-body { padding: .7rem 0 0; }
-details.callout summary:hover .c-tag { filter: brightness(1.08); }
+details.callout summary::before { content: ""; flex: none; width: .38em; height: .38em;
+  margin: 0 .2rem 0 -.05rem; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg); transition: transform .15s ease; }
+details.callout.adv summary::before { color: var(--adv); }
+details.callout.basis summary::before { color: var(--ok); }
+details.callout[open] summary::before { transform: rotate(45deg) translate(-1px, -1px); }
+details.callout summary .c-tag { flex: none; margin: 0; }
+details.callout summary .c-tag svg { display: none; }
+details.callout.adv summary .c-tag { color: var(--adv); }
+details.callout.basis summary .c-tag { color: var(--ok); }
+details.callout .c-teaser { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap;
+  text-overflow: ellipsis; font-size: 14.5px; color: var(--muted); transition: color .12s ease; }
+details.callout[open] .c-teaser { display: none; }
+details.callout summary:hover .c-teaser { color: var(--ink-soft); }
+details.callout .callout-body { padding: .45rem 0 0; }
 
 /* ---------- Selbstcheck als Erinnerungskarten ---------- */
 .quiz { display: grid; gap: .6rem; margin: 1rem 0 1.4rem; }
@@ -517,8 +538,8 @@ details.callout summary:hover .c-tag { filter: brightness(1.08); }
 .quiz-card.show .quiz-a { max-height: 40rem; padding: .8rem 1rem .95rem 3.2rem; border-top-color: var(--rule-soft); }
 
 /* ---------- Quelltext-Seiten: Einordnung vor dem Code -------------------- */
-/* Ohne diesen Kasten begann eine Code-Seite mit Zeile 1 eines Skripts — der
-   Reiter „Python" führte in eine Datei ohne Anlass. */
+/* Ohne diesen Kasten begann eine Code-Seite mit Zeile 1 eines Skripts – der
+   Reiter „Python“ führte in eine Datei ohne Anlass. */
 .code-intro {
   border: 1px solid var(--rule); border-left: 3px solid var(--accent);
   border-radius: 10px; background: var(--paper-2);
@@ -564,7 +585,7 @@ a.dateilink:focus-visible > code { outline: 2px solid var(--accent); outline-off
  * Das Inline-Skript im <head> setzt data-js="1", bevor irgendetwas gezeichnet
  * wird. Fehlt das Attribut, läuft kein JS: dann klappt kein Klick eine Antwort
  * auf, und `.quiz-a { max-height: 0 }` hätte JEDE Selbstcheck-Antwort dauerhaft
- * unlesbar gemacht. Also alles zeigen — und die Bedienelemente ausblenden, die
+ * unlesbar gemacht. Also alles zeigen – und die Bedienelemente ausblenden, die
  * ohne ihre Handler nur tote Knöpfe wären.
  * ------------------------------------------------------------------------- */
 html:not([data-js]) .quiz-a {
@@ -604,7 +625,7 @@ html:not([data-js]) .fab { display: none !important; }
   border-radius: 8px; padding: .55rem .85rem; line-height: 1.35; }
 .course-resume a:hover { background: var(--accent-2); border-color: var(--accent-2); }
 /* Pfad-Filter: kompakter, sekundärer Ausklapper neben dem immer sichtbaren
-   Weiterlernen-Link — bewusst zugeklappt, damit die Übersicht ruhig bleibt,
+   Weiterlernen-Link – bewusst zugeklappt, damit die Übersicht ruhig bleibt,
    aber ein Klick entfernt und klar beschriftet. */
 .pfad-details { justify-self: start; }
 .pfad-summary { display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; list-style: none;
@@ -674,8 +695,9 @@ html[data-theme="dark"] .karte .k-step { color: #0d1117; }
   .quiz-a { max-height: none !important; padding: .5rem 1rem .5rem 3.2rem !important; }
 
   /* Auf Papier gibt es kein Aufklappen. Jede eingeklappte Spur muss gedruckt
-     werden — sonst verliert ein Ausdruck von Modul 14 stillschweigend die
+     werden – sonst verliert ein Ausdruck von Modul 14 stillschweigend die
      Vertiefung (§7–§11), also den größeren Teil des Moduls. */
+  details.callout .c-teaser { display: none !important; }
   details.callout.adv .callout-body,
   details.callout.basis .callout-body,
   details.vertiefung .vertiefung-body { display: block !important; }
@@ -730,7 +752,7 @@ html[data-theme="dark"] .karte .k-step { color: #0d1117; }
 .ls-start li strong { color: var(--ink); font-weight: 650; }
 .ls-start > p:last-child { margin-bottom: 0; font-size: .9rem; color: var(--muted); }
 
-/* „Was du danach kannst" – zweispaltige Häkchenliste */
+/* „Was du danach kannst“ – zweispaltige Häkchenliste */
 .ls-ergebnis ul { list-style: none; padding: 0; margin: 0; display: grid;
   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr)); gap: .5rem 1.6rem; }
 .ls-ergebnis li { position: relative; padding-left: 1.5rem; font-size: .92rem; line-height: 1.5; }
@@ -739,7 +761,10 @@ html[data-theme="dark"] .karte .k-step { color: #0d1117; }
   transform: rotate(-45deg); }
 
 /* Modulübersicht – Grid sitzt direkt im Abschnitt */
-.ls-module .uebersicht-kopf { margin-top: .2rem; }
+/* Der Titelblock schließt schon mit einer Linie ab; eine zweite Linie mit
+   Abstand davor ließ eine leere Bande stehen. */
+.landing .body > .ls-module:first-child { padding-top: 0; }
+.ls-module .uebersicht-kopf { margin-top: 0; padding-top: 0; border-top: none; }
 .ls-module .teil-head:first-of-type { margin-top: 1.4rem; }
 
 /* ---------- Checkboxen in Listen (Checklisten) ---------- */
@@ -811,7 +836,7 @@ html[data-theme="dark"] .ro-backdrop { background: rgba(5, 7, 10, 0.65); }
 .dl-name { font-size: .92rem; font-weight: 640; color: var(--ink); }
 .dl-meta { font-size: .76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .dl-actions { display: flex; align-items: center; gap: .5rem; flex: none; }
-/* Höher gescoped als „.body a" (Fließtext-Linkstil), damit Farbe/Rahmen der
+/* Höher gescoped als „.body a“ (Fließtext-Linkstil), damit Farbe/Rahmen der
    Download-Aktionen nicht vom allgemeinen Link-Unterstrich überschrieben werden. */
 .data-downloads a { border-bottom: none; }
 .data-downloads .dl-btn { font-size: .82rem; font-weight: 600; text-decoration: none; color: #fff;

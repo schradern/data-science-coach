@@ -35,8 +35,8 @@ WURZEL = Path(__file__).resolve().parent.parent
 ZIEL = WURZEL / "website" / "site"
 
 # Abbildung -> der Code, der genau sie zeichnet. Einmal gebaut, überall benutzt:
-# von fig_code_resolver() für den „Code ansehen"-Link und von baue_abbildungs_seite()
-# für die Seite dahinter. Beschränkt auf Abbildungen, die eine Lektion auch zeigt —
+# von fig_code_resolver() für den „Code ansehen“-Link und von baue_abbildungs_seite()
+# für die Seite dahinter. Beschränkt auf Abbildungen, die eine Lektion auch zeigt –
 # für ein Bild, das niemand sieht, braucht niemand eine Seite.
 ABB_INDEX = {k: s for k, s in build_index(WURZEL).items()
              if k in displayed_images(WURZEL)}
@@ -47,7 +47,7 @@ ABB_INDEX = {k: s for k, s in build_index(WURZEL).items()
 # in Codeblöcken, z. B. pd.read_csv("{{DATEN}}kohorte.csv")); schreibe() ersetzt
 # sie im fertigen HTML jeder Seite, bevor sie geschrieben wird.
 #
-# {{DATEN}} zeigt auf das data/-Verzeichnis dieser Website selbst — der Build
+# {{DATEN}} zeigt auf das data/-Verzeichnis dieser Website selbst – der Build
 # kopiert die Datensätze neben die Lektionen. Kein zweiter Ablageort, keine
 # Abhängigkeit von raw.githubusercontent.com.
 PLATZHALTER = "__SET_ME__"
@@ -69,7 +69,7 @@ def pruefe_konfiguration() -> None:
 
     Ohne diese Prüfung erzeugt ein nicht gesetztes config.json eine Website, in
     der jeder kopierbare `pd.read_csv("{{DATEN}}…")`-Block und jeder
-    Download-Button auf eine 404-Adresse zeigt — ohne dass der Build meckert.
+    Download-Button auf eine 404-Adresse zeigt – ohne dass der Build meckert.
     """
     if PLATZHALTER in DATA_BASE_URL:
         raise SystemExit(
@@ -83,7 +83,7 @@ def pruefe_konfiguration() -> None:
         raise SystemExit("config.json: data_base_url muss auf '/' enden.")
 
 # Herunterladbare Datendateien: Dateiname → menschenlesbares Label. Nur Dateien,
-# die tatsächlich in data/ existieren, werden im Download-Panel angezeigt —
+# die tatsächlich in data/ existieren, werden im Download-Panel angezeigt –
 # kein Hardcode-Fail, wenn eine (noch) fehlt.
 DATEN_LABELS = {
     "kohorte.csv": "Kohorte (Hauptdatensatz)",
@@ -99,7 +99,7 @@ DATEN_LABELS = {
 }
 
 # Cache-Buster: kurzer Inhalts-Hash von style.css + app.js. Ändert sich nur, wenn
-# sich die Assets ändern — so lädt der Browser aktualisierte Dateien zuverlässig.
+# sich die Assets ändern – so lädt der Browser aktualisierte Dateien zuverlässig.
 def _asset_version() -> str:
     import hashlib
     h = hashlib.sha1()
@@ -169,6 +169,7 @@ TEILE = [
          "32-einsatz-governance", "33-rag-llm-pipelines", "34-design-ki-studien"]),
 ]
 REIHENFOLGE = [s for _, slugs in TEILE for s in slugs]
+ZAHLWORT = {3: "drei", 4: "vier", 5: "fünf", 6: "sechs", 7: "sieben"}
 TEIL_VON = {s: t for t, slugs in TEILE for s in slugs}
 
 BESCHREIBUNG = {
@@ -285,13 +286,13 @@ WERKZEUG = {
 CODE_LEXER = {".py": "python", ".R": "r", ".sql": "sql", ".qmd": "markdown"}
 CODE_LABEL = {".py": "Python", ".R": "R", ".sql": "SQL", ".qmd": "Quarto"}
 
-# „Wo gebe ich das ein?" – ein knapper, ausklappbarer Hinweis je Codeart, damit
+# „Wo gebe ich das ein?“ – ein knapper, ausklappbarer Hinweis je Codeart, damit
 # Einsteiger:innen wissen, wohin die Zeilen gehören. Fence-Sprache → Kategorie.
 WHERE_KEY = {"bash": "shell", "sh": "shell", "shell": "shell", "console": "shell",
              "powershell": "shell", "ps1": "shell",
              "python": "python", "py": "python", "r": "r", "sql": "sql"}
 WHERE_HINT = {
-    "shell": ('Diese Zeilen kommen ins <b>Terminal</b> (macOS: „Terminal", Windows: „PowerShell"). '
+    "shell": ('Diese Zeilen kommen ins <b>Terminal</b> (macOS: „Terminal“, Windows: „PowerShell“). '
               'Vorher in den Projektordner wechseln und die Umgebung aktivieren – Schritt für Schritt '
               'in Modul&nbsp;02. Ein <code>#</code>-Kommentar wird nicht mitausgeführt.'),
     "python": ('Python-Code: in eine Datei mit Endung <code>.py</code> schreiben und mit dem '
@@ -374,7 +375,7 @@ _IMG_P = re.compile(r'<p>\s*(<img\b[^>]*>)\s*(.*?)</p>', re.DOTALL)
 
 
 def _png_size(pfad: Path):
-    """Liest Breite/Höhe aus dem IHDR-Chunk einer PNG-Datei — kein Zusatzpaket nötig."""
+    """Liest Breite/Höhe aus dem IHDR-Chunk einer PNG-Datei – kein Zusatzpaket nötig."""
     try:
         kopf = pfad.read_bytes()[:33]
         if len(kopf) < 33 or kopf[:8] != b"\x89PNG\r\n\x1a\n":
@@ -406,7 +407,7 @@ def wrap_figures(html: str, fig_code=None, base_dir: "Path | None" = None) -> st
 
     fig_code(src) -> URL liefert optional die Quellcode-Seite dieser Abbildung.
     base_dir, falls gesetzt, ist das Quellverzeichnis, in dem `src` aufgelöst
-    werden kann — daraus liest wrap_figures die tatsächlichen Bildmaße, um
+    werden kann – daraus liest wrap_figures die tatsächlichen Bildmaße, um
     width/height zu setzen (verhindert Layout-Sprünge/CLS beim Laden), und
     versieht jedes Bild mit loading="lazy" (Bilder liegen unterhalb des ersten
     Bildschirms, hinter Lernkompass/TOC/Vorspann).
@@ -512,7 +513,7 @@ _CHECK_SVG = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 
 
 def modul_menu(tiefe: int, aktiv_slug: str = "") -> str:
-    """„Module ▾" – Sprung-Menü über den gesamten Kurs, auf jeder Seite gleich.
+    """„Module ▾“ – Sprung-Menü über den gesamten Kurs, auf jeder Seite gleich.
 
     Listet alle vorhandenen Module nach Teilen gruppiert; das aktuelle Modul ist
     hervorgehoben. Auf dem Desktop ein aufklappbares Dropdown, auf schmalen
@@ -540,7 +541,7 @@ def modul_menu(tiefe: int, aktiv_slug: str = "") -> str:
             gruppen.append(f'<details class="nm-group"{cur} open><summary class="nm-teil">{escape(teil_titel)}</summary>'
                            + "".join(eintraege) + "</details>")
     # Kopf des Menüs: die zwei Ziele, die kein Modul sind. Vorher stand „Zur
-    # Modulübersicht" als Link mit leerer Nummer zwischen den Modulen — es sah
+    # Modulübersicht" als Link mit leerer Nummer zwischen den Modulen – es sah
     # aus wie ein Modul ohne Nummer. Beides sind Sprungziele, also gehören sie
     # zusammen, abgesetzt und mit Symbol statt Nummernspalte.
     overview_html = (
@@ -588,7 +589,7 @@ _ICON_CHECK_SM = ('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" s
 
 
 def done_toggle(slug: str) -> str:
-    """Kompakter, ruhiger „erledigt"-Umschalter (oben rechts in der Tab-Zeile)."""
+    """Kompakter, ruhiger „erledigt“-Umschalter (oben rechts in der Tab-Zeile)."""
     return (f'<button type="button" class="done-toggle" data-slug="{slug}" aria-pressed="false" '
             f'title="Modul als erledigt markieren">'
             f'<span class="dt-ico" aria-hidden="true">{_ICON_CHECK_SM}</span>'
@@ -599,17 +600,17 @@ def studybar() -> str:
     """Die drei Einstellungen, die bestimmen, wie die Seite aussieht.
 
     Alle drei sind seitenübergreifend persistent (localStorage). Der Sprachfilter
-    blendet Python- oder R-Blöcke aus; „Grundlagen" klappt die Vertiefungen ein;
+    blendet Python- oder R-Blöcke aus; „Grundlagen“ klappt die Vertiefungen ein;
     das Farbschema folgt standardmäßig dem Betriebssystem.
 
     Das Farbschema war früher ein Knopf unter einem Trennstrich, neben „Material
-    und Referenz" — einem Sprungziel, keiner Einstellung. Es ist aber genau das,
+    und Referenz" – einem Sprungziel, keiner Einstellung. Es ist aber genau das,
     was die anderen beiden auch sind: eine Ansichtsoption. Also steht es hier.
     """
     # Beschriftung und Optionen liegen in getrennten Zellen, damit die Optionen
     # aller drei Zeilen an derselben Kante beginnen. Vorher stand die Auswahl
-    # direkt hinter der Beschriftung, und weil „CODEANSICHT" länger ist als
-    # „LERNTIEFE", begann jede Zeile woanders.
+    # direkt hinter der Beschriftung, und weil „CODEANSICHT“ länger ist als
+    # „LERNTIEFE“, begann jede Zeile woanders.
     return (
         '<div class="studybar" aria-label="Kursweite Ansicht">'
         '<div class="seg" id="segLevel" data-target="level" data-store="dsc-level" data-default="grund">'
@@ -646,7 +647,7 @@ def data_download_panel(href_prefix: str) -> str:
 
     href_prefix zeigt auf das Verzeichnis, in dem die kopierten Dateien liegen
     (siehe main()); "{{DATEN}}<name>" wird beim Schreiben der Seite (schreibe())
-    zur echten Roh-URL aufgelöst — dieselbe Datei funktioniert also sowohl als
+    zur echten Roh-URL aufgelöst – dieselbe Datei funktioniert also sowohl als
     direkter Download als auch als copy-paste-fähige Lade-URL für Notebooks.
     """
     rows = []
@@ -681,7 +682,7 @@ ICON_SHIELD_SM = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 # Ziel-Standalone-Seite je Ressourcen-Kachel (Schlüssel → Pfad relativ zur
 # Website-Wurzel). Das Overlay lädt den Seiteninhalt bei Bedarf per fetch()
 # nach (kein per-Seite-Duplikat mehr) und fällt bei fehlendem JS/fetch auf
-# eine normale Navigation zur Standalone-Seite zurück — dieselbe Seite dient
+# eine normale Navigation zur Standalone-Seite zurück – dieselbe Seite dient
 # also beiden Zwecken, einmal gebaut.
 RESOURCE_PAGES = {
     "daten": "data/index.html",
@@ -696,7 +697,7 @@ RESOURCE_PAGES = {
 def resources_overlay(r: str) -> str:
     """Erzeugt das ausfahrbare Ressourcen-Overlay (Sheet Drawer) auf jeder Seite.
 
-    Enthält nur das Kachel-Menü (klein, identisch auf jeder Seite) — die
+    Enthält nur das Kachel-Menü (klein, identisch auf jeder Seite) – die
     referenzierten Dokumente selbst werden NICHT mehr pro Seite dupliziert;
     app.js lädt sie bei Klick per fetch() aus RESOURCE_PAGES nach.
     """
@@ -772,8 +773,8 @@ def resources_overlay(r: str) -> str:
 def seite(titel: str, titleblock: str, body: str, aktiv: str, tiefe: int,
           klass: str = "") -> str:
     r = rel_root(tiefe)
-    # `aktiv` ist auf Modulseiten der Slug (z. B. „05-sql"), sonst leer –
-    # damit hebt das „Module"-Menü das aktuelle Modul hervor.
+    # `aktiv` ist auf Modulseiten der Slug (z. B. „05-sql“), sonst leer –
+    # damit hebt das „Module“-Menü das aktuelle Modul hervor.
     return f"""<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -813,7 +814,7 @@ def parse_lektion(text: str):
     if m:
         titel = m.group(1).strip()
         rest = rest[: m.start()] + rest[m.end():]
-    # Meta-Blockquote „> **Teil …** · Dauer: … · Voraussetzung: …"
+    # Meta-Blockquote „> **Teil …** · Dauer: … · Voraussetzung: …“
     m = re.search(r"^> (\*\*Teil.+)$", rest, re.MULTILINE)
     if m:
         teile = [t.strip() for t in m.group(1).split("·")]
@@ -880,7 +881,7 @@ def sub_nav(slug, aktiv_datei, code_dateien, von_code=False):
         html.append('<span class="sub-sep" aria-hidden="true"></span>')
         # Module 14 ships five Python and four R scripts. Labelling them all
         # "Python"/"R" gave nine indistinguishable links and no run order.
-        # Whenever a language has more than one script, name it — and put the
+        # Whenever a language has more than one script, name it – and put the
         # module's entry script (python.py / r.R) first.
         pro_sprache: dict[str, int] = {}
         for cf in code_dateien:
@@ -942,7 +943,7 @@ def weiter_nav(slug):
 
 
 def schreibe(pfad: Path, inhalt: str) -> None:
-    """Schreibt eine Textdatei — einzige Stelle, an der {{DATEN}}/{{REPO}} im
+    """Schreibt eine Textdatei – einzige Stelle, an der {{DATEN}}/{{REPO}} im
     fertig zusammengesetzten HTML/Text jeder Seite durch die echten URLs
     ersetzt werden (siehe DATA_BASE_URL/REPO_URL oben). Wirkt auch innerhalb
     von Codeblöcken, da diese zu diesem Zeitpunkt bereits reiner Text sind."""
@@ -957,7 +958,7 @@ def schreibe(pfad: Path, inhalt: str) -> None:
 #   **Darüber hinaus:** …  → Für Fortgeschrittene (Vertiefungsspur, einklappbar)
 #   **Praxis:** …          → Praxis-Hinweis
 #   > **Merksatz:** …      → Kernaussage
-# Der Renderer macht daraus visuelle, im „Grundlagen"-Modus reduzierbare Boxen –
+# Der Renderer macht daraus visuelle, im „Grundlagen“-Modus reduzierbare Boxen –
 # ohne eine Zeile Prosa zu ändern (einzige Quelle der Wahrheit bleibt Markdown).
 CALLOUT_ICON = {
     "fallstrick": ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'
@@ -983,6 +984,14 @@ _MARK = re.compile(r'<strong>(Stolperstein|Darüber hinaus|Praxis|Grundlage):</s
 _PARA = re.compile(r'<p>(.*?)</p>', re.DOTALL)
 
 
+def _teaser(body: str) -> str:
+    """Anfang des Box-Textes als Vorschau im zugeklappten <summary>. Zwei
+    Vertiefungen hintereinander sahen sonst identisch aus; das CSS kürzt die
+    Zeile mit Auslassungspunkten."""
+    text = re.sub(r"<[^>]+>", "", body)
+    return re.sub(r"\s+", " ", text).strip()[:160]
+
+
 def _render_box(art: str, body: str) -> str:
     body = body.strip()
     if art == "Stolperstein":
@@ -992,19 +1001,19 @@ def _render_box(art: str, body: str) -> str:
         return (f'<div class="callout praxis"><div class="c-tag">{CALLOUT_ICON["praxis"]}'
                 f'<span>Praxis</span></div><div class="callout-body"><p>{body}</p></div></div>')
     if art == "Grundlage":
-        # Einsteiger-Spur → natives <details>, Standardansicht „Grundlagen": offen
-        # (im „Alles"-Modus per JS zugeklappt). Statisch (ohne JS) ebenfalls offen,
+        # Einsteiger-Spur → natives <details>, Standardansicht „Grundlagen“: offen
+        # (im „Alles“-Modus per JS zugeklappt). Statisch (ohne JS) ebenfalls offen,
         # konsistent mit dem neuen Standard.
         return (f'<details class="callout basis" data-track="basis" open><summary>'
                 f'<span class="c-tag">{CALLOUT_ICON["basis"]}<span>Grundlage</span></span>'
-                f'<span class="c-hint">Für Einsteiger</span></summary>'
+                f'<span class="c-teaser">{_teaser(body)}</span></summary>'
                 f'<div class="callout-body"><p>{body}</p></div></details>')
-    # „Darüber hinaus" = Vertiefungsspur → natives <details>, Standardansicht
-    # „Grundlagen": zugeklappt (für Fortgeschrittene/„Alles"-Modus per JS offen).
+    # „Darüber hinaus“ = Vertiefungsspur → natives <details>, Standardansicht
+    # „Grundlagen“: zugeklappt (für Fortgeschrittene/„Alles“-Modus per JS offen).
     # Statisch geschlossen, damit Einsteiger:innen nicht erschlagen werden.
     return (f'<details class="callout adv" data-track="adv"><summary>'
             f'<span class="c-tag">{CALLOUT_ICON["adv"]}<span>Für Fortgeschrittene</span></span>'
-            f'<span class="c-hint">Vertiefung</span></summary>'
+            f'<span class="c-teaser">{_teaser(body)}</span></summary>'
             f'<div class="callout-body"><p>{body}</p></div></details>')
 
 
@@ -1026,7 +1035,7 @@ def transform_vertiefung(html: str, quelle: str = "?") -> str:
     """Wrap a `<!-- vertiefung: … -->` … `<!-- /vertiefung -->` span in a <details>.
 
     Both failure modes are silent and destructive, so both abort the build:
-    a missing end marker folds the rest of the page — footer included — into the
+    a missing end marker folds the rest of the page – footer included – into the
     collapsed box, and a second start marker is ignored outright, leaving a raw
     HTML comment in the body and a section that never becomes a track.
     """
@@ -1036,7 +1045,7 @@ def transform_vertiefung(html: str, quelle: str = "?") -> str:
     if len(starts) > 1:
         raise SystemExit(
             f"{quelle}: {len(starts)} '<!-- vertiefung: -->' Startmarken. "
-            "Genau eine pro Datei — die übrigen würden stillschweigend verschwinden."
+            "Genau eine pro Datei – die übrigen würden stillschweigend verschwinden."
         )
     start = starts[0]
     titel = escape(start.group(1)) or "Vertiefung"
@@ -1055,7 +1064,7 @@ def transform_vertiefung(html: str, quelle: str = "?") -> str:
     box = (
         f'<details class="vertiefung" data-track="adv">'
         f'<summary><span class="c-tag">{CALLOUT_ICON["adv"]}<span>{titel}</span></span>'
-        f'<span class="c-hint">Vertiefung — im Grundlagen-Modus eingeklappt</span></summary>'
+        f'<span class="c-hint">Vertiefung – im Grundlagen-Modus eingeklappt</span></summary>'
         f'<div class="vertiefung-body">{inhalt}</div>'
         f'</details>'
     )
@@ -1067,7 +1076,7 @@ def transform_vertiefung(html: str, quelle: str = "?") -> str:
 #
 # Die Lektionen nennen ständig Dateien: `lib/helpers.py`, `kohorte.csv`,
 # `tools/check_repo.py`. Gedruckt auf einer Website ist so ein Pfad eine
-# Sackgasse — man weiß, dass die Datei existiert, kommt aber nicht hin. Jeder
+# Sackgasse – man weiß, dass die Datei existiert, kommt aber nicht hin. Jeder
 # Verweis auf eine Datei, die es wirklich gibt, wird deshalb zu einem Link auf
 # genau diese Datei im Repository.
 #
@@ -1083,7 +1092,7 @@ _IGNORIERTE_ORDNER = {".venv", ".git", "__pycache__", "site", ".ipynb_checkpoint
 # Vorkommen zu einem Link. Nur diese wenigen Ordner sind gemeint.
 _VERLINKTE_ORDNER = {"data", "docs", "lib", "module", "tools", "notebooks", "website"}
 # Dateien, die im Kurs als Begriff vorkommen, nicht als Verweis auf dieses Repo.
-# Modul 22 lässt eine erfundene `.gitignore` einer Kollegin korrigieren — ein
+# Modul 22 lässt eine erfundene `.gitignore` einer Kollegin korrigieren – ein
 # Link auf die echte Datei dieses Projekts wäre schlicht das falsche Ziel.
 _NICHT_VERLINKEN = {".gitignore"}
 
@@ -1118,7 +1127,7 @@ def _aufloesen(ziel: str, kontext: str | None) -> str | None:
     """Repo-Pfad zu einem Dateiverweis, oder None.
 
     `code/python.py` steht in jeder Lektion und meint jedes Mal eine andere
-    Datei — nämlich die des Moduls, das man gerade liest. Deshalb zählt der
+    Datei – nämlich die des Moduls, das man gerade liest. Deshalb zählt der
     Kontext der Seite mehr als der globale Index.
     """
     if ziel in _NICHT_VERLINKEN:
@@ -1187,7 +1196,7 @@ def transform_callouts(html: str) -> str:
 
 
 # Ein Marker erfasst nur seinen eigenen <p>-Absatz. Folgt darauf ein Codeblock
-# oder eine Liste, die inhaltlich dazugehört, blieb sie AUSSERHALB der Box —
+# oder eine Liste, die inhaltlich dazugehört, blieb sie AUSSERHALB der Box –
 # bei `Darüber hinaus:`/`Grundlage:` (native <details>) hieß das: der Inhalt
 # war im Grundlagen-Modus dauerhaft sichtbar, obwohl er eingeklappt sein
 # sollte. Wir ziehen genau solche direkt folgenden Blöcke in die Box hinein.
@@ -1201,7 +1210,7 @@ def _block_ende(html: str, start: int) -> int:
         tag = html[start + 1:start + 3]
         schluss = html.find(f"</{tag}>", start)
         return schluss + len(tag) + 3 if schluss != -1 else -1
-    # <div …> — verschachtelte <div> mitzählen.
+    # <div …> – verschachtelte <div> mitzählen.
     tiefe, i = 0, start
     while i < len(html):
         if html.startswith("<div", i):
@@ -1242,7 +1251,7 @@ def _absorb_trailing_blocks(html: str) -> str:
 # --- Selbstcheck → aktive Erinnerung (aufdeckbare Karten) --------------------
 _SELF = re.compile(r'(<h2 id="selbstcheck">.*?</h2>)\s*<ol>(.*?)</ol>', re.DOTALL)
 _LI = re.compile(r'<li>(.*?)</li>', re.DOTALL)
-# Frage/Antwort-Muster: „<strong>Frage?</strong>, Antwort". Trenner ist das erste
+# Frage/Antwort-Muster: „<strong>Frage?</strong>, Antwort“. Trenner ist das erste
 # Satzzeichen (Komma, Doppelpunkt oder Gedankenstrich) nach dem </strong>.
 _QA = re.compile(r'\s*<strong>(.*?)</strong>\s*[,:—–]\s*(.*)', re.DOTALL)
 
@@ -1271,21 +1280,21 @@ def transform_quiz(html: str) -> str:
 
 
 # --- Sprachabschnitte gruppieren --------------------------------------------
-# Überschriften wie „## 5 In Python" / „## 6 In R" leiten sprachspezifische
+# Überschriften wie „## 5 In Python“ / „## 6 In R“ leiten sprachspezifische
 # Abschnitte ein. Wir umschließen jeden Abschnitt (Überschrift bis zur nächsten
 # gleich-/höherrangigen Überschrift) mit <section data-lang>, damit der
 # Sprachfilter den ganzen Abschnitt inkl. Überschrift ein-/ausblendet – nicht
-# nur den Codeblock. Standard ist Python; R und „Beide" per Schalter.
+# nur den Codeblock. Standard ist Python; R und „Beide“ per Schalter.
 _HEAD = re.compile(r'<h([23]) id="[^"]*">(.*?)</h\1>', re.DOTALL)
 
 
 def wrap_lang_sections(html: str) -> str:
     heads = list(_HEAD.finditer(html))
     # Eine waagerechte Linie (`---` im Markdown) beendet einen Sprachabschnitt
-    # ebenfalls. Ohne sie reicht ein „## … In Python"-Abschnitt bis zur nächsten
-    # Überschrift und verschluckt jede neutrale Prosa dazwischen — ein Ergebnis,
-    # eine Abbildung, einen Wegweiser —, die im R-Modus dann verschwindet. Die
-    # Linie gibt Autor:innen eine ausdrückliche Grenze: „ab hier wieder für alle".
+    # ebenfalls. Ohne sie reicht ein „## … In Python“-Abschnitt bis zur nächsten
+    # Überschrift und verschluckt jede neutrale Prosa dazwischen – ein Ergebnis,
+    # eine Abbildung, einen Wegweiser –, die im R-Modus dann verschwindet. Die
+    # Linie gibt Autor:innen eine ausdrückliche Grenze: „ab hier wieder für alle“.
     rules = [m.start() for m in re.finditer(r"<hr\s*/?>", html)]
 
     def naechste_grenze(ab: int, lvl: int) -> int:
@@ -1315,7 +1324,7 @@ def _pruefe_sprachabschnitte(html: str, spans: list) -> None:
     """Bricht ab, wenn ein Sprachabschnitt neutrale Inhalte verschluckt.
 
     Genau dieser Fehler ließ Modul 17 die Hazard Ratios nur im Python-Modus
-    zeigen — im R-Modus fehlten sie ersatzlos. Ein Ergebnis, eine Abbildung oder
+    zeigen – im R-Modus fehlten sie ersatzlos. Ein Ergebnis, eine Abbildung oder
     ein Wegweiser, der NACH dem letzten Codeblock eines Abschnitts steht, gehört
     hinter eine `---`-Linie, damit er für beide Sprachen sichtbar bleibt.
     """
@@ -1326,7 +1335,7 @@ def _pruefe_sprachabschnitte(html: str, spans: list) -> None:
             continue
         schwanz = koerper[letzter_code:]
         schwanz = re.sub(r'<div class="code-wrap".*?</div>\s*</div>', "", schwanz, flags=re.S)
-        # Eine Abbildung oder Überschrift nach dem Code ist NIE sprachspezifisch —
+        # Eine Abbildung oder Überschrift nach dem Code ist NIE sprachspezifisch –
         # sie gehört immer hinter eine `---`-Linie.
         if re.search(r"<figure\b|<h[23]\b", schwanz):
             raise SystemExit(
@@ -1336,7 +1345,7 @@ def _pruefe_sprachabschnitte(html: str, spans: list) -> None:
             )
         # Prosa nach dem Code darf sprachspezifisch sein (ein R-Paket-Tipp gehört
         # in den R-Abschnitt). Verdächtig ist nur ein Absatz, der ein ERGEBNIS für
-        # beide Sprachen trägt — erkennbar daran, dass er die je ANDERE Sprache
+        # beide Sprachen trägt – erkennbar daran, dass er die je ANDERE Sprache
         # erwähnt oder eine Kennzahl mit KI/HR/p-Wert nennt. Genau so lag Modul 17.
         andere = r"\bin R\b|\bR-Konsole\b|\bRscript\b" if lang == "py" else r"\bin Python\b|\bpandas\b|smf\.|sklearn"
         for p in re.findall(r"<p>(.*?)</p>", schwanz, re.S):
@@ -1350,10 +1359,10 @@ def _pruefe_sprachabschnitte(html: str, spans: list) -> None:
                 )
 
 
-# Kurze Einleitungs-Absätze („In R:", „…dasselbe in Python:") direkt vor einem
+# Kurze Einleitungs-Absätze („In R:“, „…dasselbe in Python:“) direkt vor einem
 # sprachspezifischen Codeblock erben dessen Sprache, damit sie mit dem Block
-# ein- und ausgeblendet werden – sonst „hängt" die Zeile, wenn der Sprachfilter
-# den Block versteckt. Nur kurze, mit „:" endende Absätze gelten als Einleitung.
+# ein- und ausgeblendet werden – sonst „hängt“ die Zeile, wenn der Sprachfilter
+# den Block versteckt. Nur kurze, mit „:“ endende Absätze gelten als Einleitung.
 _LEAD = re.compile(
     r'<p>((?:(?!</p>).)*?:(?:</(?:strong|em|b|i|code)>)*)\s*</p>\s*'
     r'(<div class="code-wrap" data-lang="(py|r)">)', re.S)
@@ -1369,8 +1378,8 @@ def tag_lang_leads(html: str) -> str:
     return _LEAD.sub(rep, html)
 
 
-# Eine 🗣 Code-Verbalisierung erklärt GENAU den Codeblock über ihr. Blendet der
-# Sprachfilter diesen Block aus, muss die Erklärung mitgehen — sonst steht in
+# Eine Code-Erläuterung („Zeile für Zeile“) erklärt GENAU den Codeblock über ihr. Blendet der
+# Sprachfilter diesen Block aus, muss die Erklärung mitgehen – sonst steht in
 # der R-Ansicht eine Erläuterung zu Python-Code, dessen Code nirgends zu sehen
 # ist. Das Gegenstück zu tag_lang_leads(), nur hinter statt vor dem Block.
 # Shell-/SQL-Blöcke tragen data-lang="x", werden nie gefiltert und bleiben
@@ -1471,7 +1480,7 @@ def aufbereiten(md_text: str, fig_code=None, base_dir: "Path | None" = None,
 def fig_code_resolver(slug: str):
     """Verlinkt jede Abbildung auf GENAU den Code, der sie zeichnet.
 
-    Früher zeigte jeder Link auf die ganze erzeugende Datei — bei data/figures.py
+    Früher zeigte jeder Link auf die ganze erzeugende Datei – bei data/figures.py
     fast tausend Zeilen für sechzehn Module. Und jedes .svg zeigte auf
     lib/diagrams.py, auch die fünf von Hand gezeichneten Diagramme, die dort gar
     nicht vorkommen. Wer nichts erzeugt hat, bekommt jetzt keinen Link.
@@ -1496,7 +1505,7 @@ def quelle_url(quelle: str, tiefe: int) -> str:
 def baue_abbildungs_seite(slug: str, key: str, snippet) -> None:
     """Eine Seite pro Abbildung: das Bild, dann der Code, der es erzeugt.
 
-    Genau so viel Code wie nötig — die Funktion, der Abschnitt oder der
+    Genau so viel Code wie nötig – die Funktion, der Abschnitt oder der
     Zeichenteil von main(), nicht die ganze Datei. Der Weg zur vollständigen
     Datei bleibt einen Klick entfernt.
     """
@@ -1507,13 +1516,13 @@ def baue_abbildungs_seite(slug: str, key: str, snippet) -> None:
     hinweis = ""
     if snippet.kind == "section":
         hinweis = ('<p class="fig-hint">Dieses Skript läuft von oben nach unten. Der gemeinsame '
-                   'Vorspann — Bibliotheken, Kohorte laden, Plot-Stil — steht am Anfang der '
+                   'Vorspann – Bibliotheken, Kohorte laden, Plot-Stil – steht am Anfang der '
                    'vollständigen Datei und gilt für alle Abbildungen darin.</p>')
 
     if snippet.kind == "section":
-        herkunft = f'Erzeugt im Abschnitt „{escape(snippet.symbol)}"'
+        herkunft = f'Erzeugt im Abschnitt „{escape(snippet.symbol)}“'
     elif snippet.kind == "part":
-        herkunft = (f'Erzeugt in <code>{escape(snippet.symbol)}</code> — hier steht nur der '
+        herkunft = (f'Erzeugt in <code>{escape(snippet.symbol)}</code> – hier steht nur der '
                     'Teil, der zeichnet')
     else:
         herkunft = f'Erzeugt von <code>{escape(snippet.symbol)}</code>'
@@ -1552,9 +1561,9 @@ def prereq_banner(slug: str) -> str:
         '<aside class="prereq" data-prereq>'
         f'<span class="pq-ico" aria-hidden="true">{ICON_INFO}</span>'
         '<div class="pq-text"><strong>Bevor du Code ausführst.</strong> '
-        f'Die Beispiele setzen die in <a href="{m02}">Modul&nbsp;02</a> eingerichtete '
-        'Umgebung voraus – aktivierte <code>.venv</code>, installierte Pakete – sowie die '
-        'einmalig erzeugten Daten: <code>python data/generate_data.py</code>. '
+        'Zum Mitrechnen brauchst du Python oder R mit den Kurspaketen, eingerichtet in '
+        f'<a href="{m02}">Modul&nbsp;02</a>. Die Daten lädt jeder Codeblock selbst über '
+        'eine Web-Adresse; herunterladen oder erzeugen musst du nichts. '
         'Noch nichts installiert? '
         f'<a href="{m02}">Beim Setup starten&nbsp;→</a></div>'
         '<button type="button" class="pq-close" aria-label="Hinweis ausblenden" title="Ausblenden">×</button>'
@@ -1633,23 +1642,23 @@ def baue_unterseite(slug, datei, ausgabe, code_dateien):
 
 
 # Wozu ist diese Datei da? Eine Quelltext-Seite zeigte bislang nur den nackten
-# Code. Wer über den „Python"-Reiter darauf stieß, sah 57 Zeilen ohne Anlass:
+# Code. Wer über den „Python“-Reiter darauf stieß, sah 57 Zeilen ohne Anlass:
 # kein Zweck, kein Startbefehl, keine Rückverbindung zur Lektion. Der Text pro
 # Dateiname steht hier, damit jede Code-Seite dieselbe Einordnung bekommt.
 CODE_ROLLE: dict[str, str] = {
     "python.py": "Das vollständige, lauffähige Python-Skript dieser Lektion. Es führt "
-                 "dieselben Schritte aus wie der Abschnitt „In Python“ — am Stück, "
+                 "dieselben Schritte aus wie der Abschnitt „In Python“ – am Stück, "
                  "ohne Kürzungen und mit allen Zwischenausgaben.",
     "r.R": "Dasselbe Programm in R. Es rechnet mit denselben Daten und liefert "
            "dieselben Zahlen wie die Python-Fassung.",
     "figures.py": "Erzeugt die Abbildungen dieses Moduls neu und schreibt sie nach "
                   "<code>assets/</code>. Nur nötig, wenn du eine Abbildung verändern willst.",
-    "sql.sql": "Die SQL-Abfragen der Lektion zum Nachschlagen — ausgeführt werden sie "
+    "sql.sql": "Die SQL-Abfragen der Lektion zum Nachschlagen – ausgeführt werden sie "
                "von <code>python.py</code> oder direkt in der DuckDB-Konsole.",
     "benchmark.py": "Die Monte-Carlo-Simulation aus der Vertiefung: 500 Wiederholungen "
                     "messen, welche Imputationsmethode ihre eigene Unsicherheit korrekt "
                     "angibt. Läuft mehrere Minuten.",
-    "rubin.py": "Rubins Regeln Schritt für Schritt von Hand nachgerechnet — ohne "
+    "rubin.py": "Rubins Regeln Schritt für Schritt von Hand nachgerechnet – ohne "
                 "Imputationspaket, damit jede Zwischengröße sichtbar wird.",
     "rubin.R": "Dieselbe Handrechnung in R, am Ende gegen <code>mice::pool()</code> geprüft.",
     "mice_praxis.py": "MICE in der Praxis: passive Imputation, plausible Wertebereiche, "
@@ -1660,17 +1669,17 @@ CODE_ROLLE: dict[str, str] = {
     "mnar_delta.R": "Dieselbe Sensitivitätsanalyse in R.",
     "bericht_beispiel.qmd": "Ein vollständiger Quarto-Bericht: Text, Code und Ergebnis in "
                             "einer Datei, aus der Quarto ein PDF oder HTML rendert.",
-    "manifest.md": "Das Paket-Manifest, das dieses Modul erzeugt — die Liste aller "
+    "manifest.md": "Das Paket-Manifest, das dieses Modul erzeugt – die Liste aller "
                    "verwendeten Versionen, damit die Auswertung in fünf Jahren noch läuft.",
 }
 _START = {".py": "python", ".R": "Rscript"}
 
-# Die beiden projektweiten Skripte hinter „Code ansehen" unter den Abbildungen.
+# Die beiden projektweiten Skripte hinter „Code ansehen“ unter den Abbildungen.
 QUELLCODE_ROLLE: dict[str, str] = {
-    "figures.py": "Erzeugt die gemeinsamen Abbildungen mehrerer Module in einem Lauf — "
+    "figures.py": "Erzeugt die gemeinsamen Abbildungen mehrerer Module in einem Lauf – "
                   "ein Skript, das von oben nach unten läuft und eine Abbildung nach der "
                   "anderen zeichnet.",
-    "diagrams.py": "Zeichnet die Konzept-Diagramme des Kurses als SVG — je Diagramm eine "
+    "diagrams.py": "Zeichnet die Konzept-Diagramme des Kurses als SVG – je Diagramm eine "
                    "Funktion, ohne Daten, rein aus Rechtecken, Linien und Text.",
 }
 
@@ -1678,7 +1687,7 @@ QUELLCODE_ROLLE: dict[str, str] = {
 def code_intro(slug: str, quelle: Path) -> str:
     name = quelle.name
     if name not in CODE_ROLLE:
-        # Lieber laut abbrechen als eine Code-Seite ohne Einordnung ausliefern —
+        # Lieber laut abbrechen als eine Code-Seite ohne Einordnung ausliefern –
         # genau das war der Zustand, den dieser Kasten behebt.
         raise SystemExit(
             f"module/{slug}/code/{name}: kein Eintrag in CODE_ROLLE. Jede "
@@ -1689,12 +1698,12 @@ def code_intro(slug: str, quelle: Path) -> str:
     pfad = f"module/{slug}/code/{name}"
 
     if quelle.suffix in _START:
-        start = (f'<code>{_START[quelle.suffix]} {escape(pfad)}</code> — aus dem '
+        start = (f'<code>{_START[quelle.suffix]} {escape(pfad)}</code> – aus dem '
                  f'Projektordner heraus.')
     elif quelle.suffix == ".qmd":
         start = f'<code>quarto render {escape(pfad)}</code>'
     else:
-        start = "Wird nicht direkt ausgeführt — Nachschlagewerk zur Lektion."
+        start = "Wird nicht direkt ausgeführt – Nachschlagewerk zur Lektion."
 
     ergebnis = ("Schreibt die PNG-Dateien nach <code>assets/</code>."
                 if name == "figures.py"
@@ -1705,7 +1714,7 @@ def code_intro(slug: str, quelle: Path) -> str:
          f'<span class="ci-val">{start}</span></div>'),
         ('<div class="ci-row"><span class="ci-label">Daten</span>'
          '<span class="ci-val">Liegen fertig im Projekt unter <code>data/</code>. '
-         'Fehlen sie, lädt das Skript dieselben Dateien über die Web-Adresse nach — '
+         'Fehlen sie, lädt das Skript dieselben Dateien über die Web-Adresse nach – '
          'erzeugen musst du nichts.</span></div>'),
         ('<div class="ci-row"><span class="ci-label">Ergebnis</span>'
          f'<span class="ci-val">{ergebnis}</span></div>'),
@@ -1716,7 +1725,7 @@ def code_intro(slug: str, quelle: Path) -> str:
         + "".join(zeilen) +
         '<p class="ci-back">Diese Datei gehört zur Lektion '
         f'<a href="../index.html">{escape(TITEL[slug])}</a>. '
-        'Zum Mitrechnen im Browser brauchst du sie nicht — dort genügen die '
+        'Zum Mitrechnen im Browser brauchst du sie nicht – dort genügen die '
         'Codeblöcke der Lektion.</p>'
         '</aside>'
     )
@@ -1748,13 +1757,13 @@ def baue_quellcode_seite(quelle: Path, subtitle: str) -> str:
         f'<p class="ci-lead"><strong>Wozu diese Datei?</strong> {rolle}</p>'
         '<div class="ci-row"><span class="ci-label">Ausführen</span>'
         f'<span class="ci-val"><code>python {escape(quelle.parent.name)}/'
-        f'{escape(quelle.name)}</code> — aus dem Projektordner heraus.</span></div>'
+        f'{escape(quelle.name)}</code> – aus dem Projektordner heraus.</span></div>'
         '<div class="ci-row"><span class="ci-label">Ergebnis</span>'
         '<span class="ci-val">Schreibt die Bilddateien neben die Lektionen, '
         'nach <code>module/*/assets/</code>.</span></div>'
         '<p class="ci-back">Du erreichst diese Seite über „Code ansehen“ unter einer '
         'Abbildung. Willst du nur den Ausschnitt sehen, der genau diese eine Abbildung '
-        'zeichnet, gehe über die Abbildungsseite zurück — dort steht er allein.</p>'
+        'zeichnet, gehe über die Abbildungsseite zurück – dort steht er allein.</p>'
         '</aside>'
     )
     body = intro + md_to_html(f"```python\n{text}\n```")
@@ -1766,13 +1775,13 @@ def baue_quellcode_seite(quelle: Path, subtitle: str) -> str:
 def uebersicht_kopf(r: str = "") -> str:
     """Klarer Wiedereinstieg über der Modulübersicht mit interaktiver Pfadauswahl.
 
-    „Weiterlernen" ist die mit Abstand wertvollste Aktion für wiederkehrende
-    Besucher:innen und deshalb IMMER sichtbar — nicht hinter einem Klick
+    „Weiterlernen“ ist die mit Abstand wertvollste Aktion für wiederkehrende
+    Besucher:innen und deshalb IMMER sichtbar – nicht hinter einem Klick
     versteckt. Der Pfad-Filter ist ein sekundäres Werkzeug und bleibt daher
     kompakt in einem eigenen, kleinen Ausklapper.
     """
     # Fortschrittsring: `app.js` (paintRing) füllt #ringFill/#ringLabel. Ohne
-    # dieses Markup war paintRing toter Code — README und LEHRPLAN versprachen
+    # dieses Markup war paintRing toter Code – README und LEHRPLAN versprachen
     # einen Ring, den keine Seite je gerendert hat. r=26 muss zum Umfang
     # passen, den paintRing berechnet (C = 2·π·26).
     # Nutzt die bereits vorhandenen .ring-Regeln in style.css (svg wird dort um
@@ -1795,7 +1804,7 @@ def uebersicht_kopf(r: str = "") -> str:
         '</div></div>'
     )
     # Sieben Pfade, wie in docs/LEHRPLAN.md. `paper` ist der kurze Shortcut,
-    # `forschung` der vollständige Publikationsweg — vorher fehlte der zweite
+    # `forschung` der vollständige Publikationsweg – vorher fehlte der zweite
     # Knopf, und die Pfadwahl fiel stillschweigend auf den Shortcut zurück.
     picker_html = (
         '<div class="pfad-picker">'
@@ -1803,14 +1812,14 @@ def uebersicht_kopf(r: str = "") -> str:
         '<div class="pfad-buttons" id="pfadPicker" aria-label="Lernpfad auswählen">'
         # Beschriftungen und Reihenfolge exakt wie die kanonische Liste in
         # docs/LEHRPLAN.md. Vorher hießen die Knöpfe anders als der Lehrplan,
-        # und „Erstes Paper" ließ sich nicht von „Klinische Forschung"
-        # unterscheiden — das `title` nennt jetzt Länge und Zweck.
+        # und „Erstes Paper“ ließ sich nicht von „Klinische Forschung“
+        # unterscheiden – das `title` nennt jetzt Länge und Zweck.
         '<button type="button" data-path="all" class="on" aria-pressed="true" '
         'title="Alle 33 Module in didaktischer Reihenfolge">Vollständig</button>'
         '<button type="button" data-path="basis" aria-pressed="false" '
         'title="6 Module: schnell zu einer ersten Auswertung">Schnell zur Auswertung</button>'
         '<button type="button" data-path="daten" aria-pressed="false" '
-        'title="5 Module: CSV, SQL, FHIR — Daten beschaffen und zusammenführen">Datenextraktion</button>'
+        'title="5 Module: CSV, SQL, FHIR – Daten beschaffen und zusammenführen">Datenextraktion</button>'
         '<button type="button" data-path="paper" aria-pressed="false" '
         'title="7 Module: der kürzeste Weg zu Table 1, Regression und Bericht">Mein erstes Paper</button>'
         '<button type="button" data-path="forschung" aria-pressed="false" '
@@ -1866,7 +1875,7 @@ def wrap_landing_sections(html: str) -> str:
     for p in parts:
         # Ein `---` in der README trennt auf GitHub die Abschnitte; auf der
         # Website zieht die Section-Grenze bereits eine Linie. Der abschließende
-        # <hr> wäre sonst eine doppelte Trennlinie — hier entfernen.
+        # <hr> wäre sonst eine doppelte Trennlinie – hier entfernen.
         p = re.sub(r'\s*<hr\s*/?>\s*$', '', p)
         m = re.match(r'<h2[^>]*>(.*?)</h2>', p, re.S)
         if not m:
@@ -1880,8 +1889,8 @@ def wrap_landing_sections(html: str) -> str:
 
 
 # Die README ist Doppelverwendung: Repo-Startseite auf GitHub UND Startseite der
-# Website. Ein „Kurs lesen → <Live-URL>"-Aufruf gehört auf die GitHub-Seite, wo
-# er Besuchende zur Website schickt — auf der Website selbst ist er sinnlos, weil
+# Website. Ein „Kurs lesen → <Live-URL>“-Aufruf gehört auf die GitHub-Seite, wo
+# er Besuchende zur Website schickt – auf der Website selbst ist er sinnlos, weil
 # man schon dort ist. Alles zwischen diesen Markern erscheint darum nur auf
 # GitHub (die HTML-Kommentare sind dort unsichtbar) und wird für die Website
 # entfernt.
@@ -1908,7 +1917,7 @@ def baue_404_seite():
     """A self-contained 404 page. GitHub Pages serves it for ANY missing path,
     so it cannot rely on relative asset links (those would resolve against the
     missing URL, not the site root). It inlines its styles and links absolutely
-    to the course — the graceful landing for a bookmark to a renamed module.
+    to the course – the graceful landing for a bookmark to a renamed module.
     """
     home = PAGES_BASE_URL
     inhalt = f"""<!DOCTYPE html>
@@ -1938,7 +1947,7 @@ def baue_404_seite():
 <main>
   <p class="code">404</p>
   <h1>Diese Seite gibt es hier nicht (mehr).</h1>
-  <p>Der Kurs wurde neu geordnet, und Modulnummern können sich verschoben haben —
+  <p>Der Kurs wurde neu geordnet, und Modulnummern können sich verschoben haben –
      ein alter Link zeigt dann ins Leere. Nichts ist verloren; die Modulübersicht
      führt dich zum passenden Thema.</p>
   <div class="links">
@@ -1953,8 +1962,9 @@ def baue_404_seite():
 
 
 def baue_moduluebersicht_seite():
-    tb = titleblock("Übersicht", "Modulübersicht", 
-                    "33 Module in fünf Teilen – von Grundlagen über klinische Datenextraktion und klassische Auswertung bis zu KI.",
+    tb = titleblock("Übersicht", "Modulübersicht",
+                    f"{len(REIHENFOLGE)} Module in {ZAHLWORT[len(TEILE)]} Teilen – von Grundlagen über "
+                    "klinische Datenextraktion und klassische Auswertung bis zu KI.",
                     [], None, None)
     body = (
         '<section class="ls ls-module" id="module">'
@@ -1979,7 +1989,7 @@ def baue_meta_seite(titel, kicker, quelle: Path, ziel: Path, tiefe: int):
 def baue_daten_seite():
     """Datensätze-Seite: Beschreibung aus data/README.md + echtes Download-Panel.
 
-    Das Panel steht bewusst oben, vor der ausführlichen Beschreibung — es ist
+    Das Panel steht bewusst oben, vor der ausführlichen Beschreibung – es ist
     die höchstwertige Aktion auf dieser Seite (siehe Task 2, Download-UX).
     """
     quelle = WURZEL / "data" / "README.md"
@@ -2051,17 +2061,27 @@ def main() -> None:
             shutil.copy(quelle, ZIEL / datei)
     pyg = HtmlFormatter(style="default").get_style_defs(".codehilite")
     pyg_dark = HtmlFormatter(style="monokai").get_style_defs('html[data-theme="dark"] .codehilite')
+    # „System“ ist die Voreinstellung: ohne diesen Block bekäme ein dunkel
+    # eingestelltes Betriebssystem die hellen Syntaxfarben auf dunklem Grund
+    # (Blau auf Fast-Schwarz, Kontrast ~2:1).
+    pyg_dark_system = ("@media (prefers-color-scheme: dark) {\n"
+                       + HtmlFormatter(style="monokai").get_style_defs(
+                           'html:not([data-theme="light"]) .codehilite')
+                       + "\n}\n")
     # Pygments setzt einen eigenen Container-Hintergrund – neutralisieren,
     # damit die Papier-/Dunkelflächen aus style.css greifen.
     override = ('\n.codehilite{background:transparent!important}\n'
-                'html[data-theme="dark"] .codehilite{background:transparent!important}\n')
-    (ZIEL / "pygments.css").write_text(pyg + "\n" + pyg_dark + override, encoding="utf-8")
+                'html[data-theme="dark"] .codehilite{background:transparent!important}\n'
+                '@media (prefers-color-scheme: dark) {'
+                'html:not([data-theme="light"]) .codehilite{background:transparent!important}}\n')
+    (ZIEL / "pygments.css").write_text(pyg + "\n" + pyg_dark + "\n" + pyg_dark_system + override,
+                                       encoding="utf-8")
 
     # Startseite
     baue_startseite()
     baue_404_seite()
     baue_moduluebersicht_seite()
-    # Abbildungs-Quellcode (für „Code ansehen"-Links an den Abbildungen)
+    # Abbildungs-Quellcode (für „Code ansehen“-Links an den Abbildungen)
     if (WURZEL / "data" / "figures.py").exists():
         baue_quellcode_seite(WURZEL / "data" / "figures.py",
                              "Erzeugt die Plots der Grundlagen-Module (Seed 42, reproduzierbar).")
@@ -2095,10 +2115,10 @@ def main() -> None:
             continue
         ziel_datei = ZIEL / "data" / name
         ziel_datei.parent.mkdir(parents=True, exist_ok=True)
-        if quelle_datei.suffix.lower() in (".csv", ".json"):
-            schreibe(ziel_datei, quelle_datei.read_text(encoding="utf-8"))
-        else:  # z. B. .xlsx — binär kopieren, keine Textsubstitution möglich/nötig
-            shutil.copy(quelle_datei, ziel_datei)
+        # Byte-genau kopieren: kohorte_de.csv ist absichtlich Latin-1 (Modul 04
+        # lehrt genau das), ein Umweg über UTF-8 würde die Lektion entwerten.
+        # Die Datensätze enthalten keine {{DATEN}}/{{REPO}}-Platzhalter.
+        shutil.copy(quelle_datei, ziel_datei)
 
     n_code = 0
     n_abb = 0
