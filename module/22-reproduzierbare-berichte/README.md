@@ -211,7 +211,7 @@ Darunter folgt der Bericht: normaler Markdown-Text, unterbrochen von **Code-Chun
 
 ### Rendern
 
-`quarto render code/bericht_beispiel.qmd` erzeugt HTML (das im YAML-Header gesetzte `format`). Mit `--to pdf` oder `--to docx` entstehen die anderen Formate aus **derselben** Quelle. `quarto preview code/bericht_beispiel.qmd` rendert bei jedem Speichern neu und zeigt den Bericht live im Browser – praktisch beim Schreiben.
+Aus der Projektwurzel erzeugt `quarto render module/22-reproduzierbare-berichte/code/bericht_beispiel.qmd` HTML (das im YAML-Header gesetzte `format`). Mit `--to pdf` oder `--to docx` entstehen die anderen Formate aus **derselben** Quelle. `quarto preview` mit demselben Pfad rendert bei jedem Speichern neu und zeigt den Bericht live im Browser – praktisch beim Schreiben.
 
 **Stolperstein:** Enthält der YAML-Header `echo: false`, bleibt der Code im gerenderten Bericht unsichtbar, Gutachter können die Analyse nicht nachvollziehen. Für Publikationen immer `echo: true` setzen. `code-fold: true` ist ein guter Kompromiss: Der Code ist vorhanden, aber standardmäßig eingeklappt.
 

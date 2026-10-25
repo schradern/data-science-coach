@@ -56,7 +56,7 @@ pipe.fit(X_train, y_train)
 
 **Stolperstein:** Bag-of-Words ignoriert **Reihenfolge** und **Kontext**: „kein Fieber“ und „Fieber“ haben denselben Fieber-Token. Negationsverarbeitung ist in TF-IDF nur über Bigramme teilweise möglich.
 
-**Darüber hinaus:** `TfidfVectorizer(sublinear_tf=True)` dämpft hochfrequente Terme mit `log(1 + tf)`. Bei sehr kurzen Kliniktexten (< 50 Wörter) ist die Unterdrückung seltener Terme via `min_df=2` wichtiger als die IDF-Gewichtung.
+**Darüber hinaus:** `TfidfVectorizer(sublinear_tf=True)` dämpft hochfrequente Terme mit `1 + log(tf)`. Bei sehr kurzen Kliniktexten (< 50 Wörter) ist die Unterdrückung seltener Terme via `min_df=2` wichtiger als die IDF-Gewichtung.
 
 ## 3 Klassifikation und AUC
 Die Pipeline wird auf `verschlechterung` (0/1) trainiert. Als Gütekriterium wählen wir die **AUC-ROC**, sie ist unabhängig von der Schwelle, und das Label ist leicht unbalanciert (34,6 % positiv).
@@ -148,7 +148,7 @@ Große Sprachmodelle kommerzieller Anbieter können klinische Texte zusammenfass
 - **LLM-Ausgaben sind nicht verlässlich ohne Validation.** Human-in-the-Loop ist Pflicht, nicht Option.
 
 ## Selbstcheck
-1. **Warum muss der TfidfVectorizer in der Pipeline sitzen und nicht davor?** – Weil IDF-Gewichte auf dem Gesamtdatensatz auch die Testdokumente einbeziehen würden; dieses Information-Leakage führt zu optimistischen AUC-Werten.
+1. **Warum muss der TfidfVectorizer in der Pipeline sitzen und nicht davor?** – Weil IDF-Gewichte und Vokabular auf dem Gesamtdatensatz auch die Testdokumente einbeziehen würden. Dieses Leakage kann die AUC beschönigen; wie stark, hängt vom Korpus ab (in Aufgabe 1 kostet es auf diesen Daten fast nichts), aber eine saubere Auswertung darf es grundsätzlich nicht enthalten.
 2. **Was zeigt ein stark positiver Koeffizient bei einem Token?** – Das Vorkommen dieses Tokens erhöht die Log-Odds für Verschlechterung. Es ist ein Korrelat, keine Ursache.
 3. **Warum sind Embeddings gegenüber TF-IDF im Vorteil?** – Embeddings erfassen semantische Ähnlichkeit (Synonyme wie Dyspnoe und Atemnot); kontextsensitive Modelle berücksichtigen zusätzlich die Wortumgebung, auch wenn Negation für sie schwierig bleibt. TF-IDF behandelt jeden Token atomar.
-4. **Welche zwei regulatorischen Rahmen sind in Deutschland/EU für klinische KI-Modelle relevant?** – MDR 2017/745 (Medizinprodukte-Regulierung) und EU AI Act (Hochrisiko-KI).
+4. **Welche zwei regulatorischen Rahmen sind in Deutschland/EU für klinische KI-Modelle relevant?** – MDR 2017/745 (Medizinprodukte-Regulierung) und EU AI Act (Hochrisiko-KI). Sobald echte Patiententexte verarbeitet werden, kommen Datenschutz (DSGVO Art. 9 für Gesundheitsdaten, Art. 28 für Auftragsverarbeitung) und die ärztliche Schweigepflicht (§ 203 StGB) hinzu, siehe Abschnitt 6.

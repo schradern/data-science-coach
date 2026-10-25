@@ -12,7 +12,7 @@ core <- c(
 )
 
 extras <- c(
-  "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
+  "xgboost", "pdp", "DALEX", "DALEXtra",
   "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
   "tidytext", "nnet", "recipes", "ranger", "glmnet"
 )

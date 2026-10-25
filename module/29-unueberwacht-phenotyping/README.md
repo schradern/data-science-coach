@@ -41,7 +41,7 @@ X = prep.fit_transform(X_raw)
 ```
 
 **Stolperstein:** Imputation und Skalierung erfolgen hier auf *allen* Daten, das ist korrekt, weil es keine Testmenge gibt, die wir schützen müssten. Trotzdem: Wer später einen neue:n Patient:in einem Cluster zuordnen will, muss denselben `prep`-Transformer wiederverwenden, nicht neu anpassen.  
-**Darüber hinaus:** Bei kategorialen Merkmalen (z. B. `aufnahmegrund`) lieber **Gower-Distanz** (dann mit k-Medoids oder hierarchischem Clustering, denn k-Means braucht euklidische Distanzen) oder One-Hot-Encoding mit nachgelagerter PCA verwenden, euklidische Distanz auf Dummy-Variablen ist verzerrt.
+**Darüber hinaus:** Bei kategorialen Merkmalen (z. B. `aufnahmegrund`) lieber **Gower-Distanz** (dann mit k-Medoids oder hierarchischem Clustering mit Average- oder Complete-Linkage; k-Means und Ward brauchen euklidische Distanzen) oder One-Hot-Encoding mit nachgelagerter PCA verwenden, euklidische Distanz auf Dummy-Variablen ist verzerrt.
 
 > [!IMPORTANT]
 > **Skalierungsabhängigkeit bei PCA und Clustering**  
@@ -101,7 +101,7 @@ df["cluster"] = km_final.labels_
 **Stolperstein:** Der Silhouettenkoeffizient bevorzugt kompakte, gut getrennte Cluster, er belohnt nicht notwendigerweise klinisch sinnvolle Gruppen. Hier ist er sogar bei k=2 am höchsten (0,130) und **nicht** bei k=3 (0,115), das statistisch „beste“ k muss trotzdem nicht das klinisch nützlichste sein: Zwei Cluster wären für eine differenzierte Risikostratifizierung oft zu grob. Wer k=3 wählt, muss das explizit klinisch begründen, nicht als „das Elbow/die Silhouette bestätigt 3“ ausgeben, das wäre hier schlicht falsch. Wie instabil dieses „beste“ k ist, zeigt der Vergleich der Sprachen: Das R-Skript findet mit seinem eigenen k-Means-Zufallsstart bei k=4 denselben Höchstwert (0,130) wie bei k=2 und meldet k=4 als bestes k. Bei so flachen Silhouettenkurven entscheidet der Zufallsstart, nicht die Datenstruktur.
 **Darüber hinaus:** **k-Medoids** (PAM) ist robuster gegenüber Ausreißern als k-Means und liefert echte Patientenrepräsentanten als Clusterzentren, hilfreich für die klinische Kommunikation.
 
-**Stolperstein:** k-Means setzt implizit voraus, dass Cluster im euklidischen Raum ungefähr **kugelförmig, varianzgleich und ähnlich groß** sind, es minimiert schließlich nur die Distanz zum jeweiligen Clusterzentrum. Längliche, unterschiedlich dichte oder stark unterschiedlich große Gruppen kann k-Means daher nicht sauber trennen, selbst nach Standardisierung. Passt die klinische Struktur nicht zu dieser Annahme, sind **Gaussian Mixture Models** (für elliptische, unterschiedlich orientierte Cluster), **DBSCAN/HDBSCAN** (für dichtebasierte Cluster beliebiger Form) oder **hierarchisches Clustering mit Ward-Linkage** (wenn die Verschmelzungsstruktur selbst interessiert) die geeigneteren Werkzeuge.
+**Stolperstein:** k-Means setzt implizit voraus, dass Cluster im euklidischen Raum ungefähr **kugelförmig, varianzgleich und ähnlich groß** sind, es minimiert schließlich nur die Distanz zum jeweiligen Clusterzentrum. Längliche, unterschiedlich dichte oder stark unterschiedlich große Gruppen kann k-Means daher nicht sauber trennen, selbst nach Standardisierung. Passt die klinische Struktur nicht zu dieser Annahme, sind **Gaussian Mixture Models** (für elliptische, unterschiedlich orientierte Cluster), **DBSCAN/HDBSCAN** (für dichtebasierte Cluster beliebiger Form) oder **hierarchisches Clustering mit Average- oder Single-Linkage** die geeigneteren Werkzeuge. Ward-Linkage gehört nicht in diese Liste: Es minimiert wie k-Means die Varianz innerhalb der Cluster und bevorzugt dieselben kompakten Kugeln.
 
 In R:
 
@@ -121,9 +121,20 @@ from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 import matplotlib.pyplot as plt
 
 Z = linkage(X, method="ward")
-# Cut at k=3 to match k-means
+dendrogram(Z, truncate_mode="lastp", p=20)       # last 20 merges, readable
+plt.ylabel("Verschmelzungsabstand")
+plt.show()
+print(Z[-6:, 2][::-1].round(1))                  # heights of the last merges
+
+# Cut at k=3 to compare with k-means
 labels_hier = fcluster(Z, t=3, criterion="maxclust")
 ```
+
+Die Höhen der letzten Verschmelzungen liegen dicht beieinander (23,6; 21,9; 19,3;
+19,1; 17,4; 16,1). Einen großen Sprung, an dem sich ein bestimmtes k aufdrängt,
+zeigt der Baum nicht, genau wie die flache Silhouettenkurve in Abschnitt 2: Die
+Kohorte zerfällt nicht in klar getrennte Gruppen. Der Schnitt bei k=3 dient hier
+dem Vergleich mit k-Means, er ist keine Ableitung aus dem Baum.
 
 **Stolperstein:** Ward-Linkage minimiert die Varianz innerhalb von Clustern und setzt euklidische Distanz voraus, nach Standardisierung korrekt. **Average**- oder **complete**-Linkage reagieren anders auf Ausreißer und können sinnvoller sein, wenn die Daten nicht-sphärisch verteilt sind. 
 **Darüber hinaus:** Ab einigen tausend Datenpunkten wird vollständiges hierarchisches Clustering speicher- und rechenintensiv, weil die Distanzmatrix quadratisch mit der Fallzahl wächst. **BIRCH** oder ein zweistufiger Ansatz (zuerst Mini-Batch-k-Means, dann Hierarchie auf Clusterzentren) skaliert besser.

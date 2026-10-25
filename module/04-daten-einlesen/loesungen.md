@@ -86,44 +86,66 @@ print(df)
 ```python
 import json
 import urllib.request
+from pathlib import Path
 import pandas as pd
 
-def load_api_or_local(url: str, local_file: str) -> pd.DataFrame:
-    """Fetch from URL; fall back to local file on any error."""
+def load_api_or_cache(url: str, cache_file: str) -> pd.DataFrame:
+    """Fetch from URL and cache the answer locally; on any error read the cache."""
+    cache = Path(cache_file)
     # A custom User-Agent: some APIs answer urllib's default one with HTTP 403.
     request = urllib.request.Request(url, headers={"User-Agent": "data-science-course"})
     try:
         with urllib.request.urlopen(request, timeout=5) as response:
-            return pd.DataFrame(json.load(response))
+            df = pd.json_normalize(json.load(response))
+        df.to_csv(cache, index=False)              # keep a copy for offline re-runs
+        return df
     except Exception as exc:
-        print(f"API unreachable ({exc}). Using: {local_file}")
-        return pd.read_csv(local_file)
+        if cache.exists():
+            print(f"API unreachable ({exc}). Using local cache {cache}.")
+            return pd.read_csv(cache)
+        raise RuntimeError(f"API unreachable and no local cache {cache}: {exc}") from exc
 
-df = load_api_or_local(
-    "https://disease.sh/v3/covid-19/countries?allowNull=false&limit=5",
-    "{{DATEN}}kohorte.csv"
-)
+url = "https://disease.sh/v3/covid-19/countries?allowNull=false"
+df = load_api_or_cache(url, "api_cache.csv")
 print(df.shape)
+
+# Second call with a deliberately broken address: must fall back to the cache.
+df_offline = load_api_or_cache(url.replace("disease.sh", "disease.invalid"), "api_cache.csv")
+print(df_offline.shape)
 ```
 ```r
-library(dplyr)
-load_api_or_local <- function(url, local_file) {
+library(httr2)
+library(jsonlite)
+
+load_api_or_cache <- function(url, cache_file) {
   tryCatch({
-    if (!requireNamespace("httr2", quietly=TRUE)) stop("httr2 missing")
-    library(httr2); library(jsonlite)
-    fromJSON(resp_body_string(request(url) |> req_timeout(5) |> req_perform())) |>
-      as.data.frame()
+    response <- request(url) |> req_timeout(5) |> req_perform()
+    # flatten = TRUE unpacks nested fields, so write_csv() can save them.
+    df <- fromJSON(resp_body_string(response), flatten = TRUE) |> tibble::as_tibble()
+    readr::write_csv(df, cache_file)          # keep a copy for offline re-runs
+    df
   }, error = function(e) {
-    message("API unreachable: ", e$message, ". Using: ", local_file)
-    readr::read_csv(local_file, show_col_types=FALSE)
+    if (!file.exists(cache_file)) {
+      stop("API unreachable and no local cache ", cache_file, ": ", conditionMessage(e))
+    }
+    message("API unreachable: ", conditionMessage(e), ". Using local cache ", cache_file, ".")
+    readr::read_csv(cache_file, show_col_types = FALSE)
   })
 }
-df <- load_api_or_local(
-  "https://disease.sh/v3/covid-19/countries?allowNull=false&limit=5",
-  "{{DATEN}}kohorte.csv"
-)
+
+url <- "https://disease.sh/v3/covid-19/countries?allowNull=false"
+df <- load_api_or_cache(url, "api_cache.csv")
 dim(df)
+
+# Second call with a deliberately broken address: must fall back to the cache.
+df_offline <- load_api_or_cache(sub("disease.sh", "disease.invalid", url, fixed = TRUE),
+                                "api_cache.csv")
+dim(df_offline)
 ```
+
+Der Fallback liest absichtlich keine zweite Web-Adresse: Im Klinik-Netz ohne
+externe Verbindung wäre auch die nicht erreichbar. Nur eine lokale Kopie der
+letzten erfolgreichen Antwort macht das Skript wirklich offline-fähig.
 
 ## Bonus – IDs vergleichen
 

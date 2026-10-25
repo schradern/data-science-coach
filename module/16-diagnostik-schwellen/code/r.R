@@ -62,9 +62,16 @@ pred_y <- score >= youden
 sens_y <- sum(pred_y & y == 1) / sum(y == 1)
 spec_y <- sum(!pred_y & y == 0) / sum(y == 0)
 
-cat(sprintf("AUC=%.3f\n", auc_val))
-cat(sprintf("Youden threshold=%.2f, sensitivity=%.3f, specificity=%.3f\n",
-            youden, sens_y, spec_y))
+# 95% CI for the AUC: DeLong (pROC's default); python.py bootstraps instead,
+# so the two intervals differ in the last digit.
+auc_ci <- as.numeric(ci.auc(roc_obj))
+# Wilson intervals for sensitivity/specificity (prop.test without correction)
+wilson <- function(k, n) sprintf("[%.3f, %.3f]", prop.test(k, n, correct = FALSE)$conf.int[1],
+                                  prop.test(k, n, correct = FALSE)$conf.int[2])
+cat(sprintf("AUC=%.3f  95%% CI (DeLong) [%.3f, %.3f]\n", auc_val, auc_ci[1], auc_ci[3]))
+cat(sprintf("Youden threshold=%.2f, sensitivity=%.3f %s, specificity=%.3f %s  (Wilson 95%% CI)\n",
+            youden, sens_y, wilson(sum(pred_y & y == 1), sum(y == 1)),
+            spec_y, wilson(sum(!pred_y & y == 0), sum(y == 0))))
 cat("NOTE: the Youden threshold here is chosen AND evaluated on the same data\n")
 cat("(in-sample) – optimistic. Validate on held-out data (see modules 24/25).\n")
 

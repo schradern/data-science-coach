@@ -23,7 +23,7 @@ Eine **relationale Datenbank** speichert Daten in mehreren Tabellen. Jede Tabell
 hat einen **Primärschlüssel** (eindeutige ID je Zeile). Tabellen werden über
 **Fremdschlüssel** verknüpft.
 
-![Abbildung: Datenmodell, die Tabelle `kohorte` enthält eine Zeile pro Patient:in (Primärschlüssel `patient_id`). Die Messtabellen `vitalwerte`, `labor` und `notizen` verweisen über den Fremdschlüssel `patient_id` zurück und können viele Zeilen je Patient:in enthalten (1:∞).](assets/datenmodell.svg)
+![Abbildung: Datenmodell, die Tabelle `kohorte` enthält eine Zeile pro Patient:in (Primärschlüssel `patient_id`). Die Tabellen `vitalwerte`, `labor` und `notizen` verweisen über den Fremdschlüssel `patient_id` zurück. `vitalwerte` hat mehrere Zeilen je Patient:in (1:n), `labor` und `notizen` haben im Kursdatensatz genau eine (1:1); in echten Klinikdaten sind auch sie meist 1:n.](assets/datenmodell.svg)
 
 In unserem Datensatz ist `patient_id` der gemeinsame Schlüssel zwischen
 `kohorte.csv`, `labor.csv` und `vitalwerte.csv`.

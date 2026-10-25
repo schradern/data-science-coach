@@ -54,8 +54,9 @@ es trainiert wurde, wirkt immer gut, es hat die Antworten schon gesehen.
 
 ![Abbildung: Aufteilung der Gesamtkohorte (N = 500) in Trainingsdaten (80 %, N = 400, zum Modelltraining) und Testdaten (20 %, N = 100, ausschließlich zur Evaluation, nie vorher anfassen).](assets/train_test_split.svg)
 
-Bei einem Mortalitäts-Outcome von ~16 % kann ein zufälliger Split dazu führen,
-dass das Testset kaum Ereignisse enthält. Deshalb **stratifizieren** wir: Der
+Bei einem Mortalitäts-Outcome von ~16 % schwankt die Zahl der Todesfälle in
+einem zufälligen Testset von 100 Patient:innen spürbar (grob 16 ± 4), und damit
+auch jede Kennzahl, die auf ihnen beruht. Deshalb **stratifizieren** wir: Der
 Split erhält die Ereignisrate in beiden Mengen.
 
 <!-- excerpt-note -->
@@ -70,7 +71,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 ![Abbildung: ROC-Kurve eines logistischen Regressionsklassifikators für 30-Tage-Mortalität (Testdaten, N = 100, AUC = 0,880). Die gestrichelte Diagonale entspricht einem Zufallsklassifikator (AUC = 0,50). Die schraffierte Fläche ist die AUC, ein schwellenunabhängiges Gütemaß.](assets/roc_kurve.png)
 
 **Stolperstein:** Stratifizierung vergessen bei seltenen Outcomes. Ohne
-`stratify=y` kann das Testset in einem ungünstigen Split 0 Ereignisse enthalten, dann ist kein AUC berechenbar und alle Metriken sind wertlos.
+`stratify=y` hängen die Metriken davon ab, wie viele Ereignisse zufällig im
+Testset landen. Bei sehr seltenen Ereignissen oder kleinen CV-Folds kann ein
+Fold sogar ganz ohne Ereignis bleiben, dann ist keine AUC berechenbar.
 
 **Darüber hinaus:** Bei wiederholten Messungen pro Patient:in dürfen Zeilen
 desselben Menschen nicht über Train und Test verstreut werden, sonst lernt das
@@ -112,7 +115,8 @@ es kaum etwas (Test-AUC 0,880 mit, 0,878 ohne Gewichtung). Dafür verzerrt es
 gleich häufig. Auf unseren Daten sagt das Modell im Testset im Mittel **46 %**
 Mortalität vorher, obwohl nur **16 %** tatsächlich sterben (Abschnitt 5). Für
 Rangordnung/AUC ist das fast unerheblich (die Gewichtung verschiebt vor allem den
-Achsenabschnitt, und eine solche Verschiebung ändert die Reihenfolge nicht), für Kalibrierung, Brier Score und Decision-Curve-Analyse
+Achsenabschnitt, die Steigungen ändern sich beim Neufit nur leicht, deshalb bleibt
+die Reihenfolge fast gleich), für Kalibrierung, Brier Score und Decision-Curve-Analyse
 (Modul 25) ist es entscheidend, dort wird zuerst rekalibriert.
 
 **Stolperstein:** Den `StandardScaler` *vor* dem Split auf allen Daten fitten.
@@ -216,9 +220,11 @@ Sterbende höher einstuft als Überlebende, schwellenunabhängig.
 
 `class_weight="balanced"` legt mehr Gewicht auf die Minderheitsklasse und verschiebt damit die Standardschwelle 0,5 zugunsten der Sensitivität. Gegen das Genauigkeitsparadox helfen aber vor allem das passende Gütemaß und eine bewusst gewählte Schwelle; die Gewichtung selbst kostet Kalibrierung (Abschnitt 5).
 
-**Stolperstein:** AUC > 0,9 unkritisch als Erfolg werten. Bei kleinen Testsets
-mit seltenen Ereignissen deutet eine sehr hohe AUC eher auf Overfitting oder
-Leakage hin. Ziehe keine Schlüsse ohne externe Validierung.
+**Stolperstein:** AUC > 0,9 unkritisch als Erfolg werten. Overfitting allein bläht
+die AUC auf den *Trainings*daten auf, nicht auf einem unberührten Testset. Ist die
+*Test*-AUC auffällig hoch, sind die üblichen Gründe Zufall bei wenigen Ereignissen,
+Leakage (eine Variable verrät das Outcome) oder eine Wahl, die doch auf dem
+Testset getroffen wurde. Ziehe keine Schlüsse ohne externe Validierung.
 
 **Darüber hinaus:** Neben AUC ist die **Average Precision** (Fläche unter der
 Precision-Recall-Kurve) bei sehr seltenen Ereignissen informativer, weil sie
@@ -311,7 +317,7 @@ zwischen zwei Sprachen.
 
 ## Fallstricke und Merksätze
 - **Erst splitten, dann alles andere.** Kein Preprocessing auf den Gesamtdaten vor dem Split.
-- **Stratifizieren** bei seltenen Outcomes, ohne Stratifizierung kann ein Fold keine Ereignisse enthalten.
+- **Stratifizieren** bei seltenen Outcomes, sonst schwankt die Ereigniszahl je Split und Fold (im Extremfall bis null).
 - **AUC statt Accuracy** bei unbalancierten Klassen: 84 % Accuracy für ein Modell, das immer „lebt“ sagt, ist kein Erfolg.
 - **Pipeline = Schutz vor Leakage.** Der Scaler kennt nur die Trainingsdaten, nie die Testdaten.
 - **`class_weight="balanced"` verschiebt die Schwelle, nicht die Rangordnung, und verzerrt die Wahrscheinlichkeiten.** Für Kalibrierung immer vorher rekalibrieren (`CalibratedClassifierCV`, Modul 25).
@@ -319,7 +325,7 @@ zwischen zwei Sprachen.
 - **Assoziation ≠ Kausalität.** Das gilt auch für ML-Modelle, drei Mal, weil es das Wichtigste ist.
 
 ## Selbstcheck
-1. **Warum stratifizieren wir beim Train/Test-Split?** – Bei ~16 % Mortalität kann ein zufälliger Split dazu führen, dass das Testset kaum oder gar keine Ereignisse enthält; Stratifizierung erhält die Ereignisrate in beiden Mengen und macht den AUC berechenbar.
+1. **Warum stratifizieren wir beim Train/Test-Split?** – Bei ~16 % Mortalität schwankt die Zahl der Ereignisse in einem zufälligen Testset deutlich, und mit ihr jede Kennzahl; in kleinen CV-Folds kann sie bis null fallen. Stratifizierung erhält die Ereignisrate in beiden Mengen.
 2. **Was verhindert die Pipeline bei der Skalierung?** – Dass der StandardScaler auf den Gesamtdaten (inkl. Testset) gefittet wird; in der Pipeline geschieht das erst nach dem Split auf den Trainingsdaten, kein Leakage.
-3. **Warum ist ein AUC von 0,88 bei einem Mortalitätsmodell mit kleinem Testset ein Ergebnis, das man nicht unkritisch feiern sollte?** – Bei nur ~16 Ereignissen im Testset (N = 100) ist das 95-%-KI des AUC breit; eine sehr hohe AUC kann auch auf Overfitting oder Leakage hindeuten und erfordert externe Validierung, bevor man ihr traut.
+3. **Warum ist ein AUC von 0,88 bei einem Mortalitätsmodell mit kleinem Testset ein Ergebnis, das man nicht unkritisch feiern sollte?** – Bei nur ~16 Ereignissen im Testset (N = 100) ist das 95-%-KI des AUC breit; eine sehr hohe Test-AUC kann ein glücklicher Split sein oder auf Leakage hindeuten (Overfitting allein bläht nur die Trainings-AUC auf) und erfordert externe Validierung, bevor man ihr traut.
 4. **Warum sagt unser Modell im Mittel 46 % Mortalität vorher, obwohl nur 16 % der Testpatient:innen sterben?** – Weil `class_weight="balanced"` die Verlustfunktion so umgewichtet, als wären beide Klassen gleich häufig; das verschiebt die Standardschwelle zugunsten der Sensitivität und ändert die Rangordnung (AUC) nur wenig, weil der Neufit ein etwas anderes Modell ergibt, verzerrt aber `predict_proba()` als absolute Wahrscheinlichkeit. Vor jeder Kalibrierungsaussage muss zuerst mit `CalibratedClassifierCV` rekalibriert werden.

@@ -28,7 +28,9 @@ interpretierbar und braucht keine Normalisierung. Bei unbegrenzter Tiefe
 lernt er jedoch das Trainingsrauschen auswendig.
 
 **Praxis:** Unsere Kohorte hat ~500 Zeilen und 78 Ereignisse (15,6 %) auf 11
-Rohmerkmale, EPV (Events per Variable) ≈ 7. Die klassische EPV≈10-Faustregel
+Rohmerkmale. Nach dem One-Hot-Encoding der beiden kategorialen Merkmale (eine
+Spalte je Kategorie) sieht das Modell 17 Spalten, also EPV (Events per Variable,
+gezählt je Parameter) ≈ 4,6. Die klassische EPV≈10-Faustregel
 stammt aus der Regressionswelt; Baum-Ensembles können faktisch noch mehr
 effektive Parameter aus denselben Daten ziehen. Bei so wenig Daten zählt
 Regularisierung (Tiefe, Lernrate, `n_estimators`, `class_weight`) also noch
@@ -108,6 +110,7 @@ auc_rf = cross_val_score(Pipeline([("pre", pre), ("model", rf)]), X, y,
 
 In R:
 ```r
+# Excerpt from code/r.R: runs inside the full script, not on its own.
 library(ranger)
 # Balanced weights from the data (like sklearn's class_weight="balanced":
 # weight_c = n / (n_classes * n_c)) instead of a hard-coded 10:1 that
@@ -205,6 +208,7 @@ except Exception:  # not installed or failed to load (e.g. missing libomp)
 
 In R:
 ```r
+# Excerpt from code/r.R: runs inside the full script, not on its own.
 library(xgboost)
 dtrain <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
 params <- list(objective = "binary:logistic", eval_metric = "auc",
@@ -243,8 +247,10 @@ for name, pipe in models.items():
 
 Auf unserer Kohorte: Entscheidungsbaum 0,655 ± 0,043, Random Forest 0,791 ±
 0,028, HistGradBoost 0,711 ± 0,064, XGBoost 0,739 ± 0,030, LightGBM 0,755 ±
-0,047. Random Forest gewinnt hier klar (+0,135 AUC vs. Einzelbaum) – aber das
-ist ein *Ergebnis dieses Laufs*, keine allgemeine Wahrheit. Führe den
+0,047. Klar ist nur der Abstand von Random Forest zum Einzelbaum (+0,135 AUC).
+Die Unterschiede zwischen den Ensembles (0,71–0,79) liegen in der Größenordnung
+der Fold-Streuung und sind ohne gepaarten Vergleich (Modul 30) keine Rangfolge.
+Auch das ist ein *Ergebnis dieses Laufs*, keine allgemeine Wahrheit. Führe den
 Vergleich immer neu aus und lies die tatsächlichen Zahlen ab, `code/python.py`
 leitet die Schlussfolgerung am Ende genauso her (nie hartkodiert), und wenn
 die Modelle bei dir gleichauf liegen oder der Baum vorn liegt, ist das ein
@@ -255,11 +261,13 @@ genauso gültiges, berichtenswertes Ergebnis.
 **Stolperstein:** Die Standardabweichung der CV-Scores (±) zeigt die Instabilität
 des Schätzers. Ein Modell mit AUC 0,82 ± 0,08 ist nicht nachweislich besser als 0,80 ± 0,02, der Unterschied liegt im Rauschen.
 
-**Darüber hinaus:** Für den formalen Modellvergleich gibt es den **DeLong-Test** für
-AUC-Unterschiede (`pROC::roc.test()` in R). In Python approximierst du ihn mit
-Bootstrap-Konfidenzintervallen über `scipy.stats.bootstrap`.
+**Darüber hinaus:** Für den formalen Vergleich zweier Modelle auf **demselben
+Testset** gibt es den **DeLong-Test** für AUC-Unterschiede (`pROC::roc.test()` in
+R; in Python per Bootstrap). Für Mittelwerte aus der Kreuzvalidierung passt er
+nicht; dort vergleichst du die gepaarten Fold-Differenzen mit einem korrigierten
+Intervall wie in Modul 30.
 
-> **Wann du Hilfe holst.** Baum-Ensembles überfitten auf kleinen klinischen Kohorten leicht (hier EPV ≈ 7), und ihre scheinbare Güte hält externer Validierung oft nicht stand – bevor ein solches Modell klinisch genutzt wird, gehören Tuning-Strategie und Validierung methodisch abgesichert.
+> **Wann du Hilfe holst.** Baum-Ensembles überfitten auf kleinen klinischen Kohorten leicht (hier EPV ≈ 4,6), und ihre scheinbare Güte hält externer Validierung oft nicht stand – bevor ein solches Modell klinisch genutzt wird, gehören Tuning-Strategie und Validierung methodisch abgesichert.
 
 ## Fallstricke und Merksätze
 - **Einzelner Baum tief = Overfit.** Ensembles regeln Varianz, aber Bias bleibt.

@@ -1,6 +1,6 @@
 # Übungen · Inferenzstatistik und Hypothesentests
 
-Nutze den Kohorten- und Labordatensatz (geladen mit `load_cohort()` und `load_labs()`).
+Nutze den Kohorten- und Labordatensatz (`kohorte.csv` und `labor.csv` wie in der Lektion, im Projektordner auch `load_cohort()` und `load_labs()`).
 Versuche jede Aufgabe zuerst in **Python**, dann in **R**. Lösungen: [`loesungen.md`](loesungen.md).
 
 Für jede Aufgabe gilt: **p + Effektgröße + Konfidenzintervall** berichten, nie p allein.
@@ -30,7 +30,7 @@ die Schiefe und erstelle ein Histogramm.
 Beantworte:
 
 - Warum taugt der Shapiro-Wilk-Test bei großen (und bei sehr kleinen) Stichproben wenig als Entscheidungshilfe?
-- Welcher Hypothesentest ist bei nicht-normalverteilten Daten die robustere Wahl?
+- Wenn du Laktat zwischen zwei Gruppen vergleichen willst: Welcher Test passt zu welcher Frage (Mittelwertdifferenz vs. „Wer hat eher höhere Werte?“), und was ändert die Schiefe daran?
 
 *Tipp:* Achte auf den Unterschied zwischen statistischer Signifikanz des Shapiro-Tests
 und praktischer Relevanz der Abweichung.

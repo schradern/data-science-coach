@@ -17,8 +17,9 @@ zu hoch kalibriert ist, kann mehr schaden als nützen. Dieses Modul gibt dir die
 Werkzeuge, um beide Fragen ehrlich zu beantworten.
 
 **Stolperstein:** Die Modelle aus Modul 23/24 verwenden `class_weight="balanced"`,
-damit seltene Todesfälle beim Rangordnen (AUC, Schwellenwahl) nicht ignoriert
-werden. Das Umgewichten verzerrt aber `predict_proba()`: Unser Modell sagt im
+damit die Standardschwelle von 0,5 seltene Todesfälle nicht übergeht. Die
+Rangordnung (AUC) verbessert das nicht, hier wird sie sogar minimal schlechter
+(Abschnitt 1). Das Umgewichten verzerrt aber `predict_proba()`: Unser Modell sagt im
 Mittel **41 % Mortalität** vorher, obwohl im Testset nur **15 %** tatsächlich
 sterben, das Ranking (AUC) bleibt davon fast unberührt, die absoluten
 Wahrscheinlichkeiten sind aber Fiktion. Kalibrierung, Brier Score und DCA
@@ -70,8 +71,8 @@ das gilt auch für den Subgruppenvergleich in Modul 32.
 
 Diese Rangordnungs-Metriken hängen nur von der Reihenfolge der Scores ab.
 Halte zwei Vorgänge auseinander: Eine **monotone Neuskalierung fester Scores**
-(etwa die Rekalibrierung in Abschnitt 2) ändert die Reihenfolge nicht, also auch
-nicht AUC/PR-AUC. Ein **Neufit mit `class_weight="balanced"`** ist dagegen ein
+(etwa eine Platt-Skalierung, die auf die fertigen Scores eines einzigen Modells
+gesetzt wird) ändert die Reihenfolge nicht, also auch nicht AUC/PR-AUC. Ein **Neufit mit `class_weight="balanced"`** ist dagegen ein
 anderes Modell mit anderen Koeffizienten, und das kann die Reihenfolge der
 Patient:innen ändern. Auf diesem Split liegt die ROC-AUC mit Gewichtung bei
 0,8436, ohne bei 0,8515. Der Unterschied ist klein gegen das Bootstrap-KI, aber
@@ -117,9 +118,9 @@ unabhängig voneinander gut oder schlecht sein.
 
 ### 2.0 Erst rekalibrieren
 
-Unser Modell nutzt `class_weight="balanced"` (Modul 23/24). Das ist gut fürs
-Ranking, macht `predict_proba()` aber unbrauchbar für alles, was absolute
-Wahrscheinlichkeiten braucht:
+Unser Modell nutzt `class_weight="balanced"` (Modul 23/24). Das verschiebt die
+Standardschwelle zugunsten der Sensitivität, macht `predict_proba()` aber
+unbrauchbar für alles, was absolute Wahrscheinlichkeiten braucht:
 
 ```python
 # Excerpt from code/python.py: runs inside the full script, not on its own.
@@ -137,11 +138,19 @@ print(f"Mittlere vorhergesagte Mortalität (rekalibriert): {proba_cal.mean():.1%
 
 `CalibratedClassifierCV` fittet die Neuskalierung per interner Kreuzvalidierung
 **nur auf den Trainingsdaten** und wendet sie danach auf `X_test` an, kein
-Leakage. Ab hier arbeitet dieses Modul mit `proba_cal`.
+Leakage. Mit `cv=5` ist das allerdings keine reine Neuskalierung fester Scores:
+Es fittet fünf Modelle neu und mittelt ihre kalibrierten Vorhersagen. Die
+Reihenfolge kann sich dadurch minimal ändern (AUC 0,843 statt 0,8436 vorher,
+gerundet gleich). Ab hier arbeitet dieses Modul mit `proba_cal`.
 
-> **Merksatz:** `class_weight="balanced"` löst das Ranking-Problem bei seltenen
-> Ereignissen, aber es zerstört die Wahrscheinlichkeits-Semantik von
-> `predict_proba()`. Für Kalibrierung, Brier Score, CITL/Slope und DCA immer
+**In R** fittet `code/r.R` das Modell von vornherein ohne Klassengewichtung.
+Seine Wahrscheinlichkeiten sind deshalb schon auf der richtigen Skala, und die
+R-Blöcke unten arbeiten direkt mit `proba`; eine Rekalibrierung braucht es dort
+nicht.
+
+> **Merksatz:** `class_weight="balanced"` verschiebt nur, wo die Standardschwelle
+> liegt; die Rangordnung verbessert es nicht, die Wahrscheinlichkeits-Semantik
+> von `predict_proba()` zerstört es. Für Kalibrierung, Brier Score, CITL/Slope und DCA immer
 > zuerst rekalibrieren (oder die Klassengewichtung ganz weglassen und die
 > Schwelle stattdessen anpassen, Modul 24 Abschnitt 6).
 
@@ -203,6 +212,7 @@ muss als **Offset** eingehen (Code oben), nicht weggelassen werden.
 
 In R:
 ```r
+# Excerpt from code/r.R: runs inside the full script, not on its own.
 library(rms)
 val.prob(proba, y_test)   # reports Brier, intercept and slope, among others
 # Caution: this intercept comes from the model with a freely estimated slope,
@@ -264,7 +274,11 @@ ist nützlich, wenn seine Kurve sowohl die „Alle behandeln“- als auch die
 „Niemanden behandeln“-Linie übersteigt. Auf unseren Daten ist das über fast den
 gesamten gezeigten Schwellenbereich (0,01–0,50) der Fall. Nur unterhalb von etwa
 0,02 fällt die Modellkurve mit „alle behandeln“ zusammen, weil dort jede
-vorhergesagte Wahrscheinlichkeit über der Schwelle liegt.
+vorhergesagte Wahrscheinlichkeit über der Schwelle liegt. Lies das als vorläufigen
+Befund: Die Kurve beruht auf 19 Todesfällen im Testset und ist ohne
+Unsicherheitsband gezeichnet. Bei kleinen Schwellen liegen Modell und „alle
+behandeln“ nur wenige Tausendstel auseinander; ein Bootstrap-Band über die
+Kurve würde zeigen, wo der Vorsprung über das Rauschen hinausgeht.
 
 In R:
 ```r
@@ -398,4 +412,4 @@ DCA ist klinisch unvollständig dokumentiert, unabhängig von der AUC.
  Net Benefit des Modells *über* beiden Referenzlinien (alle behandeln, niemanden
  behandeln) liegt. Außerhalb dieses Bereichs bringt das Modell keinen Mehrwert.
 
-4. **Warum berechnen wir in diesem Modul zuerst `CalibratedClassifierCV`, bevor wir Brier Score, Kalibrierungskurve oder DCA anschauen?** – Weil das Modell mit `class_weight="balanced"` trainiert wurde: Das verbessert das Ranking bei seltenen Ereignissen, bläht aber `predict_proba()` systematisch auf (hier im Mittel 41 % statt der beobachteten 15 %). Die AUC verschiebt sich dadurch nur wenig, aber Brier Score, Kalibrierungskurve, CITL/Slope und DCA werten die Wahrscheinlichkeiten absolut, ohne Rekalibrierung wären sie irreführend.
+4. **Warum berechnen wir in diesem Modul zuerst `CalibratedClassifierCV`, bevor wir Brier Score, Kalibrierungskurve oder DCA anschauen?** – Weil das Modell mit `class_weight="balanced"` trainiert wurde: Das verschiebt die Standardschwelle zugunsten seltener Ereignisse, bläht aber `predict_proba()` systematisch auf (hier im Mittel 41 % statt der beobachteten 15 %). Die AUC verschiebt sich dadurch nur wenig, aber Brier Score, Kalibrierungskurve, CITL/Slope und DCA werten die Wahrscheinlichkeiten absolut, ohne Rekalibrierung wären sie irreführend.

@@ -7,8 +7,7 @@ Data: read from data/ (committed with the repo); if that folder is
 missing, the same files are fetched from the published URL.
 
 Figures are written to this module's assets/ directory – the SAME files the
-chapter (README §5–§7) displays, with the SAME variables and the SAME trend
-line as the shared generator data/figures.py:
+chapter (README §5–§7) displays. This script is their only source:
     ../assets/verteilung_alter.png
     ../assets/verteilung_laktat_nach_grund.png
     ../assets/streu_crp_verweildauer.png
@@ -37,8 +36,7 @@ from lib.plotstyle import apply_style, PRIMARY, EVENT  # noqa: E402
 apply_style()
 pd.set_option("display.width", 100)
 # Figures belong in the module's assets/ dir (as in every other module), not in
-# code/. These are the exact files the README shows and that data/figures.py
-# also generates.
+# code/. These are the exact files the README shows.
 FIGURE_DIR = Path(__file__).parent.parent / "assets"
 
 
@@ -105,7 +103,7 @@ def plot_age_histogram(df: pd.DataFrame) -> None:
     ax.legend()
     fig.tight_layout()
     path = FIGURE_DIR / "verteilung_alter.png"
-    fig.savefig(path, dpi=120)
+    fig.savefig(FIGURE_DIR / "verteilung_alter.png", dpi=120)   # literal path: lets the site link this code
     plt.close(fig)
     print(f"\nSaved: {path}")
 
@@ -135,7 +133,7 @@ def plot_lactate_boxplot(df: pd.DataFrame) -> None:
     ax.set_title("Laktatverteilung nach Aufnahmegrund")
     fig.tight_layout()
     path = FIGURE_DIR / "verteilung_laktat_nach_grund.png"
-    fig.savefig(path, dpi=120)
+    fig.savefig(FIGURE_DIR / "verteilung_laktat_nach_grund.png", dpi=120)   # literal path: lets the site link this code
     plt.close(fig)
     print(f"Saved: {path}")
 
@@ -165,7 +163,7 @@ def plot_crp_los_scatter(df: pd.DataFrame) -> None:
     ax.legend()
     fig.tight_layout()
     path = FIGURE_DIR / "streu_crp_verweildauer.png"
-    fig.savefig(path, dpi=120)
+    fig.savefig(FIGURE_DIR / "streu_crp_verweildauer.png", dpi=120)   # literal path: lets the site link this code
     plt.close(fig)
     print(f"Saved: {path}")
 

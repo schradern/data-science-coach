@@ -1,10 +1,10 @@
 # 21 · Auswahl der passenden statistischen Methode
 
-> **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~85 min · Voraussetzung: Module 09–10, 12 (Deskriptiv, Inferenz, Regression)
+> **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~85 min · Voraussetzung: Module 09–10, 12, 15, 17 (Deskriptiv, Inferenz, Regression, kausale Inferenz, Survival)
 
 ## Lernziele
 - Aus klinischer Frage, Outcome, Gruppendesign und Messniveau die passende Methode ableiten.
-- Zwischen unabhängigen, gepaarten und wiederholten Messungen unterscheiden.
+- Zwischen unabhängigen und gepaarten Messungen unterscheiden (mehr als zwei Messzeitpunkte je Person: Modul 18).
 - Parametrische Tests, robuste Alternativen und Regressionsmodelle sinnvoll wählen.
 - Effektgrößen und Konfidenzintervalle passend zum Test berichten.
 - Häufige Fehlentscheidungen vermeiden: Normalitätstest-Autopilot, Median-Mythos, p-Wert-Monokultur.

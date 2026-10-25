@@ -2,7 +2,7 @@
 #   Rscript module/27-erklaerbarkeit/code/r.R
 # Data: read from data/ (committed with the repo); if that folder is
 # missing, the same files are fetched from the published URL.
-# Packages: tidymodels, ranger, vip, pdp (install if missing).
+# Packages: tidymodels, ranger, pdp (install if missing).
 # Code is English; dataset schema (column names) stays German.
 
 suppressPackageStartupMessages({
@@ -54,18 +54,17 @@ preds <- augment(fit, new_data = test)
 cat("\nTest AUC:\n")
 print(roc_auc(preds, truth = verstorben_30d, .pred_1))
 
-# ---- 2) Permutation Importance (vip package) --------------------------------
-if (requireNamespace("vip", quietly = TRUE)) {
-  library(vip)
-  cat("\n--- Permutation Importance (ranger, permutation method) ---\n")
-  # Extract the fitted ranger model from the workflow.
-  ranger_fit <- extract_fit_parsnip(fit)$fit
-  # vip uses the importance stored in the ranger object directly.
-  print(vi(ranger_fit) |> slice_head(n = 10))
-} else {
-  cat("\nvip package not installed. Install with: install.packages('vip')\n")
-  cat("Permutation importance is computed inside ranger when importance='permutation'.\n")
-}
+# ---- 2) Permutation Importance (ranger, out-of-bag) ------------------------
+# ranger computes it during fitting (importance = "permutation" above): for
+# each tree, permute one feature in the out-of-bag rows and measure the loss
+# in accuracy. code/python.py permutes on the held-out test set instead; both
+# rank features by how much the model relies on them.
+cat("\n--- Permutation Importance (ranger, out-of-bag) ---\n")
+ranger_fit <- extract_fit_parsnip(fit)$fit
+importance_tbl <- tibble(feature = names(ranger_fit$variable.importance),
+                         importance = unname(ranger_fit$variable.importance)) |>
+  arrange(desc(importance))
+print(importance_tbl |> slice_head(n = 10))
 
 # ---- 3) Partial Dependence (pdp package) ------------------------------------
 if (requireNamespace("pdp", quietly = TRUE)) {

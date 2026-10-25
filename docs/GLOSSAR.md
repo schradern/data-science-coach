@@ -25,7 +25,7 @@ Nachsehen, wenn ein Wort stört.
 | Variable | Merkmal oder benannter Wert, z. B. `alter` oder `crp_mg_l`. |
 | Datentyp | Art eines Werts: Zahl, Text, Wahrheitswert, Datum, fehlend. |
 | Fehlender Wert | Nicht erhoben oder unbekannt. Nicht dasselbe wie `0`. |
-| Tidy Data | Jede Variable eine Spalte, jede Beobachtung eine Zeile, jeder Wert eine Zelle. |
+| Tidy Data | Jede Variable eine Spalte, jede Beobachtung eine Zeile, jede Beobachtungseinheit eine eigene Tabelle (Wickham 2014; spätere Fassungen formulieren die dritte Regel als „jeder Wert eine Zelle“). Modul 06. |
 | Join | Tabellen über Schlüsselspalten verbinden, z. B. über `patient_id`. |
 | Long Format | Mehr Zeilen, weniger Messwertspalten; gut für wiederholte Messungen. |
 | Wide Format | Mehr Spalten, weniger Zeilen; gut für Übersichten und manche Modelle. |

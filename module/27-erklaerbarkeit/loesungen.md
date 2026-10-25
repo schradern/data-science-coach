@@ -93,9 +93,12 @@ und SOFA-Score vorn; bei den Hochrisikofällen dominiert der SOFA-Score, weil
 hohe Werte dort den Score am stärksten nach oben schieben. Lokale und globale
 Rangfolge müssen nicht übereinstimmen.
 
-Ohne SHAP: Man vergleicht den Merkmalswert der/des Patient:in gegen die PDP-Kurve und
-identifiziert, bei welchem Merkmal der individuelle Wert im steilsten Teil der
-Kurve liegt, das ist der wahrscheinlichste Haupttreiber der Vorhersage.
+Ohne SHAP: Für jedes Merkmal liest man an der ICE-Kurve der Person (sonst an der
+PDP-Kurve) ab, wie weit die Vorhersage bei ihrem eigenen Merkmalswert über oder
+unter dem Mittel der Vorhersagen liegt. Das Merkmal mit der größten Abweichung
+ist der wahrscheinlichste Haupttreiber. Wie steil die Kurve ist, zählt dagegen
+nicht: Ein Merkmal kann an anderer Stelle steil sein und für diese Person
+trotzdem nichts beitragen.
 
 ## Aufgabe 4 – Korrelierte Merkmale
 ```python

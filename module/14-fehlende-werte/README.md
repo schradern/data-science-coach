@@ -144,7 +144,10 @@ der Mittelwert in deiner Table 1 ist zu hoch.
 **Einfache Imputation** (Median/Mittelwert) ersetzt fehlende Werte durch eine
 Konstante. Zwei Schäden auf einmal: sie **schrumpft den Effekt gegen Null**
 (regression dilution), und sie **tut sicherer, als sie ist**, weil die
-erfundenen Werte wie gemessene zählen.
+erfundenen Werte wie gemessene zählen. Zusammen ergibt das ein schmales
+Konfidenzintervall an der falschen Stelle (Überdeckung 84 % statt 95 %,
+Abschnitt 9). Den Standardfehler selbst unterschätzen vor allem die
+Regressions-Imputationen.
 
 **Multiple Imputation** erzeugt *m* plausible Datensätze, analysiert jeden und
 kombiniert die Ergebnisse mit **Rubins Regeln**: der Punktschätzer ist das
@@ -166,9 +169,10 @@ einen *kleineren* Standardfehler als die Complete-Case-Analyse. Sie ist die
 schlechteste der drei Optionen – und die verbreitetste.
 
 **Stolperstein:** Multiple Imputation ist ein **stochastisches** Verfahren. Die
-Tabelle zeigt die Python-Zahlen (`statsmodels`, Regressions-Imputation); das
-R-Skript nutzt `mice` mit *predictive mean matching* und landet bei β ≈ −10,04
-und OR ≈ 2,73. Beide treffen die Wahrheit, beide sind korrekt – die dritte
+Tabelle zeigt die Python-Zahlen (`statsmodels`, *predictive mean matching* mit
+20 Spendern); das R-Skript nutzt `mice` mit *predictive mean matching* und 5
+Spendern und landet bei β ≈ −10,04 und OR ≈ 2,73. Beide liegen nah an der
+Wahrheit, beide sind gültig – die dritte
 Nachkommastelle einer MI-Schätzung ist kein Ergebnis, sondern Rauschen. Wer
 exakt reproduzierbare Zahlen braucht, dokumentiert Seed, `m` und die
 Imputationsmethode.
@@ -313,10 +317,12 @@ Barnard–Rubin korrekt. [`code/rubin.py`](code/rubin.py) und
 der jeweiligen Bibliothek und **drucken die Abweichung aus, statt sie zu glätten**.
 
 **Stolperstein:** Die Zahlen dieses Abschnitts stammen aus der Python-Pipeline.
-`code/rubin.R` imputiert mit `mice` (Predictive Mean Matching) und findet eine
-deutlich größere Varianz *zwischen* den Imputationen: λ ≈ 0,41 statt 0,157,
-SE ≈ 3,96 statt 3,31. Beides sind gültige Ergebnisse, aber von verschiedenen
-Imputationsmodellen. λ ist eine Eigenschaft von Daten **und** Imputationsmodell;
+`code/rubin.R` imputiert mit `mice` (Predictive Mean Matching, 5 Spender statt
+der 20 in `statsmodels`) und findet eine deutlich größere Varianz *zwischen* den
+Imputationen: λ ≈ 0,41 statt 0,157, SE ≈ 3,96 statt 3,30. Mit weniger Spendern
+streuen die gezogenen Werte stärker; `code/mice_praxis.py` mit 5 Spendern kommt
+in Abschnitt 10 entsprechend auf λ = 0,443. Beides sind gültige Ergebnisse, aber
+von verschiedenen Imputationsverfahren. λ ist eine Eigenschaft von Daten **und** Imputationsmodell;
 leite `m` deshalb aus deinem eigenen Lauf ab, nicht aus einer Zahl im Lehrbuch.
 
 ## 8 Wie viele Imputationen? (`m`)
@@ -328,7 +334,10 @@ m = 5 über 0,96) – nicht auf die Stabilität des **Standardfehlers**.
 **White, Royston & Wood (2011):** `m` sollte mindestens so groß sein wie der
 Prozentsatz unvollständiger Fälle, hier also 20 (der pH fehlt bei 19,8 %). Die
 Regel nähert `m ≳ 100 · λ` an; bei λ = 0,157 heißt das `m ≳ 16`. Unser `m = 20`
-genügt gerade.
+genügt gerade – aber nur für dieses Verfahren. Mit 5 Spendern (λ ≈ 0,41–0,44,
+Abschnitt 7 und 10) verlangt dieselbe Regel `m ≳ 45`. Da λ vom
+Imputationsverfahren abhängt, plane `m` mit dem größten plausiblen λ, hier
+also `m = 50`.
 
 Der Grund ist empirisch nachprüfbar. `code/rubin.py` wiederholt die gesamte
 Pipeline über 10 Seeds je `m` und misst, wie stark der **gepoolte SE selbst**
@@ -451,6 +460,7 @@ Richtig ist die **passive Imputation**: imputiere `gewicht_kg`, *leite* `bmi`
 daraus ab. In R kann `mice` das nativ:
 
 ```r
+# Excerpt from code/mice_praxis.R: runs inside the full script, not on its own.
 meth["bmi"] <- "~ I(gewicht_kg / (groesse_cm/100)^2)"
 pred["gewicht_kg", "bmi"] <- 0   # otherwise bmi would predict the weight it is derived from
 ```
@@ -541,7 +551,7 @@ identischen gemessenen Patient:innen. `δ = 0` ist die MAR-Analyse.
 
 | δ | OR je −0,1 pH | 95-%-KI | Schluss hält? |
 |---|---|---|---|
-| −0,02 | 3,31 | (1,56; 6,99) | ja |
+| −0,02 | 3,30 | (1,56; 6,99) | ja |
 | 0,00 (**MAR**) | **2,40** | (1,12; 5,14) | ja |
 | +0,01 | 2,21 | (1,05; 4,65) | ja (knapp) |
 | **+0,02** | 1,83 | (0,93; 3,59) | **nein – Kipppunkt** |
@@ -558,7 +568,11 @@ der eine Gutachterin fragen wird.**
 Blutgasanalysators wäre ein Kategorienfehler: Analysenrauschen ist *zufällig*, `δ`
 ist ein *systematischer* Gruppenunterschied. Das richtige Maß ist die
 **bedingte Streuung** des pH nach Adjustierung, hier 0,050. Der Kipppunkt liegt
-also bei **0,40 bedingten Standardabweichungen**.
+also bei **0,40 bedingten Standardabweichungen**. Ein zweiter Maßstab steckt im
+Datensatz selbst: Verstorbene haben im Mittel einen um 0,024 niedrigeren pH
+(`data/README.md`). Ein δ von +0,02 würde diesen Unterschied für die nicht
+gemessenen Patient:innen fast vollständig aufheben. Das ist keine abwegige
+Größenordnung, der Schluss ist also nur mäßig robust.
 
 > **Merksatz:** Die Schlussfolgerung hält, solange die nicht gemessenen
 > Patient:innen um weniger als ~0,4 Standardabweichungen von dem abweichen, was
@@ -623,4 +637,4 @@ Ende Ergebnisse aus. Das Skript sagt das beim Start selbst – nicht abbrechen.
 2. **Wofür stehen `Ū` und `B` in Rubins Regeln, und welche der beiden setzt eine Median-Imputation auf null?** – `Ū` ist die Unsicherheit, die auch bei vollständigen Daten bestünde; `B` ist die Unsicherheit, die allein daraus entsteht, dass Werte geraten wurden. Die Median-Imputation setzt `B = 0` und behandelt die geratenen Werte wie gemessene.
 3. **Eine Methode trifft die wahren pH-Werte am genauesten (kleinster RMSE) und hat trotzdem die schlechteste Überdeckung. Wie geht das?** – Die deterministische Regressions-Imputation setzt jeden fehlenden Wert auf seinen bedingten Erwartungswert. Das minimiert den RMSE, entfernt aber die Streuung aus den Daten: der berichtete SE beträgt nur 66 % der wahren. Weil die eingesetzten Werte zudem exakt dem Outcome folgen, übertreibt sie den Effekt (Bias −3,37). Das nominale 95-%-KI überdeckt in 73 % der Fälle.
 4. **Warum muss das Outcome im Imputationsmodell stehen, obwohl es im Analysemodell die abhängige Variable ist?** – Weil das Fehlen vom Outcome abhängt. Ohne das Outcome erklären die Imputationsvariablen die Missingness nicht mehr, die Imputation reproduziert die Verzerrung, und das Odds Ratio bricht (β = −5,69 statt −10,14).
-5. **Der Kipppunkt der Delta-Adjustment-Analyse liegt bei δ = +0,02 pH. Ist die Schlussfolgerung damit robust?** – Bezogen auf die bedingte Streuung des pH (0,050) sind das 0,4 Standardabweichungen, und zwar in der Richtung, die der höheren Sterblichkeit der nicht gemessenen Patient:innen widerspricht. Das ist eine benennbare, eher unplausible Annahme – die Schlussfolgerung ist also moderat robust, aber nicht unangreifbar. An der Messungenauigkeit des Analysators darf man δ nicht messen: die ist zufällig, δ ist systematisch.
+5. **Der Kipppunkt der Delta-Adjustment-Analyse liegt bei δ = +0,02 pH. Ist die Schlussfolgerung damit robust?** – Bezogen auf die bedingte Streuung des pH (0,050) sind das 0,4 Standardabweichungen, und zwar in der Richtung, die der höheren Sterblichkeit der nicht gemessenen Patient:innen widerspricht. Gemessen am Sterbe-Effekt auf den pH im Datensatz (0,024) ist das keine kleine, aber auch keine abwegige Verschiebung – die Schlussfolgerung ist also nur mäßig robust und gehört mit ihrer Bedingung berichtet. An der Messungenauigkeit des Analysators darf man δ nicht messen: die ist zufällig, δ ist systematisch.

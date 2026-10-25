@@ -6,7 +6,7 @@
 - Ein **neuronales Netz** mit `MLPClassifier` in einer sklearn-Pipeline trainieren und dabei verstehen, warum Skalierung unverzichtbar ist.
 - Die **Lernkurve** (Loss über Epochen) lesen und Überanpassung erkennen.
 - **AUC** von MLP, logistischer Regression und Gradient Boosting auf denselben Daten vergleichen und das Ergebnis ehrlich einordnen.
-- **Regularisierung** (`alpha`) und `early_stopping` als Gegenmaßnahmen zu Overfitting anwenden.
+- **Regularisierung** (`alpha`) als Gegenmaßnahme zu Overfitting anwenden und die Grenzen von `early_stopping` (Abbruch nach Accuracy) erkennen.
 - Das Konzept von **CNNs für medizinische Bildgebung** in Prosa verstehen (ohne lauffähigen Torch-Code).
 
 ## Klinischer Aufhänger
@@ -83,7 +83,8 @@ rec <- recipe(verstorben_30d ~ alter + sofa_score + crp_mg_l + bmi +
   step_normalize(all_numeric_predictors())
 
 spec_nnet <- mlp(hidden_units = 64, penalty = 0.01, epochs = 200) |>
-  set_engine("nnet") |> set_mode("classification")
+  set_engine("nnet", MaxNWts = 2000) |>   # nnet refuses > 1000 weights by default
+  set_mode("classification")
 
 wf <- workflow() |> add_recipe(rec) |> add_model(spec_nnet)
 fit <- fit(wf, data = train)
@@ -112,7 +113,7 @@ val_curve   = mlp.validation_scores_
 
 ![MLP-Lernkurve: Trainingsverlust und Validierungsgüte über die Trainingsepochen. Der Punkt, an dem die Validierungsgüte aufhört zu steigen, markiert den Zeitpunkt des Early Stopping.](assets/lernkurve.png)
 
-**Stolperstein:** `mlp.best_validation_score_` ist bei `early_stopping=True` die **Genauigkeit (Accuracy)** auf dem internen Validierungssplit, keine AUC. Bei einem seltenen Zielereignis (hier ~16 % 30-Tage-Mortalität) ist Genauigkeit ein irreführendes Maß: Ein Modell, das stur „überlebt“ vorhersagt, erreicht bereits ~84 % Genauigkeit, ohne einen einzigen Todesfall zu erkennen. Genau das passiert im Skriptlauf: Das Training stoppt nach 15 Epochen bei einer Validierungsgenauigkeit von 0,842, praktisch dem Anteil der Überlebenden, und das Netz hat bis dahin kaum etwas gelernt (Test-AUC 0,407, unter der Zufallsgrenze). Verlass dich für den Modellvergleich in diesem Modul auf die **AUC** (Abschnitt 3), nicht auf `best_validation_score_`. 
+**Stolperstein:** `mlp.best_validation_score_` ist bei `early_stopping=True` die **Genauigkeit (Accuracy)** auf dem internen Validierungssplit, keine AUC. Bei einem seltenen Zielereignis (hier ~16 % 30-Tage-Mortalität) ist Genauigkeit ein irreführendes Maß: Ein Modell, das stur „überlebt“ vorhersagt, erreicht bereits ~84 % Genauigkeit, ohne einen einzigen Todesfall zu erkennen. Genau das passiert im Skriptlauf: Das Training stoppt nach 15 Epochen bei einer Validierungsgenauigkeit von 0,842, praktisch dem Anteil der Überlebenden, und das Netz hat bis dahin kaum etwas gelernt (Test-AUC 0,407; bei rund 19 Todesfällen im Testset ist das von 0,5 nicht zu unterscheiden, das Netz trennt praktisch gar nicht). Verlass dich für den Modellvergleich in diesem Modul auf die **AUC** (Abschnitt 3), nicht auf `best_validation_score_`. 
 **Stolperstein:** Der Validierungssplit für `early_stopping` wird **intern** aus den Trainingsdaten entnommen und reduziert so die effektive Trainingsmenge. Bei wenig Daten solltest du abwägen, ob Early Stopping lohnt oder ein festes `max_iter` besser ist. 
 **Darüber hinaus:** Bei `solver="adam"` (Standard) reagiert die Lernrate auf den Gradientenverlauf. `learning_rate_init` ist ein wichtiger Hyperparameter, zu groß führt zu Oszillation, zu klein zu sehr langsamer Konvergenz.
 
@@ -218,7 +219,7 @@ cat("Logistische Regression AUC:", round(auc_lr, 3), "\n")
 
 ## 4 Regularisierung und Early Stopping
 
-Neuronale Netze mit vielen Parametern neigen zur Überanpassung. Zwei Gegenmaßnahmen dagegen:
+Neuronale Netze mit vielen Parametern neigen zur Überanpassung. Die beiden üblichen Gegenmaßnahmen sind Regularisierung über `alpha` und Early Stopping; auf diesen Daten trägt nur die erste (siehe Stolperstein):
 
 ```python
 for alpha in [0.0001, 0.001, 0.01, 0.1, 1.0]:

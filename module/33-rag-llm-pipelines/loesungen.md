@@ -3,14 +3,16 @@
 ## Übung 1: Fehleranalyse in einer RAG-Pipeline
 
 1. **Hauptfehlerquellen:**
-    * **Retrieval-Fehler:** Die Vektorsuche hat versagt. Trotz Vorhandenseins der Information im Dokument war die semantische Ähnlichkeit zwischen Frage und Textchunk zu gering, oder die Chunks waren so ungünstig geschnitten, dass der relevante Absatz nicht unter den Top-K-Ergebnissen landete. Der Kontext blieb leer.
+    * **Retrieval-Fehler:** Die Vektorsuche hat versagt. Trotz Vorhandenseins der Information im Dokument war die Ähnlichkeit zwischen Frage und Textchunk zu gering (bei TF-IDF: zu wenige gemeinsame Wörter), oder die Chunks waren so ungünstig geschnitten, dass der relevante Absatz nicht unter den Top-K-Ergebnissen landete. Der Kontext blieb leer.
+    * **Schwellen-Fehler:** Der richtige Chunk wurde gefunden, aber sein Ähnlichkeitswert lag unter dem Konfidenz-Schwellenwert, und die Pipeline hat „keine Information“ gemeldet, bevor das LLM ihn sah. Mit TF-IDF passiert das leicht, wenn Frage und Leitlinie verschiedene Wörter benutzen.
     * **Generations-Fehler:** Das Retrieval war erfolgreich und der Absatz wurde an den Prompt übergeben. Das LLM hat den Text jedoch nicht korrekt interpretiert oder aufgrund eines zu restriktiven System-Prompts („Antworte nur bei 100%iger Übereinstimmung“) die Antwort verweigert.
 
 2. **Systematische Untersuchung:**
     * **Schritt 1:** Gib den Roh-Output des Retrievers aus (z. B. die Top 3 ähnlichsten Text-Chunks zur Frage). 
      * *Ergebnis A:* Der korrekte Absatz ist nicht dabei. -> Fehler liegt beim Retrieval (Chunk-Größe anpassen, anderes Embedding-Modell nutzen, Synonyme in der Frage ergänzen).
-     * *Ergebnis B:* Der Absatz ist dabei. -> Fehler liegt bei der Generation.
-    * **Schritt 2 (falls Ergebnis B):** Überprüfe den Prompt und die Modellparameter (z. B. Temperatur senken, System-Prompt lockern).
+     * *Ergebnis B:* Der Absatz ist dabei, sein Score liegt aber unter der Schwelle. -> Fehler liegt an der Schwelle (Top-1-Score ausgeben, Schwelle prüfen).
+     * *Ergebnis C:* Der Absatz ist dabei und liegt über der Schwelle. -> Fehler liegt bei der Generation.
+    * **Schritt 2 (falls Ergebnis C):** Überprüfe den Prompt und die Modellparameter (z. B. Temperatur senken, System-Prompt lockern).
 
 ---
 

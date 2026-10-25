@@ -20,8 +20,8 @@ Die Grafiken in diesem Kapitel liegen als fertige Dateien unter `assets/`.
 Führst du [`code/python.py`](code/python.py) selbst aus, reproduziert es genau
 diese drei Kapitelgrafiken (`verteilung_alter.png`,
 `verteilung_laktat_nach_grund.png`, `streu_crp_verweildauer.png`) mit denselben
-Variablen und derselben Trendgeraden nach `assets/`; die verbindlichen Versionen
-erzeugt der gemeinsame Generator `data/figures.py`. [`code/r.R`](code/r.R)
+Variablen und derselben Trendgeraden nach `assets/`; das Skript ist die einzige
+Quelle dieser Abbildungen. [`code/r.R`](code/r.R)
 schreibt inhaltsgleiche `_r`-Varianten daneben.
 
 ## 1 Grammatik der Grafik
@@ -221,7 +221,7 @@ sns.boxplot(data=df, x="aufnahmegrund", y="laktat_mmol_l",
             order=order, hue="aufnahmegrund", palette="Set2", legend=False, ax=ax)
 ax.set_xlabel("Aufnahmegrund")
 ax.set_ylabel("Laktat (mmol/l)")
-ax.set_title("Laktat nach Aufnahmegrund")
+ax.set_title("Laktatverteilung nach Aufnahmegrund")
 fig.tight_layout()
 fig.savefig("verteilung_laktat_nach_grund.png", dpi=120)
 ```

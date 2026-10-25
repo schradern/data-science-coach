@@ -4,7 +4,7 @@ Nutze den Kohorten- und Labordatensatz. Versuche jede Aufgabe zuerst in **Python
 dann in **R**. Code in Englisch, Antworten auf Deutsch. Lösungen: [`loesungen.md`](loesungen.md).
 
 ## Aufgabe 1 – Erste Erkundung
-Lade `kohorte` und `labor` mit `load_cohort()` / `load_labs()`, führe sie zusammen.
+Lade `kohorte.csv` und `labor.csv` wie in der Lektion (Web-Adresse, im Projektordner auch `load_cohort()` / `load_labs()`) und führe sie zusammen.
 Gib für die Spalten `bmi`, `kreatinin_mg_dl` und `haemoglobin_g_dl` den Mittelwert,
 Median und die Standardabweichung aus. Welche Variable ist am stärksten rechtsschief?
 
@@ -30,6 +30,7 @@ eingefärbt nach `verstorben_30d`. Berechne danach den Pearson-Korrelationskoeff
 Entspricht das Bild dem Koeffizienten?
 
 ## Bonus
-Erstelle eine Korrelationsmatrix für alle numerischen Variablen in der zusammengeführten
-Tabelle. Welche Variable korreliert am stärksten mit `verstorben_30d`?
+Erstelle eine Korrelationsmatrix für die numerischen klinischen Messwerte in der
+zusammengeführten Tabelle (ohne IDs und ohne die Spalten zur Nachbeobachtung wie
+`status` oder `fu_zeit_tage`). Welche Variable korreliert am stärksten mit `verstorben_30d`?
 Überrascht dich das Ergebnis?

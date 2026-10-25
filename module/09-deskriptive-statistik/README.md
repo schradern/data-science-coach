@@ -18,7 +18,10 @@ Komorbiditäten, Aufnahmestatus, getrennt nach Hauptgruppen (Überlebende vs.
 Verstorbene). Sie zeigt, wen die Studie eingeschlossen hat und worin sich die
 Gruppen unterscheiden; bei Gruppen nach Exposition (z. B. Therapie ja/nein) zeigt
 sie außerdem, ob diese vergleichbar sind. Wir bauen sie einmal manuell, einmal
-mit einem Paket.
+mit einem Paket. Die Gruppierung nach Outcome ist hier didaktisch gewählt, weil
+sie Unterschiede gut sichtbar macht; in einer Publikation steht Table 1 meist
+für die Gesamtkohorte oder nach Exposition. Die p-Werte zeigen wir, um sie in
+den Fallstricken einzuordnen, nicht als Ziel.
 
 ## 1 Lagemaße: Mittelwert vs. Median
 
@@ -148,12 +151,14 @@ print(table1.tabulate(tablefmt="simple"))
 
 ```r
 library(readr)
+library(dplyr)
 library(gtsummary)
 
 cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 labs   <- read_csv("{{DATEN}}labor.csv", show_col_types = FALSE)
 df <- left_join(cohort, labs, by = "patient_id") |>
   mutate(
+    geschlecht = if_else(geschlecht == "w", "weiblich", geschlecht),  # as in Python
     verstorben_30d = factor(verstorben_30d, levels = c(0, 1),
                             labels = c("Überlebt", "Verstorben")),
     diabetes   = factor(diabetes,   levels = c(0, 1), labels = c("nein", "ja")),
@@ -165,9 +170,10 @@ df |>
          hypertonie, sofa_score, crp_mg_l, verweildauer_tage, verstorben_30d) |>
   tbl_summary(by = verstorben_30d,
               statistic = list(all_continuous()  ~ "{median} [{p25}; {p75}]",
+                               alter ~ "{mean} ({sd})",          # as tableone above
                                all_categorical() ~ "{n} ({p}%)"),
               missing = "ifany") |>
-  add_p() |>
+  add_p(test = list(alter ~ "t.test")) |>
   add_overall()
 ```
 

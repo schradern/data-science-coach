@@ -122,7 +122,7 @@ eher linear-proportionalen Kohorten wie dieser ist ein gut regularisiertes Cox-
 Modell oft mindestens ebenbürtig. Der Lerneffekt: RSF ist kein Selbstläufer, und
 eine AUC-Differenz ohne Konfidenzintervall ist keine Rangfolge.
 
-## Bonus – Konkurrierende Risiken konzeptuell
+## Bonus – Verlegung: Zensierung oder konkurrierendes Ereignis?
 Wenn verlegte Patient:innen als Nicht-Ereignis kodiert werden (als hätten sie
 bis Tag 30 sicher überlebt), überschätzt die KM-Kurve das Überleben, also
 unterschätzt sie das Sterberisiko: Die Todesfälle nach der Verlegung fehlen. Auch

@@ -97,7 +97,14 @@ cat(sprintf("Schiefe = %.2f\n",
 
 **Trennschärfe:** Das Problem ist nicht zu wenig, sondern zu viel Power. Ab N > 200–300 ist Shapiro-Wilk so mächtig, dass er klinisch unwichtige Abweichungen als signifikant ausweist. Immer visualisieren (Histogramm, QQ-Plot) und den Shapiro-Test als ergänzendes Hilfsmittel sehen, nicht als alleinige Entscheidungsgrundlage. Bei sehr kleinem N übersieht er umgekehrt auch deutliche Abweichungen.
 
-**Robustere Alternative:** Der Mann-Whitney-U-Test (Wilcoxon-Rangsummentest) benötigt keine Normalverteilungsannahme und ist bei schiefen Daten wie Laktat oder CRP die sicherere Wahl.
+**Welcher Test?** Das entscheidet die Frage, nicht der Shapiro-Test. Geht es um
+die **Mittelwertdifferenz**, bleibt der Welch-t-Test bei zwei Gruppen dieser
+Größe trotz Schiefe brauchbar (zentraler Grenzwertsatz), ergänzt um ein
+Bootstrap-KI. Geht es darum, ob eine Gruppe **eher höhere Werte** hat
+(stochastische Überlegenheit), ist der Mann-Whitney-U-Test die passende Wahl;
+er braucht keine Normalverteilung, testet aber eine andere Größe als den
+Mittelwert (README, Abschnitt 4). Deshalb können beide Tests auf denselben
+Daten verschieden ausfallen, wie im Bonus: Mann-Whitney p ≈ 0,035, Welch p ≈ 0,10.
 
 ---
 
@@ -286,7 +293,10 @@ pwr.t.test(d = d_lac, power = 0.8, sig.level = 0.05,
 ```
 
 **Befund:** Der beobachtete Effekt ist klein (d ≈ 0,197, t-Test p ≈ 0,10, nicht
-signifikant). Die *beobachtete* Power bei den vorliegenden Stichprobengrößen
+signifikant). Der Mann-Whitney-Test der Lektion findet für denselben Vergleich
+p ≈ 0,035, weil er eine andere Größe testet (stochastische Überlegenheit statt
+Mittelwertdifferenz); welcher Test gilt, legt die Frage fest, nicht das
+Ergebnis. Die *beobachtete* Power bei den vorliegenden Stichprobengrößen
 (n_Sepsis ≈ 87, n_nicht-Sepsis ≈ 327) beträgt ~37 %. Für Power = 0,8 wären je
 Gruppe etwa **n ≈ 405** erforderlich (prospektive Fallzahlplanung für eine
 *künftige* Studie mit diesem Effekt als Planungsannahme).

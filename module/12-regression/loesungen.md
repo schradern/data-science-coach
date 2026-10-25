@@ -51,7 +51,11 @@ result2 = smf.logit(formula, data=df).fit(disp=False)
 print(np.exp(result2.params).round(3))
 ```
 
-Die wahren ORs liefert `lib/ground_truth.py`. Das geht nur im Projektordner
+Die wahren ORs liefert `lib/ground_truth.py`, und zwar für genau dieses
+Fünf-Prädiktoren-Modell. Das Modell der Lektion enthält zusätzlich aktives
+Rauchen und hat deshalb leicht andere wahre ORs (Diabetes 1,710 statt 1,703):
+Odds Ratios sind nicht kollabierbar, ihr wahrer Wert hängt davon ab, wofür
+adjustiert wird. Das geht nur im Projektordner
 (lokal oder in Colab nach dem Klonen); im Browser-Weg nimmst du die Zahlen
 aus der Tabelle unten.
 
@@ -78,7 +82,11 @@ round(exp(coef(m2)), 3)
 | `sepsis` | 2,013 | [0,99; 4,08] | 2,036 | ja |
 
 **Beobachtung:** Das 95-%-KI überdeckt die wahre OR bei **allen fünf**
-Prädiktoren. Es liegt also **keine Verzerrung** vor, nur Stichprobenvarianz.
+Prädiktoren. Das ist kein Hinweis auf eine systematische Abweichung; die
+Unterschiede sind mit Stichprobenvarianz vereinbar. Beweisen lässt sich
+Unverzerrtheit mit einer einzigen Stichprobe nicht, dafür braucht es viele
+Wiederholungen wie im Benchmark von Modul 14 (der dort auch eine kleine
+Verzerrung der logistischen Regression bei 78 Ereignissen zeigt).
 
 Relativ am stärksten weicht `diabetes` ab (1,11 vs. 1,70). Der Grund ist
 Präzision, nicht Bias: bei 78 Ereignissen und ~19 % Diabetes-Prävalenz reicht
@@ -161,9 +169,9 @@ Hier ist `alter` ein echter Confounder: In der DAG führt ein Pfeil von `alter`
 zu `diabetes` (Ältere haben häufiger Diabetes), entsprechend fällt die wahre OR
 mit der Altersadjustierung von 2,90 auf 2,12.
 
-Die Punktschätzer fallen genauso – 2,07 → 1,59 → 0,99. Aber jedes dieser
-Konfidenzintervalle enthält sowohl den wahren totalen als auch den wahren
-direkten Effekt. Bei N = 500 und 78 Ereignissen lässt sich der
+Die Punktschätzer fallen genauso – 2,07 → 1,59 → 0,99. Aber die ersten beiden
+Konfidenzintervalle enthalten sowohl den wahren totalen (2,12) als auch den
+wahren direkten Effekt (1,57); das dritte enthält nur den direkten. Bei N = 500 und 78 Ereignissen lässt sich der
 Overadjustment-Bias für Diabetes **herleiten** (aus der DAG), aber nicht
 **zeigen** (aus den Daten). Der Sprung auf 0,99 ist zum großen Teil Rauschen.
 
@@ -241,6 +249,12 @@ m_cox <- coxph(Surv(fu_zeit_tage, status) ~ sofa_score + sepsis,
                data = df)
 summary(m_cox)$conf.int
 ```
+
+**Welche Frage beantwortet das Modell?** Weil `sofa_score` mit im Modell steht,
+ist die Sepsis-HR der **direkte** Effekt bei gleichem SOFA-Score. Den Teil, den
+die Sepsis über einen höheren SOFA-Score verursacht, rechnet das Modell heraus.
+Für „Wie viel gefährlicher ist eine Sepsis insgesamt?“ gehört der Mediator SOFA
+nicht ins Modell (Lektion §4).
 
 **Interpretation:** Sepsis: HR ≈ 1,51 (95-%-KI ≈ [0,88; 2,59], p ≈ 0,14);
 SOFA-Score: HR ≈ 1,43 (95-%-KI ≈ [1,27; 1,61], p < 0,0001). Eine HR von ~1,5

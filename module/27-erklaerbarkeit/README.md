@@ -14,7 +14,9 @@ Du hast in Modul 26 ein Ensemble trainiert, das `verstorben_30d` mit guter AUC
 vorhersagt. Die Stationsleitung fragt: „Warum sagt das Modell bei Patient 42 ein
 hohes Sterberisiko voraus?“ Und der Ethikausschuss: „Welche Variablen treibt das
 Modell überhaupt?“ Erklärbarkeit ist keine Kür, sondern Voraussetzung für Vertrauen,
-Fehlerdiagnose und regulatorische Akzeptanz (MDR, EU-AI-Act).
+Fehlerdiagnose und die Transparenzpflichten, die MDR und EU AI Act stellen
+(Gebrauchsanweisung mit Leistung und Grenzen, menschliche Aufsicht). Eine
+mathematische Erklärung des Modells schreibt keines der beiden Gesetze vor.
 
 ## 1 Globale vs. lokale Erklärbarkeit
 **Globale Erklärbarkeit** beschreibt, welche Merkmale das Modell *im Durchschnitt*
@@ -59,15 +61,17 @@ model = HistGradientBoostingClassifier(random_state=SEED, max_iter=200,
 model.fit(X_train, y_train)
 ```
 
-In R arbeitest du analog mit `ranger` (Random Forest) und dem Paket `vip` für
-globale Wichtigkeit sowie `pdp` oder `iml` für PDP/ICE und lokale Erklärungen.
+In R arbeitest du analog mit `ranger` (Random Forest), das die Permutation
+Importance beim Fitten gleich mitrechnet (`importance = "permutation"`), sowie
+`pdp` oder `DALEX` für PDP/ICE und lokale Erklärungen.
 
 **Stolperstein:** Erklärbarkeit erklärt das **Modell**, nicht die Realität. Ein
 Merkmal mit hoher Wichtigkeit ist nicht kausal, es könnte ein Proxy für eine
 versteckte dritte Variable sein.
-**Darüber hinaus:** Für regulatorische Kontexte (MDR Klasse IIb/III) reicht
-technische Erklärbarkeit allein nicht; es braucht klinische Validierung und
-Dokumentation der Entscheidungslogik.
+**Darüber hinaus:** Für die Zulassung als Medizinprodukt (MDR, z. B. Klasse IIb/III)
+zählen klinische Validierung, technische Dokumentation und eine verständliche
+Gebrauchsanweisung; Erklärbarkeitsmethoden können dabei helfen, ersetzen aber
+nichts davon.
 
 ## 2 Permutation Importance, das ehrliche Maß
 Impurity-basierte Wichtigkeit (Standard bei RandomForest) wird auf den
@@ -165,7 +169,7 @@ except ImportError:
     SHAP_AVAILABLE = False
 ```
 
-![Abbildung: SHAP-Beeswarm-Plot für 150 zufällige Testpatient:innen (HistGradientBoosting). Jeder Punkt ist ein/e Patient:in, x-Position = SHAP-Wert (Beitrag zum log-odds-Score), Farbe = Merkmalswert (rot = hoch, blau = niedrig). SOFA-Score, Alter und CRP haben den größten Streubereich und damit den größten Einfluss auf einzelne Vorhersagen.](assets/shap_beeswarm.png)
+![Abbildung: SHAP-Beeswarm-Plot für alle 125 Testpatient:innen (HistGradientBoosting). Jeder Punkt ist ein/e Patient:in, x-Position = SHAP-Wert (Beitrag zum log-odds-Score), Farbe = Merkmalswert (rot = hoch, blau = niedrig). SOFA-Score, Alter und CRP haben den größten Streubereich und damit den größten Einfluss auf einzelne Vorhersagen.](assets/shap_beeswarm.png)
 
 Ohne SHAP bleibt die Permutation Importance als globales Ersatzmaß gültig; die
 lokale Erklärung eines Einzelfalls lässt sich über Koeffizienten (bei linearen

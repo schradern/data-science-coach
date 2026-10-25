@@ -112,20 +112,27 @@ def datenmodell() -> str:
                      [("patient_id", "PK"), ("alter", ""), ("aufnahmegrund", ""),
                       ("sofa_score", ""), ("verstorben_30d", "")])
     rx = 540
-    specs = [(64, "vitalwerte", [("patient_id", "FK"), ("herzfrequenz", ""), ("mad_mmhg", ""), ("spo2", "")]),
-             (232, "labor", [("patient_id", "FK"), ("laktat_mmol_l", ""), ("crp_mg_l", ""), ("leukozyten", "")]),
-             (400, "notizen", [("patient_id", "FK"), ("notiztext", "")])]
+    # (y, Tabelle, Zeilen je Patient:in im Kursdatensatz, Spalten). Nur
+    # vitalwerte ist 1:n; labor und notizen haben genau eine Zeile je Person.
+    specs = [(64, "vitalwerte", "n", [("patient_id", "FK"), ("herzfrequenz", ""), ("map_mmhg", ""),
+                                      ("spo2_prozent", "")]),
+             (232, "labor", "1", [("patient_id", "FK"), ("laktat_mmol_l", ""), ("kreatinin_mg_dl", ""),
+                                  ("leukozyten_g_l", "")]),
+             (400, "notizen", "1", [("patient_id", "FK"), ("notiz", "")])]
     right = []
     key_y = ky + 34 + row_h / 2      # patient_id-Zeilenmitte kohorte
-    for (yy, nm, cols) in specs:
-        tbl, _ = table(rx, yy, nm, "viele / Patient:in", cols)
+    for (yy, nm, card, cols) in specs:
+        hint = "viele / Patient:in" if card == "n" else "1 Zeile / Patient:in"
+        tbl, _ = table(rx, yy, nm, hint, cols)
         right.append(tbl)
         ty = yy + 34 + row_h / 2      # patient_id-Zeilenmitte rechts
         b.append(f'<path d="M{kx+W},{key_y} C{kx+W+120},{key_y} {rx-120},{ty} {rx},{ty}" '
                  f'stroke="{T["acc"]}" stroke-width="1.5" fill="none"/>')
-        b.append(f'<path d="M{rx},{ty} l-10,-5 M{rx},{ty} l-10,0 M{rx},{ty} l-10,5" '
-                 f'stroke="{T["acc"]}" stroke-width="1.5" fill="none" stroke-linecap="round"/>')
-        b.append(txt(rx - 18, ty - 8, "∞", size=12, fill=T["acc"], w=700, anchor="end"))
+        if card == "n":
+            b.append(f'<path d="M{rx},{ty} l-10,-5 M{rx},{ty} l-10,0 M{rx},{ty} l-10,5" '
+                     f'stroke="{T["acc"]}" stroke-width="1.5" fill="none" stroke-linecap="round"/>')
+        b.append(txt(rx - 18, ty - 8, "∞" if card == "n" else "1", size=12, fill=T["acc"], w=700,
+                     anchor="end"))
     b.append(f'<circle cx="{kx+W}" cy="{key_y}" r="3.4" fill="{T["acc"]}"/>')
     b.append(txt(kx + W + 12, key_y - 8, "1", size=12, fill=T["acc"], w=700))
     b.append(ktbl)
@@ -138,7 +145,8 @@ def datenmodell() -> str:
     b.append(txt(kx + 26, ly + 20, "Fremdschlüssel · patient_id verbindet alles", size=11, fill=T["mut"]))
     return canvas(760, 500, "".join(b),
                   "Datenmodell: kohorte hat eine Zeile pro Patient:in (Primärschlüssel patient_id); "
-                  "vitalwerte, labor und notizen verweisen über den Fremdschlüssel patient_id zurück (1 zu unendlich).")
+                  "vitalwerte (mehrere Zeilen je Patient:in, 1 zu n), labor und notizen (je eine Zeile, 1 zu 1) "
+                  "verweisen über den Fremdschlüssel patient_id zurück.")
 
 
 # --- 05 · JOIN-Typen --------------------------------------------------------

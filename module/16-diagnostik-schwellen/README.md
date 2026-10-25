@@ -36,7 +36,7 @@ Aus dieser Tabelle:
 - LR+ = Sensitivität / (1 - Spezifität)
 - LR- = (1 - Sensitivität) / Spezifität
 
-> **Merksatz:** Sensitivität und Spezifität gehören zum Test. PPV und NPV hängen stark von der Prävalenz ab.
+> **Merksatz:** Sensitivität und Spezifität gehören zum Test, solange das Patientenspektrum gleich bleibt (in einer kränkeren Population ändern auch sie sich, Spektrum-Bias). PPV und NPV hängen zusätzlich stark von der Prävalenz ab.
 
 ## 2 Schwellenwahl
 
@@ -178,17 +178,27 @@ net_benefit_all <- function(pt) prev - (1 - prev) * pt / (1 - pt)
 for (pt in c(0.10, 0.15, 0.20, 0.25)) cat(pt, net_benefit(pt), net_benefit_all(pt), "\n")
 ```
 
+---
+
+**Stolperstein:** Beide Blöcke werfen die 86 Patient:innen ohne Laktatwert hinaus
+(`dropna` bzw. `drop_na`). Laktat wird bei Kränkeren häufiger gemessen, deshalb
+liegt die Mortalität unter den verbleibenden 414 bei 16,7 % statt 15,6 % in der
+ganzen Kohorte. Sensitivität, Spezifität, PPV und NPV gelten für genau diese
+Teilgruppe; berichte, wie viele fehlen und warum.
+
 Das vollständige Skript liegt unter [`code/r.R`](code/r.R). Python und R liefern
-dieselbe AUC (0,580), dieselbe Youden-Schwelle (1,70 mmol/l) und denselben Net
-Benefit.
+dieselbe AUC (0,580; 95-%-KI 0,51–0,65, in Python per Bootstrap, in R nach
+DeLong), dieselbe Youden-Schwelle (1,70 mmol/l, Sensitivität 0,70 [0,58; 0,79],
+Spezifität 0,49 [0,44; 0,54], Wilson-Intervalle) und denselben Net Benefit. Die
+Untergrenze von 0,51 zeigt, wie nah Laktat allein an einem Münzwurf liegt.
 
 ## 7 Bericht
 
 Beispiel:
 
-> Für Laktat als Marker der 30-Tage-Mortalität betrug die AUC X. Bei einer
-> Schwelle von Y mmol/l ergaben sich Sensitivität A, Spezifität B, PPV C und NPV
-> D. Da PPV/NPV prävalenzabhängig sind, gelten diese Werte für eine Kohorte mit
+> Für Laktat als Marker der 30-Tage-Mortalität betrug die AUC X (95-%-KI …). Bei
+> einer Schwelle von Y mmol/l ergaben sich Sensitivität A, Spezifität B, PPV C und
+> NPV D, jeweils mit 95-%-KI. Da PPV/NPV prävalenzabhängig sind, gelten diese Werte für eine Kohorte mit
 > der beobachteten Ereignisrate.
 
 > **Wann du Hilfe holst.** Sobald ein Cut-off reale Behandlungsentscheidungen steuern soll, hängt die richtige Schwelle von Prävalenz und dem Schaden-Nutzen-Verhältnis falsch-positiver zu falsch-negativer Befunde ab – diese Abwägung (Decision-Curve, Zielprävalenz) trifft man gemeinsam mit Methodik und Fachdisziplin, nicht allein durch Ablesen der Youden-Schwelle.
@@ -198,7 +208,7 @@ Beispiel:
 - **AUC ist schwellenfrei, Klinik ist schwellengebunden.**
 - **PPV sinkt bei niedriger Prävalenz.** Auch gute Tests produzieren dann viele falsch Positive.
 - **Screening bevorzugt Sensitivität**, Bestätigung oft Spezifität.
-- **Likelihood Ratios sind transportabler** als PPV/NPV, weil sie weniger direkt von Prävalenz abhängen.
+- **Likelihood Ratios sind transportabler** als PPV/NPV, weil sie nicht von der Prävalenz abhängen; vom Patientenspektrum hängen sie wie Sensitivität und Spezifität trotzdem ab.
 
 ## Selbstcheck
 

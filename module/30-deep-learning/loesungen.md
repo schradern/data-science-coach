@@ -179,8 +179,13 @@ for arch in [(32,), (64, 32), (128, 64, 32)]:
     print(f"  {str(arch):<18} AUC={auc:.3f}")
 ```
 
-Auf 500 Patient:innen bringt eine tiefere Architektur (128, 64, 32) oft keinen
-Vorteil (in unserem Lauf: (32,) 0,710, (64, 32) 0,662, (128, 64, 32) 0,652), der Gewinn durch mehr Kapazität wird durch Überanpassung kompensiert.
+Auf 500 Patient:innen bringt eine tiefere Architektur (128, 64, 32) keinen
+Vorteil (in unserem Lauf: (32,) 0,710, (64, 32) 0,662, (128, 64, 32) 0,652). Ob
+die flache Variante wirklich besser ist, lässt sich aus diesen Mittelwerten
+nicht ablesen: Die Unterschiede liegen in der Größenordnung der Fold-Streuung
+(Aufgabe 4 zeigt, wie man das mit gepaarten Intervallen prüft). Klar ist nur,
+dass mehr Kapazität hier nichts gewinnt. (Mit `max_iter=300` statt 500 kommt
+(64, 32) auf 0,662 statt 0,656 aus Aufgabe 1, auch das ist Rauschen.)
 Mehr Schichten machen nur Sinn, wenn genug Trainingsdaten vorhanden sind,
 um die zusätzlichen Parameter zu schätzen. Bei n < 2 000 und einer kleinen
 Merkmalszahl ist eine flache Architektur ((32,) oder (64, 32)) robuster.

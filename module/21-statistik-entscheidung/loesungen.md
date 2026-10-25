@@ -5,7 +5,7 @@
 | Frage | Methode | Warum |
 |---|---|---|
 | SOFA bei Diabetes ja/nein | Mann-Whitney oder Welch-t | ordinaler, ganzzahliger Punktwert, zwei unabhängige Gruppen; Welch-t vertretbar, wenn der Mittelwert klinisch interessiert |
-| MAP Tag 0 vs. Tag 3 | gepaarter t-Test oder Wilcoxon | dieselben Patient:innen werden zweimal gemessen |
+| MAP Tag 0 vs. Tag 3 | gepaarter t-Test; Wilcoxon nur bei symmetrischen Differenzen, sonst Vorzeichentest | dieselben Patient:innen werden zweimal gemessen; die Wahl folgt dem Estimand (README, Abschnitt 2) |
 | Aufnahmegrund und Mortalität | Chi-Quadrat, ggf. Fisher | kategoriale Variable gegen binären Outcome |
 | Laktat in vier Aufnahmegruppen | Kruskal-Wallis | stetig, mehrere Gruppen, Laktat meist rechtsschief |
 | Mortalität adjustiert für Alter und SOFA | logistische Regression | binärer Outcome mit Adjustierungsbedarf; Vorsicht: SOFA ist laut DAG (Modul 15) für Diabetes/Sepsis ein Mediator, nicht immer ein Confounder; für den totalen Effekt dieser Expositionen sollte nur Alter adjustiert werden |
@@ -34,7 +34,7 @@ Frage nach dem Median der Differenzen, denn Wilcoxon setzt für eine Aussage üb
 die Lage Symmetrie voraus (README, Abschnitt 2). Wichtig:
 kein unabhängiger t-Test, weil Tag 0 und Tag 3 pro Patient:in zusammengehören.
 Einen Shapiro-Test brauchst du dafür nicht: Bei 408 Paaren wird er schon bei
-harmlosen Abweichungen signifikant (siehe README, Abschnitt 4).
+harmlosen Abweichungen signifikant (siehe die Fallstricke im README und Modul 10).
 
 In diesen Daten sind die Differenzen symmetrisch (Median 0, IQR −7 bis 7 mmHg,
 Schiefe 0,07). Ergebnis: mittlere Differenz −0,01 mmHg (95-%-KI −1,06 bis 1,05),
@@ -86,5 +86,7 @@ Beispiel: „Da Laktat rechtsschief verteilt war, verglichen wir Sepsis vs.
 Nicht-Sepsis mit dem Mann-Whitney-U-Test und berichteten zusätzlich das
 rang-biseriale r. Das Laktat war bei Sepsis leicht höher (Median 2,0 [IQR 1,35–3,1]
 vs. 1,8 [1,0–2,8] mmol/l; r = 0,15; p = 0,035); ein Unterschied von 0,2 mmol/l ist
-klinisch eher klein.“ Für die Unsicherheit ergänzt du ein 95-%-KI, z. B. per
-Bootstrap für die Mediandifferenz.
+klinisch eher klein (Mediandifferenz 0,2 mmol/l, 95-%-Bootstrap-KI −0,1 bis
+0,6).“ Das KI gehört in den Satz, nicht dahinter: Es zeigt, dass auch kein
+Unterschied mit den Daten vereinbar ist. Das rang-biseriale r berechnest du aus
+der U-Statistik wie in Modul 10: `r = 2·U / (n₁·n₂) − 1`.

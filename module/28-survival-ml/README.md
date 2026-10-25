@@ -1,6 +1,6 @@
 # 28 · Maschinelles Lernen für Überlebenszeiten
 
-> **Teil 5 – Machine Learning und KI in der Medizin** · Dauer: ~75 min · Voraussetzung: Module 17 und 24 (klassisches Survival und Workflow)
+> **Teil 5 – Machine Learning und KI in der Medizin** · Dauer: ~75 min · Voraussetzung: Module 17, 20 und 24 (klassisches Survival, konkurrierende Risiken, Workflow)
 
 ## Lernziele
 - Verstehen, warum klassische ML-Klassifikatoren Zensierung ignorieren und warum das zählt.
@@ -105,6 +105,7 @@ print(f"  Mean AUC:      {mean_auc:.3f}")
 In R berechnet `timeROC` **denselben** Estimand (nicht nur Harrells C-Index) und
 liefert das Konfidenzintervall gleich mit:
 ```r
+# Excerpt from code/r.R: runs inside the full script, not on its own.
 library(timeROC)
 td <- timeROC(T = test$fu_zeit_tage, delta = test$status,
               marker = cox_lp, cause = 1, times = c(7, 14, 21, 28), iid = TRUE)
@@ -228,4 +229,4 @@ die direkt für Risikoscores mit konkurrierenden Risiken genutzt werden kann.
 ## Selbstcheck
 1. **Warum ist ein einfacher Klassifikator für Überlebensdaten problematisch?** – Er ignoriert Zensierung (wer vor Tag 30 aus der Beobachtung fällt, wird als Überlebender kodiert) und die Eventzeit, frühe vs. späte Todesfälle bekommen dasselbe Label.
 2. **Was misst die zeitabhängige AUC, und warum ist sie informativer als eine feste AUC?** – Sie bewertet die Diskriminierung des Modells zu jedem Zeitpunkt t, nicht nur am Fenster-Ende; so sieht man, ob das Modell auch früh (Tag 7) noch gut trennt.
-3. **Wann braucht man den Aalen-Johansen-Schätzer statt Kaplan-Meier?** – Bei konkurrierenden Risiken: Wenn Patient:innen aus anderen Gründen (andere Todesursache, Verlegung) das Ziel-Ereignis nicht mehr erreichen können. KM überschätzt dann das kumulierte Risiko.
+3. **Wann braucht man den Aalen-Johansen-Schätzer statt Kaplan-Meier?** – Bei konkurrierenden Risiken: Wenn ein anderes Ereignis das Ziel-Ereignis unmöglich macht, etwa die lebende Entlassung, wenn nur der Tod im Krankenhaus zählt, oder eine andere Todesursache bei ursachenspezifischer Mortalität. KM überschätzt dann das kumulierte Risiko. Eine Verlegung ist nur dann konkurrierend, wenn der Tod andernorts nicht zählt; sonst ist sie (oft informative) Zensierung (Bonus-Aufgabe).

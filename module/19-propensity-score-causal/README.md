@@ -25,7 +25,9 @@ In dieser Kohorte gilt (siehe Modul 15, DAG): `alter` ist ein echter **Confounde
 Sterblichkeit – adjustieren. `sofa_score` dagegen ist ein **Mediator**: Diabetes selbst erhöht den
 SOFA-Score bei Aufnahme (schwererer Verlauf), und der SOFA-Score wirkt dann auf die Mortalität. Würden wir
 nach `sofa_score` matchen oder adjustieren, würden wir einen Teil des tatsächlichen Diabetes-Effekts
-wegrechnen und nur noch den *direkten* Effekt schätzen – nicht den *Gesamteffekt*, nach dem wir hier fragen.
+wegrechnen und nur noch einen *direkten* Effekt schätzen – nicht den *totalen Effekt* (Gesamteffekt), nach
+dem wir hier fragen. Selbst der direkte Effekt wäre nur dann sauber geschätzt, wenn auch alle Confounder
+zwischen SOFA-Score und Mortalität adjustiert sind (Modul 15).
 
 ## 1 Was ist ein Propensity Score?
 
@@ -231,7 +233,8 @@ Fehlerschätzern, nicht aus den Voreinstellungen:
   in R. Das breitere CI `[1,03; 3,36]` schließt die 1 nur noch knapp aus.
 
 **Darüber hinaus – Sandwich vs. Bootstrap.** Der Sandwich-SE ignoriert, dass der Propensity Score selbst
-*geschätzt* wurde; für den ATE ist er dadurch tendenziell leicht **konservativ**. Der Goldstandard ist ein
+*geschätzt* wurde; für den ATE ist er dadurch in der Theorie meist leicht **konservativ**, hier liegt er
+sogar minimal darunter. Der Goldstandard ist ein
 nichtparametrischer **Bootstrap**, der in jeder Wiederholung PS- *und* Outcome-Modell neu schätzt. Auf
 diesen Daten liegen beide praktisch gleichauf (Sandwich-SE des log-OR ≈ 0,302 vs. Bootstrap ≈ 0,305 über
 2000 Resamples) – deshalb ist der Sandwich hier vertretbar. Bei starken Gewichten oder komplexeren

@@ -49,4 +49,4 @@
 
 3. **Formulierung für die Klinik.** Beispiel:
 
-    > Die Komplikationsraten der beiden Arme unterscheiden sich mit hoher Wahrscheinlichkeit um weniger als 5 Prozentpunkte (Differenz 0,01, 95-%-Credible-Interval [−0,03; 0,05], vollständig innerhalb der vorab festgelegten Äquivalenzgrenze). Die Arme sind damit als praktisch gleichwertig anzusehen.
+    > Die Komplikationsraten der beiden Arme unterscheiden sich mit hoher Wahrscheinlichkeit um weniger als 5 Prozentpunkte (Differenz 0,01, 95-%-Credible-Interval [−0,03; 0,05], an der vorab festgelegten Äquivalenzgrenze). Die Arme sind damit mit hoher Wahrscheinlichkeit (≈ 97,5 %) praktisch gleichwertig; weil die obere Intervallgrenze die Grenze gerade berührt, ist das ein Grenzfall, kein komfortabler Nachweis.

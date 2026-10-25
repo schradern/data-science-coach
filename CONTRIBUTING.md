@@ -23,10 +23,11 @@ Modul und Abschnitt, was falsch ist, und (bei fachlichen Punkten) eine Quelle.
    noch erzeugt:
 
    ```bash
-   ./.venv/bin/python tools/check_numbers.py 13   # nur Modul 14 (schnell)
+   ./.venv/bin/python tools/check_numbers.py 12   # nur Modul 12 (schnell)
    ```
 
-4. Pull Request öffnen. CI (`pages.yml`) muss grün sein.
+4. Pull Request öffnen. CI muss grün sein: `pages.yml` (Struktur-Checks und Build)
+   und `numbers.yml` (Zahlenabgleich mit Python und R).
 
 ## Grundregeln des Kurses
 

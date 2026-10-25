@@ -123,8 +123,10 @@ cox.zph(cox)
 ```
 
 `cox.zph()` prüft die PH-Annahme über Schoenfeld-Residuen; in dieser Kohorte
-liefert sie für alle drei Kovariaten p > 0,05 (kein Hinweis auf eine
-Verletzung der PH-Annahme).
+liefert sie für alle drei Kovariaten p > 0,05: kein Hinweis auf eine
+Verletzung der PH-Annahme. Ein Beweis, dass sie gilt, ist das bei 78 Ereignissen
+nicht (Modul 10: Abwesenheit von Evidenz ist keine Evidenz für Abwesenheit);
+schau dir zusätzlich den Residuenplot an (`plot(cox.zph(cox))`).
 
 ## 7 Das Ergebnis
 
@@ -145,10 +147,12 @@ Beispiel:
 
 > Überleben wurde ab Aufnahme bis Tod oder Zensierung (`fu_zeit_tage`,
 > `status`) analysiert. Kaplan-Meier-Kurven wurden nach Sepsisstatus
-> dargestellt und mit Log-rank-Test verglichen (p < 0,0001). Ein Cox-Modell
-> adjustierte für Alter und SOFA. Hazard Ratios werden mit 95-%-KI
-> berichtet; die Proportional-Hazards-Annahme wurde mit `cox.zph()` geprüft
-> und nicht verletzt.
+> dargestellt und mit Log-rank-Test verglichen (p < 0,0001). Für den
+> Gesamteffekt der Sepsis adjustierte ein Cox-Modell für Alter; ein zweites
+> Modell mit zusätzlichem SOFA-Score schätzte den nicht über den
+> Organversagens-Score vermittelten (direkten) Anteil. Hazard Ratios werden mit
+> 95-%-KI berichtet; Schoenfeld-Residuen (`cox.zph()`) zeigten keinen Hinweis auf
+> eine Verletzung der Proportional-Hazards-Annahme.
 
 > **Wann du Hilfe holst.** Wenn die Proportional-Hazards-Annahme verletzt ist, konkurrierende Ereignisse (z. B. Entlassung) das Zielereignis verhindern, oder sich eine Exposition erst im Verlauf ändert, reichen Kaplan-Meier und Standard-Cox nicht mehr aus – dann sollte eine Biostatistikerin das passende Modell mitwählen.
 

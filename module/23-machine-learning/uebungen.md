@@ -38,9 +38,10 @@ Lies die Kalibrierungsausgabe des Python-Skripts (`check_calibration`): Sie
 zeigt eine mittlere vorhergesagte Mortalität von ~46 %, obwohl im Testset nur
 ~16 % tatsächlich sterben. Was bedeutet das klinisch, wenn ein Modell für eine
 Gruppe eine so viel höhere Mortalität vorhersagt, als tatsächlich eintritt?
-Welche Konsequenz hätte das für eine ICU-Zuweisung? Nenne den Namen des
-`class_weight`-Effekts, der hier die Ursache ist, und eine statistische
-Methode, mit der man die Kalibrierung post-hoc korrigieren kann.
+Welche Konsequenz hätte das für eine ICU-Zuweisung? Erkläre, was
+`class_weight="balanced"` an der Basisrate ändert, die das Modell „sieht“, und
+nenne eine statistische Methode, mit der man die Kalibrierung post-hoc
+korrigieren kann.
 
 ## Bonus – Bias nach Subgruppe
 Berechne den ROC-AUC getrennt für Patient:innen mit und ohne Diabetes

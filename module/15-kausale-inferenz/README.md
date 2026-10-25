@@ -160,8 +160,9 @@ df <- df |>
 Ein ehrlicher Satz:
 
 > In Beobachtungsdaten war Diabetes mit 30-Tage-Mortalität assoziiert (crude OR
-> ≈ 2,07). Nach Adjustierung für den Confounder Alter war die OR kleiner (≈
-> 1,59). SOFA wurde bewusst *nicht* mitadjustiert, da es laut DAG ein Mediator
+> ≈ 2,07; 95-%-KI 1,19–3,58). Nach Adjustierung für den Confounder Alter war die
+> OR kleiner (≈ 1,59; 95-%-KI 0,90–2,82); das Intervall schließt die 1 ein, die
+> Daten sind also auch mit keinem Effekt vereinbar. SOFA wurde bewusst *nicht* mitadjustiert, da es laut DAG ein Mediator
 > auf dem Diabetes-Pfad ist; eine SOFA-adjustierte Zahl würde den totalen
 > Effekt unterschätzen. Diese Analyse kontrolliert gemessene Confounder, kann
 > aber ungemessene Confounding-Strukturen nicht ausschließen.

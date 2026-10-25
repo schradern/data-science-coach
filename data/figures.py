@@ -145,88 +145,11 @@ ax.legend(handles=legend_items, loc="lower right", fontsize=9)
 save(fig, ASSETS / "06-transformation" / "assets" / "fehlende_werte.png")
 
 # ===========================================================================
-# MODULE 08 · EDA visualisations (3 figures)
+# MODULE 08 · EDA visualisations
 # ===========================================================================
-print("[08] EDA-Visualisierungen ...")
-
-# --- 07a: Age histogram (improved) ---
-fig, ax = plt.subplots(figsize=(8, 4))
-bins = np.arange(18, 100, 5)
-ax.hist(survived, bins=bins, alpha=0.72, color=PRIMARY, label="Überlebt",  edgecolor="white", linewidth=0.5)
-ax.hist(deceased, bins=bins, alpha=0.82, color=EVENT,   label="Verstorben", edgecolor="white", linewidth=0.5)
-ax.set_xlabel("Alter (Jahre)")
-ax.set_ylabel("Anzahl Patient:innen")
-ax.set_title("Altersverteilung nach 30-Tage-Mortalität")
-ax.legend(title=None)
-ax.set_xlim(18, 100)
-
-# Annotation box
-n_total = len(cohort)
-mort_rate = cohort["verstorben_30d"].mean()
-ax.text(0.97, 0.95, f"N = {n_total}\n30-Tage-Mortalität: {mort_rate:.1%}",
-        transform=ax.transAxes, ha="right", va="top", fontsize=9.5,
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="#F0F4F8", edgecolor="none"))
-
-save(fig, ASSETS / "08-eda-visualisierung" / "assets" / "verteilung_alter.png")
-
-# --- 07b: Lactate by admission reason (boxplot) ---
-df_lactate = df.dropna(subset=["laktat_mmol_l"]).copy()
-order_by_median = (df_lactate.groupby("aufnahmegrund")["laktat_mmol_l"]
-                   .median().sort_values(ascending=False).index.tolist())
-
-fig, ax = plt.subplots(figsize=(9, 4.5))
-palette_grund = {g: (EVENT if g == "Sepsis" else PRIMARY) for g in order_by_median}
-
-bp = sns.boxplot(
-    data=df_lactate, x="aufnahmegrund", y="laktat_mmol_l",
-    hue="aufnahmegrund", order=order_by_median, palette=palette_grund,
-    width=0.5, linewidth=0.9, fliersize=2.5,
-    flierprops=dict(marker="o", alpha=0.4),
-    legend=False, ax=ax,
-)
-sns.stripplot(
-    data=df_lactate, x="aufnahmegrund", y="laktat_mmol_l",
-    hue="aufnahmegrund", order=order_by_median, palette=palette_grund,
-    size=2.2, alpha=0.30, jitter=True, legend=False, ax=ax,
-)
-ax.set_xlabel("")
-ax.set_ylabel("Laktat (mmol/l)")
-ax.set_title("Laktatverteilung nach Aufnahmegrund")
-
-# Sample size as a second line in each category label (no overlap)
-n_per_group = df_lactate["aufnahmegrund"].value_counts()
-ax.set_xticks(range(len(order_by_median)))
-ax.set_xticklabels([f"{g}\nn = {n_per_group.get(g, 0)}" for g in order_by_median])
-save(fig, ASSETS / "08-eda-visualisierung" / "assets" / "verteilung_laktat_nach_grund.png")
-
-# --- 07c: CRP vs. length of stay (scatter, coloured by outcome) ---
-fig, ax = plt.subplots(figsize=(7, 5))
-
-for outcome_val, label, color, marker in [
-    (0, "Überlebt",  PRIMARY, "o"),
-    (1, "Verstorben", EVENT,   "X"),
-]:
-    sub = df[df["verstorben_30d"] == outcome_val]
-    ax.scatter(sub["crp_mg_l"], sub["verweildauer_tage"],
-               c=color, label=label, alpha=0.42, s=22,
-               edgecolors="none", marker=marker)
-
-ax.set_xlabel("CRP (mg/l)")
-ax.set_ylabel("Verweildauer (Tage)")
-ax.set_title("CRP vs. Verweildauer nach 30-Tage-Mortalität")
-ax.legend(title=None)
-
-# Overall trend line
-mask = df["crp_mg_l"].notna() & df["verweildauer_tage"].notna()
-x_all = df.loc[mask, "crp_mg_l"].values
-y_all = df.loc[mask, "verweildauer_tage"].values
-z = np.polyfit(x_all, y_all, 1)
-x_range = np.linspace(x_all.min(), x_all.max(), 200)
-ax.plot(x_range, np.poly1d(z)(x_range), color=SECONDARY, linewidth=1.1,
-        linestyle="--", alpha=0.7, label="Trend (gesamt)")
-ax.legend(title=None)
-
-save(fig, ASSETS / "08-eda-visualisierung" / "assets" / "streu_crp_verweildauer.png")
+# Drawn by module/08-eda-visualisierung/code/python.py only: the chapter shows
+# that script's code, so its output IS the chapter figure. Drawing them here as
+# well put two different images under the same file name.
 
 # ===========================================================================
 # MODULE 09 · Baseline by outcome

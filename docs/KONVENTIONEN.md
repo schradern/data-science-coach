@@ -43,7 +43,7 @@ Data Science Coach/
 ├── tools/
 │   ├── install_r_packages.R   # installiert die R-Pakete aus DEPENDENCIES-R.md
 │   ├── check_repo.py          # Konsistenz-Check, CI-Gate (.github/workflows/pages.yml)
-│   ├── check_numbers.py       # prüft lokal: jede Ergebniszahl der Prosa kommt aus dem Code
+│   ├── check_numbers.py       # jede Ergebniszahl der Prosa kommt aus dem Code (CI: numbers.yml)
 │   └── numbers_allow.json     # begründete Ausnahmen für check_numbers.py
 └── module/
     ├── README.md              # Modulübersicht (Index aller 34 Module)
@@ -246,7 +246,9 @@ Zwei Werkzeuge prüfen den Kurs automatisiert; beide laufen lokal und in CI.
   ./.venv/bin/python tools/check_numbers.py 12
   ```
 
-  `DSC_SKIP_SLOW=1` überspringt den Benchmark.
+  `DSC_SKIP_SLOW=1` überspringt den Benchmark. In CI läuft der volle Check mit
+  R in `.github/workflows/numbers.yml` (bei jedem Push auf `main` und wöchentlich),
+  getrennt vom Deployment: Ein roter Lauf dort hält keine Veröffentlichung auf.
 
   **Blinde Flecken – bewusst, damit niemand einem grünen Lauf zu viel
   vertraut:** Das Skript liest keine Zahlen in Prosa, in ```` ```python ````-Blöcken

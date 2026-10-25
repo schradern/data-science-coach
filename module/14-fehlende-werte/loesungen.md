@@ -3,8 +3,8 @@
 Die Zahlen zu Aufgabe 1–6 stammen aus [`code/python.py`](code/python.py)
 (Seed 42), die zu Aufgabe 7–10 aus den dort genannten Vertiefungsskripten. Die
 R-Skripte liefern dieselben deterministischen Werte; nur die multiple Imputation
-weicht ab, weil sie stochastisch ist und `mice` predictive mean matching statt
-Regressions-Imputation nutzt. Beim Punktschätzer ist das wenig, bei der
+weicht ab, weil sie stochastisch ist und `mice` predictive mean matching mit 5
+statt 20 Spendern nutzt. Beim Punktschätzer ist das wenig, bei der
 Between-Varianz deutlich: [`code/rubin.R`](code/rubin.R) misst λ ≈ 0,41 statt
 0,16.
 
@@ -224,13 +224,17 @@ T  = Ū = 9,1799      SE = 3,0298      (statt 3,2998)
 Das ist genau das, was eine **Einfachimputation** berichtet: sie behandelt die
 99 geratenen Werte als gemessen und lässt die Between-Varianz weg. Der
 Standardfehler fällt um 8,2 %, ohne dass ein einziges Datum hinzugekommen wäre.
-`B` **ist** die Unsicherheit der Imputation. Sie wegzulassen ist der gesamte
-Fehler der Einfachimputation.
+`B` **ist** die Unsicherheit der Imputation. Sie wegzulassen ist der Kernfehler
+jeder Einfachimputation; bei Median- und Mittelwert-Imputation kommt der Bias
+gegen null hinzu, der im Benchmark (README, Abschnitt 9) den größeren Schaden
+anrichtet.
 
 ## Aufgabe 8 – Wie viele Imputationen?
 
 **1.** `m ≳ 100 · λ = 100 · 0,1569 = 15,7`. Mit `m = 20` ist die Faustregel
-(White, Royston & Wood 2011) **gerade erfüllt** – kein Spielraum.
+(White, Royston & Wood 2011) **gerade erfüllt** – kein Spielraum. Und nur für
+dieses Verfahren: Mit 5 PMM-Spendern liegt λ bei 0,41–0,44, dann verlangt die
+Regel `m ≳ 45`. Plane `m` mit dem größten plausiblen λ.
 
 **2./3.** `code/rubin.py` wiederholt die gesamte Pipeline über 10 Seeds je `m`:
 
@@ -305,7 +309,7 @@ Skript prüft das per Assertion):
 
 | δ | OR je −0,1 pH | 95-%-KI | Schluss hält? |
 |---|---|---|---|
-| −0,02 | 3,31 | (1,56; 6,99) | ja |
+| −0,02 | 3,30 | (1,56; 6,99) | ja |
 | 0,00 (MAR) | 2,40 | (1,12; 5,14) | ja |
 | +0,01 | 2,21 | (1,05; 4,65) | ja, knapp |
 | **+0,02** | 1,83 | (0,93; 3,59) | **nein – Kipppunkt** |
@@ -331,8 +335,9 @@ ohnehin nicht erklären kann.
 > abweichen, was das Imputationsmodell für sie annimmt. Sie müssten zudem in die
 > Richtung abweichen, die ihrer *höheren* Sterblichkeit widerspricht: die
 > unbeobachteten Patient:innen müssten trotz ihrer Übersterblichkeit
-> **unauffälligere** pH-Werte gehabt haben. Wir halten das für unplausibel,
-> geben die Annahme aber offen an und berichten den Kipppunkt, statt MAR
+> **unauffälligere** pH-Werte gehabt haben. Das halten wir für wenig
+> wahrscheinlich, aber nicht für ausgeschlossen (der gesamte Sterbe-Effekt auf
+> den pH beträgt nur 0,024), und geben die Annahme deshalb offen an und berichten den Kipppunkt, statt MAR
 > unbelegt zu behaupten.
 
 ## Aufgabe 11 – Bericht
@@ -340,14 +345,16 @@ ohnehin nicht erklären kann.
 > **Umgang mit fehlenden Werten.** Der arterielle pH fehlte bei 99 von 500
 > Patient:innen (19,8 %), Laktat bei 86 (17,2 %), der BMI bei 30 (6,0 %). Das
 > Fehlen des pH-Werts war mit der 30-Tage-Mortalität assoziiert (41,0 % der
-> Verstorbenen gegenüber 15,9 % der Überlebenden), nicht jedoch mit Alter oder
-> SOFA-Score. Das Fehlen von Laktat war umgekehrt mit dem SOFA-Score assoziiert
+> Verstorbenen gegenüber 15,9 % der Überlebenden); für den SOFA-Score zeigte sich
+> kein Hinweis auf eine Assoziation (p = 0,22). Das Fehlen von Laktat war umgekehrt mit dem SOFA-Score assoziiert
 > (β = −0,27; p < 0,001) und unabhängig vom Outcome.
 >
 > Die Hauptanalyse verwendet daher multiple Imputation (m = 20, Seed 42, Rubins
 > Regeln mit Barnard–Rubin-Freiheitsgraden); das Imputationsmodell enthielt Alter,
 > SOFA-Score und das Outcome. Die Fraktion fehlender Information für den
-> pH-Koeffizienten betrug λ = 0,16, womit m = 20 die Empfehlung m ≳ 100·λ erfüllt.
+> pH-Koeffizienten betrug λ = 0,16 (mit 5 PMM-Spendern bis 0,44); die Empfehlung
+> m ≳ 100·λ ist damit nur für das gewählte Verfahren erfüllt, m = 50 wäre die
+> vorsichtigere Wahl.
 > Eine Complete-Case-Analyse als Sensitivitätsanalyse lieferte vergleichbare Odds
 > Ratios (2,67 vs. 2,60 je 0,1 pH-Abfall), aber systematisch zu niedrige absolute
 > Risiken (−28 % am Referenzpatienten), da vollständige Fälle die Verstorbenen

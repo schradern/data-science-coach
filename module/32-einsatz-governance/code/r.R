@@ -126,12 +126,23 @@ bootstrap_auc_ci <- function(y, p) {
 }
 report_subgroups <- function(group, title) {
   cat(sprintf("\n  -- %s --\n", title))
-  for (g in sort(unique(group))) {
+  groups <- sort(unique(group))
+  for (g in groups) {
     mask <- group == g
     ci <- bootstrap_auc_ci(y_test[mask], proba[mask])
     cat(sprintf("  AUC %-12s: %.3f  [95%%-CI %.3f-%.3f]  (n=%d)\n",
                 g, auc(y_test[mask], proba[mask]), ci[1], ci[2], sum(mask)))
   }
+  # CI of the difference: resample both groups independently.
+  m1 <- group == groups[1]; m2 <- group == groups[2]
+  diffs <- replicate(N_BOOTSTRAP, {
+    i1 <- sample(which(m1), replace = TRUE); i2 <- sample(which(m2), replace = TRUE)
+    if (length(unique(y_test[i1])) < 2 || length(unique(y_test[i2])) < 2) NA_real_
+    else auc(y_test[i1], proba[i1]) - auc(y_test[i2], proba[i2])
+  })
+  d_ci <- quantile(diffs, c(0.025, 0.975), na.rm = TRUE)
+  cat(sprintf("  AUC difference %s - %s: %+.3f  [95%%-CI %+.3f to %+.3f]\n", groups[1], groups[2],
+              auc(y_test[m1], proba[m1]) - auc(y_test[m2], proba[m2]), d_ci[1], d_ci[2]))
 }
 cat("\n=== 4) Fairness: subgroup AUC with bootstrap 95%-CI ===\n")
 cat(sprintf("  Overall AUC: %.3f\n", auc(y_test, proba)))
@@ -139,7 +150,7 @@ report_subgroups(test_docs$geschlecht_clean, "Nach Geschlecht")
 report_subgroups(if_else(test_docs$alter < 65, "<65 Jahre", ">=65 Jahre"),
                  "Nach Altersgruppe (Schwelle 65 Jahre)")
 cat("\n  Overlapping CIs do not prove equality, and non-overlap is a strict criterion.\n")
-cat("  For the gap itself, compute a CI of the AUC difference (e.g. bootstrap).\n")
+cat("  The CI of the difference above is the honest test of the gap itself.\n")
 
 cat("\n=== 5) Governance note ===\n")
 cat("  Clinical decision support -> MDR 2017/745: typically Class IIa, but under\n")

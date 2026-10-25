@@ -4,7 +4,7 @@
 
 ## Lernziele
 - Ein Modell mit **joblib** reproduzierbar persistieren (Versionspinning) und als deutsche **Model Card** dokumentieren.
-- **Calibration Drift und Dataset Shift** simulieren und zeigen, wie AUC und Kalibrierung degradieren.
+- **Kalibrierungsdrift** und **Dataset Shift** unterscheiden und an einer Konzept-Drift-Simulation zeigen, wie die AUC degradiert (Kalibrierungsdrift bei stabiler AUC: Modul 34).
 - **Subgruppenleistung** (AUC nach `geschlecht` und Altersgruppe) mit **Bootstrap-Konfidenzintervallen** berechnen und Fairness-Implikationen ableiten.
 - Die regulatorischen Anforderungen von **MDR 2017/745** und **EU AI Act** für klinische Prädiktionsmodelle in Grundzügen kennen.
 - Praktische Governance-Fragen jenseits der Regulatorik einordnen: **Automation Bias**, **Haftung** und **informierte Einwilligung**.
@@ -89,7 +89,8 @@ Klinische Entscheidungsunterstützung → MDR 2017/745: typischerweise Klasse II
 unter Regel 11 aber Klasse IIb bei möglicher schwerwiegender Verschlechterung
 und Klasse III, wenn die unterstützte Entscheidung Tod oder irreversible
 Verschlechterung verursachen kann. Ein 30-Tage-Mortalitäts-CDSS ist
-ein IIb/III-Kandidat. EU AI Act: Hochrisiko. (Keine Rechtsberatung; vgl. §5.)
+ein IIb/III-Kandidat. EU AI Act: damit Hochrisiko, weil eine Benannte Stelle
+beteiligt ist. (Keine Rechtsberatung; vgl. §5.)
 Vor Produktiveinsatz: CE-Kennzeichnung, klinische Evaluierungsstudie, PMS-Plan.
 ```
 
@@ -97,14 +98,17 @@ Vor Produktiveinsatz: CE-Kennzeichnung, klinische Evaluierungsstudie, PMS-Plan.
 
 **Darüber hinaus:** Der ursprüngliche [Model-Card-Standard (Mitchell et al., 2019)](https://arxiv.org/abs/1810.03993) und die Model Cards offener Modell-Plattformen folgen ähnlichen Strukturen. EU AI Act Art. 11 fordert eine technische Dokumentation mit ähnlichem Umfang für Hochrisiko-KI.
 
-## 3 Monitoring: Calibration Drift und Dataset Shift
+## 3 Monitoring: Kalibrierungsdrift und Dataset Shift
 Modelle altern. Zwei Hauptursachen:
 
-**Calibration Drift:** Die ausgegebenen Wahrscheinlichkeiten stimmen nicht mehr mit der beobachteten Häufigkeit überein, weil sich die Ereignisrate in der Realität ändert.
+**Kalibrierungsdrift** (*calibration drift*): Die ausgegebenen Wahrscheinlichkeiten stimmen nicht mehr mit der beobachteten Häufigkeit überein, weil sich die Ereignisrate in der Realität ändert. Die AUC kann dabei stabil bleiben; Modul 34 simuliert genau das und misst O:E.
 
 **Dataset Shift:** Die Merkmalsverteilung verändert sich (Covariate Shift) oder der Zusammenhang zwischen Merkmalen und Outcome ändert sich (Concept Drift).
 
-Wir simulieren **Konzept-Drift** durch gezieltes Label-Flipping: Ein wachsender Anteil der Testlabels wird invertiert. Das modelliert den Fall, in dem sich die Beziehung zwischen Textsignal und Outcome verändert, etwa weil geänderte Dokumentationspraktiken oder Therapieprotokolle die alten Signal-Tokens unzuverlässig machen.
+Wir simulieren **Konzept-Drift** durch gezieltes Label-Flipping: Ein wachsender Anteil der Testlabels wird invertiert. Das modelliert den Fall, in dem sich die Beziehung zwischen Textsignal und Outcome verändert, etwa weil geänderte Dokumentationspraktiken oder Therapieprotokolle die alten Signal-Tokens unzuverlässig machen. Das ist eine grobe
+Vereinfachung: Zufälliges Vertauschen von Labels ist symmetrisches Rauschen, echte
+Konzept-Drift betrifft meist bestimmte Muster. Für das Prinzip, dass nur
+nacherfasste Labels einen AUC-Verlust sichtbar machen, reicht sie.
 
 ```python
 # Excerpt from code/python.py: runs inside the full script, not on its own.
@@ -165,11 +169,11 @@ for group in ["weiblich", "maennlich"]:
 
 ![Abbildung: AUC nach Geschlechtsgruppe für den Textklassifikator mit 95%-Bootstrap-Fehlerbalken. Die Referenzlinie zeigt die Gesamt-AUC. Ein Balken wird nur dann rot markiert, wenn sein Konfidenzintervall die Gesamt-AUC nicht mehr einschließt – bei den hier gemessenen Werten (Weiblich 0,88 [0,79–0,95]; Männlich 0,81 [0,69–0,91]) schließen beide Intervalle die Gesamt-AUC von 0,85 ein, die Farbe bleibt daher neutral.](assets/subgruppen_auc.png)
 
-Konkret gemessen auf dem Testsplit (n=125, Gesamt-AUC 0,849): **Weiblich** AUC 0,880, 95%-CI [0,787–0,952] (n=61); **Männlich** AUC 0,807, 95%-CI [0,689–0,909] (n=64). Der Punktschätzer-Unterschied (Δ≈0,07) sieht auf den ersten Blick nach einer Lücke aus, die Konfidenzintervalle überlappen jedoch stark. **Diese Lücke ist bei n≈60 pro Gruppe statistisch nicht von Zufall zu unterscheiden** – eine ehrliche Model Card würde hier „keine belastbare Evidenz für eine Geschlechter-Disparität“ schreiben, nicht „Modell diskriminiert nach Geschlecht“.
+Konkret gemessen auf dem Testsplit (n=125, Gesamt-AUC 0,849): **Weiblich** AUC 0,880, 95%-CI [0,787–0,952] (n=61); **Männlich** AUC 0,807, 95%-CI [0,689–0,909] (n=64). Der Punktschätzer-Unterschied (Δ = 0,072) sieht auf den ersten Blick nach einer Lücke aus. Entscheidend ist das Konfidenzintervall der **Differenz**, das das Skript per Bootstrap rechnet (beide Gruppen getrennt neu gezogen): [−0,064; +0,212]. Es schließt 0 ein. **Bei n≈60 pro Gruppe gibt es keinen Nachweis einer Lücke, aber ebenso wenig einen Nachweis von Gleichheit**: Auch ein Unterschied von 0,2 AUC-Punkten ist mit den Daten vereinbar. Eine ehrliche Model Card schreibt deshalb „keine belastbare Evidenz für eine Geschlechter-Disparität, Untersuchung an größerer Stichprobe nötig“, nicht „Modell diskriminiert nach Geschlecht“ und auch nicht „Modell ist fair“.
 
-**Praxis – Worked Example Altersgruppe:** Dieselbe Analyse lässt sich auf jede andere klinisch relevante Subgruppe anwenden. Mit der Schwelle 65 Jahre (gängiger geriatrischer Cutoff) ergibt sich auf demselben Testsplit: **<65 Jahre** AUC 0,843, 95%-CI [0,733–0,940] (n=57); **≥65 Jahre** AUC 0,842, 95%-CI [0,734–0,930] (n=68). Hier liegen die Punktschätzer praktisch identisch – noch deutlicher als bei Geschlecht kein Hinweis auf eine Alters-Disparität in diesem Modell.
+**Praxis – Worked Example Altersgruppe:** Dieselbe Analyse lässt sich auf jede andere klinisch relevante Subgruppe anwenden. Mit der Schwelle 65 Jahre (gängiger geriatrischer Cutoff) ergibt sich auf demselben Testsplit: **<65 Jahre** AUC 0,843, 95%-CI [0,733–0,940] (n=57); **≥65 Jahre** AUC 0,842, 95%-CI [0,734–0,930] (n=68). Hier liegen die Punktschätzer praktisch identisch (Differenz +0,002, 95-%-KI [−0,144; +0,145]): kein Hinweis auf eine Alters-Disparität, aber das breite Intervall zeigt, wie wenig zwei Gruppen von je etwa 60 Patient:innen über Fairness aussagen können.
 
-**Stolperstein:** Zwei sich überlappende Konfidenzintervalle sind **kein** Beweis für Gleichheit – zwei Gruppen können sich signifikant unterscheiden, obwohl ihre einzelnen Intervalle überlappen (siehe Modul 10 §3). Sauber gilt nur die eine Richtung: überlappen die Intervalle **nicht**, ist die Lücke fast sicher real. Für eine belastbare Aussage über die *Differenz* gehört das Konfidenzintervall der Differenz berechnet oder ein formaler Test – und selbst ein deutlicher Unterschied bräuchte eine größere, unabhängige Kohorte zur Bestätigung.
+**Stolperstein:** Zwei sich überlappende Konfidenzintervalle sind **kein** Beweis für Gleichheit – zwei Gruppen können sich signifikant unterscheiden, obwohl ihre einzelnen Intervalle überlappen (siehe Modul 10 §3). Sauber gilt nur die eine Richtung: überlappen die Intervalle **nicht**, ist die Lücke fast sicher real. Für eine belastbare Aussage über die *Differenz* gehört deshalb das Konfidenzintervall der Differenz berechnet, wie im Skript – und selbst ein deutlicher Unterschied bräuchte eine größere, unabhängige Kohorte zur Bestätigung.
 
 **Darüber hinaus:** Über AUC-Gleichheit hinaus gibt es Fairness-Kriterien wie Equal Opportunity (gleiche Sensitivität) oder Calibration across groups. Diese können in Konflikt stehen, die Wahl des Fairness-Kriteriums ist eine normative Entscheidung.
 
@@ -180,14 +184,16 @@ Klinische Prädiktionsmodelle sind in Europa reguliert. Zwei Rahmen sind relevan
 
 **EU AI Act (Regulation (EU) 2024/1689):** Die Verordnung ist seit
 1. August 2024 in Kraft und wird stufenweise anwendbar. Klinische KI kann
-insbesondere dann **Hochrisiko-KI** sein, wenn sie selbst ein Medizinprodukt ist,
-als Sicherheitskomponente eines Medizinprodukts dient oder in einem gelisteten
-Hochrisiko-Kontext eingesetzt wird. Die konkrete Einordnung hängt vom
+insbesondere dann **Hochrisiko-KI** sein, wenn sie selbst ein Medizinprodukt ist
+oder als Sicherheitskomponente eines Medizinprodukts dient **und** dieses nach der
+MDR eine Konformitätsbewertung durch eine Benannte Stelle braucht (Art. 6 Abs. 1,
+in der Praxis ab Klasse IIa), oder wenn sie in einem in Anhang III gelisteten
+Kontext eingesetzt wird. Die konkrete Einordnung hängt vom
 Verwendungszweck, vom Produktkontext und von aktueller EU-/MDCG-Leitlinie ab.
 Für Lernzwecke genügt hier: patient:innenrelevante Entscheidungsunterstützung
 niemals als „nur Software“ behandeln. Typische Pflichten sind:
 
-- Transparenz: Der Anbieter liefert eine Gebrauchsanweisung mit Leistung und Grenzen des Systems (Art. 13); wer direkt mit einem KI-System interagiert, muss das erkennen können (Art. 50).
+- Transparenz: Der Anbieter liefert eine Gebrauchsanweisung mit Leistung und Grenzen des Systems (Art. 13). Davon getrennt gilt für alle KI-Systeme, nicht nur für Hochrisiko-KI: Wer direkt mit einem KI-System interagiert, muss das erkennen können (Art. 50).
 - Menschliche Aufsicht: Entscheidungen müssen von qualifiziertem Personal überschaubar und übersteuerbar sein (Art. 14).
 - Robustheit und Genauigkeit: Nachgewiesene Leistung über den gesamten Lebenszyklus (Art. 15).
 - Konformitätsbewertung und technische Dokumentation vor Inbetriebnahme, wenn
@@ -242,6 +248,6 @@ Regulatorik allein macht ein KI-System nicht sicher. Drei weitere Fragen betreff
 ## Selbstcheck
 1. **Was muss beim Laden eines joblib-Modells immer geprüft werden?** – Die scikit-learn-Version; ein Versionsmismatch kann stille Fehler oder falsche Vorhersagen produzieren.
 2. **Warum reicht Covariate-Shift-Monitoring allein nicht?** – Weil Concept Drift (veränderte Outcome-Beziehung) nur mit echten Labels erkennbar ist. Merkmalsverteilung kann stabil sein, während das Modell trotzdem versagt.
-3. **Was bedeutet gleiche AUC, aber unterschiedliche Sensitivität für zwei Subgruppen – und wann ist eine Subgruppen-Differenz überhaupt belegt?** – Gleiche AUC heißt gleiche Rangliste, aber bei gleicher Schwelle liegt das Modell in einer Gruppe systematisch früher falsch: ungleiche Identifikationsraten. Ein Punktschätzer-Unterschied allein belegt keine Fairness-Lücke – die AUC ist in kleinen Subgruppen hochvariabel; erst ein Konfidenzintervall der AUC-Differenz, das 0 ausschließt, spricht für mehr als Stichprobenrauschen (nicht überlappende Einzelintervalle sind ein strengeres, konservatives Kriterium).
+3. **Was bedeutet gleiche AUC, aber unterschiedliche Sensitivität für zwei Subgruppen – und wann ist eine Subgruppen-Differenz überhaupt belegt?** – Gleiche AUC heißt gleich gute Trennung innerhalb jeder Gruppe, nicht gleiche Score-Verteilung oder Kalibrierung. Bei einer festen Schwelle können Sensitivität und Spezifität deshalb trotzdem auseinanderlaufen: ungleiche Identifikationsraten. Ein Punktschätzer-Unterschied allein belegt keine Fairness-Lücke – die AUC ist in kleinen Subgruppen hochvariabel; erst ein Konfidenzintervall der AUC-Differenz, das 0 ausschließt, spricht für mehr als Stichprobenrauschen (nicht überlappende Einzelintervalle sind ein strengeres, konservatives Kriterium).
 4. **Ab welcher EU-AI-Act-Risikoklasse gelten die strengsten Pflichten?** – Bei Hochrisiko-KI; ob ein klinisches Prädiktionsmodell darunter fällt, hängt vom Verwendungszweck und Produktkontext ab.
 5. **Was ist Alert Fatigue, und warum widerspricht sie Automation Bias?** – Alert Fatigue ist das Ignorieren von Warnungen nach zu vielen Fehlalarmen; Automation Bias ist das unkritische Übernehmen von Modellvorhersagen. Beide untergraben sinnvolle Entscheidungsunterstützung, aber in entgegengesetzte Richtungen, zu viel bzw. zu wenig Vertrauen ins Modell.

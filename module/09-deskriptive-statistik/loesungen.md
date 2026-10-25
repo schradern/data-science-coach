@@ -106,11 +106,13 @@ Datensatzes (Modul 12 prüft das formal).
 import pandas as pd
 from tableone import TableOne
 k = pd.read_csv("{{DATEN}}kohorte.csv")
+k["geschlecht"] = k["geschlecht"].replace({"w": "weiblich"})   # as in README §4
 
 table1 = TableOne(
     k,
     columns=["alter", "geschlecht", "diabetes", "sofa_score", "crp_mg_l"],
     categorical=["geschlecht", "diabetes"],
+    nonnormal=["sofa_score", "crp_mg_l"],   # skewed -> median [Q1,Q3], Kruskal-Wallis
     groupby="aufnahmegrund",
     pval=True,
 )
@@ -118,24 +120,32 @@ print(table1.tabulate(tablefmt="simple"))
 ```
 ```r
 library(readr)
+library(dplyr)
 library(gtsummary)
 k <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 
 k |>
-  dplyr::select(alter, geschlecht, diabetes, sofa_score, crp_mg_l, aufnahmegrund) |>
-  dplyr::mutate(diabetes = factor(diabetes, levels=c(0,1), labels=c("nein","ja"))) |>
+  mutate(geschlecht = if_else(geschlecht == "w", "weiblich", geschlecht),
+         diabetes = factor(diabetes, levels = c(0, 1), labels = c("nein", "ja"))) |>
+  select(alter, geschlecht, diabetes, sofa_score, crp_mg_l, aufnahmegrund) |>
   tbl_summary(by = aufnahmegrund,
               statistic = list(all_continuous() ~ "{median} [{p25}; {p75}]",
+                               alter ~ "{mean} ({sd})",
                                all_categorical() ~ "{n} ({p}%)")) |>
-  add_p()
+  add_p(test = list(alter ~ "aov"))
 ```
+Beide Sprachen zeigen jetzt dieselben Kennzahlen: Alter als Mittelwert (SD) mit
+ANOVA, die schiefen Variablen SOFA-Score und CRP als Median [Q1; Q3] mit
+Kruskal-Wallis-Test, und `w` ist wie in der Lektion zu `weiblich` vereinheitlicht.
+
 **Beobachtung:** Septische Patient:innen haben mit Abstand den höchsten
-SOFA-Score (Ø 6,1 vs. ~3 in den anderen Gruppen, p < 0,001), sie sind bei
-Aufnahme am schwersten krank. Bei CRP zeigen sich dagegen keine klaren
-Gruppenunterschiede nach Aufnahmegrund (Sepsis hat hier sogar den niedrigsten
-Mittelwert), und auch das Alter unterscheidet sich zwischen den Gruppen kaum
-(p = 0,42 mit dem ANOVA-Test von tableone; gtsummary rechnet Kruskal-Wallis und
-zeigt p = 0,32). SOFA-Score ist hier der klinisch aussagekräftigste Unterschied.
+SOFA-Score (Median 6 vs. 3 in allen anderen Gruppen, p < 0,001), sie sind bei
+Aufnahme am schwersten krank. Beim CRP unterscheiden sich die Gruppen zwar
+formal (p = 0,008), aber ohne klinisch klares Muster: Die Mediane liegen
+zwischen 52 und 70 mg/l, und Sepsis gehört mit rund 54 mg/l zu den niedrigsten.
+Alter (p = 0,42) und Geschlecht unterscheiden sich kaum. Der SOFA-Score ist der
+klinisch aussagekräftigste Unterschied. Denk an die Fallstricke der Lektion: Die
+p-Werte beschreiben hier nur, sie sind kein Ziel einer Table 1.
 
 ## Aufgabe 5 – Fehlende Werte in Table 1
 

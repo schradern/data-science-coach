@@ -32,6 +32,6 @@ pro Parameter ungefähr vertreten?
 ## Aufgabe 5 – Analyseplan
 
 Schreibe einen kurzen Analyseplan für: „Diabetes und 30-Tage-Mortalität,
-adjustiert für Confounder.“ Welche Variable ist laut DAG in Modul 15 ein
+adjustiert für Confounder.“ Welche Variable ist laut DAG (Modul 12, Abschnitt 4; ausführlich in Modul 15) ein
 Confounder von Diabetes, welche ein Mediator, und warum gehört Letztere nicht
 in die Hauptanalyse, wenn der totale Effekt interessiert?

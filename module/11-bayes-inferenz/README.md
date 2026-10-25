@@ -64,7 +64,7 @@ Bei viel Datenmaterial dominiert die Likelihood, und beide Welten treffen sich.
 Der entscheidende Unterschied liegt in der **Interpretation**. Das Credible
 Interval sagt genau das, was man beim Konfidenzintervall fälschlich glaubt:
 
-> **Merksatz:** Das 95-%-Credible-Interval bedeutet „mit 95 % Wahrscheinlichkeit liegt die wahre Rate zwischen 0,127 und 0,190“. Das 95-%-Konfidenzintervall bedeutet das gerade *nicht* (siehe Modul 10) – dort ist der Parameter fix und das Intervall die zufällige Größe.
+> **Merksatz:** Das 95-%-Credible-Interval bedeutet „mit 95 % Wahrscheinlichkeit liegt die wahre Rate zwischen 0,127 und 0,190“ – gegeben den gewählten Prior und das Modell. Das 95-%-Konfidenzintervall bedeutet das gerade *nicht* (siehe Modul 10) – dort ist der Parameter fix und das Intervall die zufällige Größe.
 
 ## 3 Wie stark zieht der Prior?
 
@@ -228,7 +228,7 @@ konjugierte Rechnung reicht für Raten vollständig aus.
 ## Selbstcheck
 
 1. **Woraus entsteht der Posterior?** – Aus Prior × Likelihood (proportional). Der Prior kodiert das Vorwissen, die Likelihood die Daten, der Posterior den aktualisierten Glauben.
-2. **Was sagt ein 95-%-Credible-Interval, was ein Konfidenzintervall nicht sagt?** – Dass die wahre Rate mit 95 % Wahrscheinlichkeit im Intervall liegt. Beim Konfidenzintervall ist der Parameter fix und das Intervall die zufällige Größe (Modul 10).
+2. **Was sagt ein 95-%-Credible-Interval, was ein Konfidenzintervall nicht sagt?** – Dass die wahre Rate mit 95 % Wahrscheinlichkeit im Intervall liegt, gegeben Prior und Modell. Beim Konfidenzintervall ist der Parameter fix und das Intervall die zufällige Größe (Modul 10).
 3. **Warum bewegt der Prior die Vollkohorte kaum, die Zwischenanalyse aber stark?** – Weil der Prior gegen die Datenmenge gewichtet wird: 500 Beobachtungen überstimmen ihn, 30 nicht.
 4. **Was bedeutet „70 % der Differenz-Masse in der ROPE“?** – Dass der Unterschied mit rund 70 % Wahrscheinlichkeit klinisch vernachlässigbar (±0,05) ist und mit rund 30 % nicht. Das ist eine direkte Wahrscheinlichkeitsaussage, die ein nicht-signifikanter p-Wert nicht liefert; für einen Äquivalenznachweis reicht sie noch nicht.
 

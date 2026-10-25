@@ -6,7 +6,7 @@
 - Das Kernkonzept von **FHIR (Fast Healthcare Interoperability Resources)** und seine wichtigsten Ressourcen (Patient, Observation) erklären.
 - FHIR-Ressourcen über eine REST-API abfragen und JSON-Antworten in Python/R parsen.
 - Das **OMOP Common Data Model (CDM)** und seine Rolle bei multizentrischen Studien verstehen.
-- Einfache SQL-Abfragen auf OMOP-Standardtabellen (person, measurement) schreiben.
+- Einfache SQL-Abfragen auf OMOP-Standardtabellen (person, measurement, death) schreiben.
 
 ## Klinischer Aufhänger
 
@@ -22,9 +22,9 @@ FHIR strukturiert medizinische Daten in **Ressourcen**. Jede Ressource repräsen
 FHIR nutzt das **REST-Prinzip**: Daten werden über URLs abgerufen.
 
 - `GET https://fhir-server.de/fhir/Patient/123` liefert den/die Patient:in mit ID 123 als JSON oder XML.
-- `GET https://fhir-server.de/fhir/Observation?code=2524-7` liefert alle Laktat-Messwerte (LOINC-Code `2524-7`).
+- `GET https://fhir-server.de/fhir/Observation?code=2524-7` liefert Laktat-Messwerte aus Serum/Plasma (LOINC-Code `2524-7`; Vollblut-Laktat hat einen eigenen Code).
 
-**Stolperstein:** LOINC-Codes sehen alle ähnlich aus (fünfstellige Zahl, Bindestrich, Prüfziffer) – ein falscher Code liefert keinen Fehler, sondern lautlos die *falschen* Werte. `2571-8` ist zum Beispiel nicht Laktat, sondern Triglyzeride. Prüfe jeden Code, den du in eine echte Abfrage einbaust, gegen [loinc.org](https://loinc.org) oder die OMOP-Vokabeltabelle – verlasse dich nie auf den Namen einer Variablen aus einem Tutorial.
+**Stolperstein:** LOINC-Codes sehen alle ähnlich aus (eine meist vier- bis fünfstellige Zahl, Bindestrich, eine Prüfziffer) – ein falscher Code liefert keinen Fehler, sondern lautlos die *falschen* Werte. `2571-8` ist zum Beispiel nicht Laktat, sondern Triglyzeride. Prüfe jeden Code, den du in eine echte Abfrage einbaust, gegen [loinc.org](https://loinc.org) oder die OMOP-Vokabeltabelle – verlasse dich nie auf den Namen einer Variablen aus einem Tutorial.
 
 ---
 
@@ -53,14 +53,25 @@ patients = (
     .rename(columns={"resource_id": "patient_id", "resource_gender": "geschlecht",
                      "resource_birthDate": "geburtsdatum"})
 )
-print(patients)
+
+# 4. Observations: the subject reference reads "Patient/pat-1", the patient id
+#    only "pat-1" -- strip the prefix, otherwise the merge finds nothing.
+observations = flat[flat["resource_resourceType"] == "Observation"].copy()
+observations["patient_id"] = observations["resource_subject_reference"].str.split("/").str[-1]
+obs_wide = observations.pivot(index="patient_id", columns="resource_code_text",
+                              values="resource_valueQuantity_value")
+
+# 5. One row per patient: master data plus measurements
+analysis = patients.merge(obs_wide, on="patient_id", how="left")
+print(analysis)
 ```
 
 **Zeile für Zeile:**
 
 * `pd.json_normalize(bundle["entry"], sep="_")` entpackt jede verschachtelte Ressource (`resource.code.text`, `resource.valueQuantity.value`, ...) in eine eigene, flache Spalte – genau der Schritt, der aus tief verschachteltem FHIR-JSON eine Tabelle macht, die sich filtern und mergen lässt.
 * Patient- und Observation-Ressourcen liegen in derselben `entry`-Liste, unterschieden nur durch `resourceType` -- deshalb filtern wir zweimal auf denselben DataFrame.
-* `code/python.py` führt diesen Schritt vollständig aus und fügt Patient:innen- und Observation-Tabelle zu einer Analysetabelle zusammen (den ganzen Weg bis zum OMOP-Modell zeigt die Abbildung in Abschnitt 4).
+* Die Observation verweist mit `subject.reference = "Patient/pat-1"` auf ihre Patientin, die Patient-Ressource selbst heißt nur `pat-1`. Ohne das Abschneiden des Präfixes findet der Merge keinen einzigen Treffer, lautlos.
+* `pivot` dreht die Messungen von „eine Zeile je Messung“ auf „eine Spalte je Messgröße“, danach passt der Merge 1:1. `code/python.py` benennt die Spalten zusätzlich in das Kursschema um (den ganzen Weg bis zum OMOP-Modell zeigt die Abbildung in Abschnitt 4).
 
 ---
 
@@ -85,7 +96,24 @@ for (entry in bundle$entry) {
   }
 }
 patients <- do.call(rbind, patient_rows)
-print(patients)
+
+# 3. Observations: strip "Patient/" from the reference, then one column per measure
+obs_rows <- list()
+for (entry in bundle$entry) {
+  res <- entry$resource
+  if (res$resourceType == "Observation") {
+    obs_rows[[length(obs_rows) + 1]] <- data.frame(
+      patient_id = sub("^Patient/", "", res$subject$reference),
+      messung = res$code$text, wert = res$valueQuantity$value
+    )
+  }
+}
+obs_wide <- reshape(do.call(rbind, obs_rows), idvar = "patient_id",
+                    timevar = "messung", direction = "wide")
+
+# 4. One row per patient: master data plus measurements
+analysis <- merge(patients, obs_wide, by = "patient_id", all.x = TRUE)
+print(analysis)
 ```
 
 **Darüber hinaus:** `fhircrackr::fhir_crack()` übernimmt für sehr komplexe, tief verschachtelte Bundles (z. B. mit wiederholten Unter-Ressourcen) automatisch, was hier von Hand mit einer Schleife passiert – für ein Produktionssystem mit vielen Ressourcentypen ist es die robustere Wahl.
@@ -102,6 +130,7 @@ Kernelemente des OMOP-Modells:
 
 - **PERSON:** Enthält eindeutige demografische Daten (Geschlecht, Geburtsjahr).
 - **MEASUREMENT:** Enthält Messwerte und Laborergebnisse (verknüpft über Concept-IDs mit LOINC/SNOMED).
+- **DEATH:** Eine Zeile je verstorbener Person mit `person_id` und `death_date`; wer lebt, hat keine Zeile – deshalb verknüpft man sie per `LEFT JOIN`.
 
 ### OMOP-SQL-Abfrage: Laktatwerte extrahieren
 ```sql
@@ -130,5 +159,5 @@ ORDER BY m.measurement_date DESC;
 ## Selbstcheck
 1. **Was ist der Unterschied zwischen FHIR und OMOP CDM?** – FHIR dient dem klinischen Datenaustausch in Echtzeit (Nachrichten- und Ressourcen-basiert); OMOP ist ein normalisiertes Datenmodell für Analysen und multizentrische Vergleiche auf großen Forschungsdatenbanken.
 2. **Wie filtere ich in einer OMOP-Datenbank nach einem bestimmten Laborwert?** – Über die Spalte `measurement_concept_id` in der Tabelle `measurement`, unter Verwendung der entsprechenden standardisierten Vokabular-ID (z. B. LOINC/SNOMED).
-3. **Ein FHIR-`Bundle` enthält `Patient`- und `Observation`-Ressourcen gemischt in `entry`. Wie wird daraus eine Analysetabelle?** – `pd.json_normalize(bundle["entry"], sep="_")` flacht alle Ressourcen in eine Tabelle ab. Danach trennt man sie über `resource_resourceType` und verknüpft die Observations per `resource_subject_reference` mit der Patient-ID.
+3. **Ein FHIR-`Bundle` enthält `Patient`- und `Observation`-Ressourcen gemischt in `entry`. Wie wird daraus eine Analysetabelle?** – `pd.json_normalize(bundle["entry"], sep="_")` flacht alle Ressourcen in eine Tabelle ab. Danach trennt man sie über `resource_resourceType` und verknüpft die Observations per `resource_subject_reference` mit der Patient-ID. Vorher das Präfix `Patient/` abschneiden, sonst findet der Merge nichts.
 4. **Warum liefert ein falscher LOINC- oder Concept-Code keinen Fehler?** – Weil die Abfrage syntaktisch gültig bleibt: der Server findet schlicht andere (oder keine) Messwerte. `2571-8` liefert Triglyzeride statt Laktat – lautlos. Codes gehören gegen loinc.org bzw. die Athena-Vokabeltabelle geprüft, nie aus einem Tutorial übernommen.

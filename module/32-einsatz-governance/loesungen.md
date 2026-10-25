@@ -118,12 +118,14 @@ for g in ["weiblich", "maennlich"]:
     print(f"{g}: AUC = {auc:.3f}  [95%-CI {lo:.3f}-{hi:.3f}]  (n={mask.sum()})")
 ```
 Tatsächlicher Lauf: Weiblich AUC 0,880 [95%-CI 0,787–0,952] (n=61); Männlich
-AUC 0,807 [95%-CI 0,689–0,909] (n=64). Die Konfidenzintervalle **überlappen sich
-stark** (0,787–0,909 gemeinsam abgedeckt), der Punktschätzer-Unterschied von
-≈0,07 ist bei diesen Stichprobengrößen **statistisch nicht von Zufall zu
-unterscheiden**, klinisch relevant wäre erst eine Lücke, die auch nach
-Bootstrap-CI bestehen bleibt. Adressieren würde man eine *bestätigte* Lücke
-(nicht überlappende CIs) durch: (1) größere, unabhängige Kohorte zur Bestätigung,
+AUC 0,807 [95%-CI 0,689–0,909] (n=64). Maßgeblich ist das Konfidenzintervall
+der Differenz (`code/python.py`): +0,072 [−0,064; +0,212]. Es schließt 0 ein,
+die Lücke ist also bei diesen Stichprobengrößen **nicht von Zufall zu
+unterscheiden**. Umgekehrt ist auch eine Lücke von 0,2 AUC-Punkten mit den Daten
+vereinbar, Gleichheit ist also ebenso wenig belegt. Ob eine Lücke klinisch
+relevant ist, ist eine zweite, eigene Frage: Sie hängt von ihrer Größe und den
+Folgen für die Betroffenen ab, nicht vom p-Wert. Adressieren würde man eine
+*bestätigte* Lücke (Differenz-KI schließt 0 aus) durch: (1) größere, unabhängige Kohorte zur Bestätigung,
 (2) Datenanalyse nach Ursache (Dokumentationsunterschiede, Ereignisraten),
 (3) gruppenspezifische Schwellen oder Kalibrierung.
 

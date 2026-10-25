@@ -70,6 +70,8 @@ course_theme <- function() {
     )
 }
 
+# The Python sibling mice_praxis.py draws the figures the README shows; the R
+# versions get an _r suffix (as in Module 08) instead of overwriting them.
 save_plot <- function(p, name, width, height) {
   path <- file.path(ASSETS, name)
   ggsave(path, p, width = width, height = height, dpi = 200, bg = "white")
@@ -158,7 +160,7 @@ p1 <- ggplot(comb1, aes(x = bmi_von_gewicht, y = bmi)) +
        y = "imputierter BMI (kg/m²)") +
   course_theme() +
   theme(legend.position = "none")
-save_plot(p1, "passive_imputation.png", width = 11, height = 6.2)
+save_plot(p1, "passive_imputation_r.png", width = 11, height = 6.2)
 
 # ===========================================================================
 cat("\n==========================================================================\n")
@@ -332,7 +334,7 @@ p2 <- ggplot(conv_long, aes(x = iteration, y = wert, color = chain)) +
   scale_color_manual(values = PALETTE[seq_len(n_chains)]) +
   labs(title = "Konvergenz der MICE-Ketten für bga_ph", x = "Iteration", y = NULL) +
   course_theme()
-save_plot(p2, "mice_konvergenz.png", width = 8.5, height = 7.5)
+save_plot(p2, "mice_konvergenz_r.png", width = 8.5, height = 7.5)
 
 observed_vals <- work4$bga_ph[!is.na(work4$bga_ph)]
 imputed_vals4 <- complete(imp4, "long") |> filter(.id %in% miss_idx4) |> pull(bga_ph)
@@ -348,7 +350,7 @@ p3 <- ggplot(dens_df, aes(x = bga_ph, color = gruppe)) +
   labs(title = "Beobachteter vs. imputierter arterieller pH",
        x = "arterieller pH (bga_ph)", y = "Dichte") +
   course_theme()
-save_plot(p3, "mice_dichte.png", width = 8.5, height = 5.2)
+save_plot(p3, "mice_dichte_r.png", width = 8.5, height = 5.2)
 
 cat(sprintf("\n  observed bga_ph  mean=%.3f  n=%d\n", mean(observed_vals), length(observed_vals)))
 cat(sprintf("  imputed  bga_ph  mean=%.3f  n=%d (pooled over %d chains)\n",

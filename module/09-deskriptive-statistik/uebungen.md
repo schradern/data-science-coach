@@ -5,7 +5,7 @@ Nutze den Kohorten- und Labordatensatz. Versuche jede Aufgabe zuerst in
 Lösungen: [`loesungen.md`](loesungen.md).
 
 ## Aufgabe 1 – Mittelwert oder Median?
-Lade die Kohorte mit `load_cohort()`. Berechne für `crp_mg_l`, `sofa_score`
+Lade die Kohorte wie in der Lektion (`kohorte.csv` über die Web-Adresse, im Projektordner auch `load_cohort()`). Berechne für `crp_mg_l`, `sofa_score`
 und `verweildauer_tage` jeweils Mittelwert und Median.
 
 a) Wo weichen sie stark voneinander ab? Was sagt das über die Verteilung? 
@@ -37,7 +37,7 @@ folgenden Variablen, gruppiert nach `aufnahmegrund` (statt nach Mortalität):
 Was fällt dir beim Vergleich der Aufnahmegruppen auf?
 
 ## Aufgabe 5 – Fehlende Werte in Table 1
-Verbinde Kohorte und Labor mit `load_cohort()` / `load_labs()`. Erstelle eine
+Verbinde Kohorte und Labor wie in der Lektion (`kohorte.csv` und `labor.csv`). Erstelle eine
 Table 1 und aktiviere die Anzeige fehlender Werte (`missing=True` in tableone,
 `missing="ifany"` in gtsummary).
 

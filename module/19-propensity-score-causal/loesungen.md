@@ -34,7 +34,7 @@ Kovariate einzeln.
 
 1. **Konsequenz für das Matching:** Ein 1:1 Matching wird weitgehend scheitern. Da die Propensity Scores der beiden Gruppen kaum überlappen (kein *Common Support*), gibt es für fast keinen behandelten Fall eine passende Kontrolle mit ähnlichem Score.
 2. **Verbleibende Patient:innen:** Nur die sehr wenigen Patient:innen, deren Scores im Überlappungsbereich liegen (z. B. zwischen 0,3 und 0,7), können erfolgreich gematcht und analysiert werden. Die Fallzahl wird drastisch schrumpfen.
-3. **Generalisierbarkeit:** Die Generalisierbarkeit (externe Validität) geht verloren. Das Ergebnis der Analyse gilt nicht mehr für die typische Sepsis-Kohorte, sondern nur für eine hochspezifische, atypische Subgruppe (z. B. Behandelte mit ungewöhnlich geringer Krankheitslast und Unbehandelte mit ungewöhnlich hoher Krankheitslast).
+3. **Generalisierbarkeit:** Die Generalisierbarkeit (externe Validität) geht verloren. Das Ergebnis der Analyse gilt nicht mehr für die typische Intensivkohorte, sondern nur für eine hochspezifische, atypische Subgruppe (z. B. Behandelte mit ungewöhnlich geringer Krankheitslast und Unbehandelte mit ungewöhnlich hoher Krankheitslast).
 
 ---
 

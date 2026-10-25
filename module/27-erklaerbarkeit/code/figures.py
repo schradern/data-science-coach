@@ -160,7 +160,7 @@ def fig_shap_beeswarm(model, X_train: pd.DataFrame, X_test: pd.DataFrame) -> boo
     # Path-dependent TreeSHAP, as in code/python.py: exact for trees, and shap
     # checks the additivity itself.
     explainer = shap.TreeExplainer(model)
-    shap_values = explainer(X_test.iloc[:150])
+    shap_values = explainer(X_test)
     shap_values.feature_names = [LABEL_MAP.get(f, f) for f in FEATURES]
 
     fig = plt.figure(figsize=(7.5, 5.5))
@@ -171,7 +171,7 @@ def fig_shap_beeswarm(model, X_train: pd.DataFrame, X_test: pd.DataFrame) -> boo
     shap.plots.beeswarm(shap_values, show=False, max_display=11)
     ax = plt.gca()
     ax.set_title("SHAP-Werte: Beitrag jedes Merkmals zur Vorhersage\n"
-                 "(150 zufällige Testpatient:innen, HistGradientBoosting)",
+                 f"(alle {len(X_test)} Testpatient:innen, HistGradientBoosting)",
                  loc="left", fontweight="bold")
     ax.set_xlabel("SHAP-Wert (Beitrag zum log-odds-Score, negativ = senkt Risiko)")
     fig = plt.gcf()

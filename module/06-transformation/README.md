@@ -5,7 +5,7 @@
 ## Lernziele
 - Das **Tidy-Data**-Prinzip verstehen und erkennen, warum es Analysen vereinfacht.
 - **Fehlende Werte** sehen, verstehen und begründet behandeln.
-- Mit den fünf Kern-Verben **filtern, auswählen, ableiten, gruppieren, zusammenfassen** arbeiten.
+- Mit den fünf Kern-Verben **filtern, auswählen, ableiten, gruppiert zusammenfassen, verbinden** arbeiten.
 - Zwei Tabellen über einen **Join** verbinden und zwischen **long/wide** umformen.
 - Dasselbe Ergebnis in **`pandas`** (Python) und **`dplyr`/`tidyr`** (R) erzeugen.
 
@@ -204,6 +204,6 @@ vollständiges long-Format anwenden, das ersetzt drei separate `pivot`-Aufrufe.
  spätere Analyse neu klären.
 
 ## Selbstcheck
-1. **Was bedeutet „informativ fehlend“ am Beispiel Laktat?** – Laktat wird nur bei klinischem Verdacht auf Hypoperfusion gemessen; sein Fehlen ist selbst eine klinische Information, kein zufälliger Datenverlust.
-2. **Warum darf ein `left_join` die Zeilenzahl der linken Tabelle nicht erhöhen, und wann passiert das doch?** – Bei 1:N-Beziehungen (mehrere Laborwerte je Patient:in) multipliziert sich die linke Tabelle; daher `df.shape` vorher und nachher prüfen.
+1. **Was bedeutet „informativ fehlend“ am Beispiel Laktat?** – Laktat wird bei schwerer kranken Patient:innen (höherer SOFA-Score) häufiger gemessen. Ob es fehlt, hängt also vom beobachteten Schweregrad ab, das Fehlen selbst trägt Information. Statistisch ist das MAR nach `sofa_score`, nicht MNAR: Der Mittelwert der vorhandenen Laktatwerte ist verzerrt (die Kränkeren sind überrepräsentiert), eine Regression, die `sofa_score` enthält, bleibt es dagegen nicht (Modul 14).
+2. **Warum darf ein `left_join` die Zeilenzahl der linken Tabelle nicht erhöhen, und wann passiert das doch?** – Bei 1:N-Beziehungen (z. B. mehrere Vitalwert-Messungen je Patient:in) multipliziert sich die linke Tabelle; daher `df.shape` vorher und nachher prüfen.
 3. **Wann braucht man das long-Format, wann das wide-Format?** – Long (eine Zeile je Messung) für Visualisierungen und Statistikfunktionen; wide (eine Spalte je Zeitpunkt) für matrixbasierte Berechnungen oder bestimmte Modellformate.

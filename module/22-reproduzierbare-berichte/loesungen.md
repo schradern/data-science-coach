@@ -61,9 +61,11 @@ for (pkg in c("dplyr", "ggplot2", "broom")) {
 ```
 
 **Warum reicht `import numpy` nicht?** Weil Paket-Updates das Verhalten von
-Funktionen still ändern können. NumPy 1.x und 2.x unterscheiden sich in Randfällen
-der Zufallsgenerierung. Scikit-learn ändert gelegentlich Default-Parameter zwischen
-Minor-Versionen. Ohne Versionsangabe weiß niemand, welche Implementierung das
+Funktionen still ändern können. NumPy 2 hat etwa die Regeln geändert, nach denen
+gemischte Datentypen in Rechnungen hochgestuft werden, und scikit-learn ändert
+gelegentlich Default-Parameter zwischen Minor-Versionen (z. B. `n_init` bei
+`KMeans` ab Version 1.4). Auch seeded Zufallsverfahren können sich mit der
+Paketversion ändern, wie Modul 14 an den Zahlen der multiplen Imputation zeigt. Ohne Versionsangabe weiß niemand, welche Implementierung das
 Ergebnis erzeugt hat, und eine Replikation auf neuerer Software kann abweichende
 Ergebnisse liefern, ohne dass ein Fehler vorliegt.
 

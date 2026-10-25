@@ -38,7 +38,7 @@ install.packages(c(
 
 ```r
 install.packages(c(
-  "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
+  "xgboost", "pdp", "DALEX", "DALEXtra",
   "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
   "tidytext", "nnet", "recipes", "ranger", "glmnet"
 ))
@@ -83,7 +83,7 @@ install.packages(c("fhircrackr", "pwr", "MatchIt", "rms", "dcurves", "PRROC"))
 | 24 Prädiktions-Workflow | `tidyverse`, `tidymodels` |
 | 25 Modellgüte & Validierung | `tidyverse`, `tidymodels`, `pROC` |
 | 26 Ensembles & Boosting | `tidyverse`, `tidymodels`, `ranger`, `xgboost` |
-| 27 Erklärbarkeit | `tidyverse`, `tidymodels`, `ranger`, `vip`, `pdp`, `DALEX`, `DALEXtra` |
+| 27 Erklärbarkeit | `tidyverse`, `tidymodels`, `ranger`, `pdp`, `DALEX`, `DALEXtra` |
 | 28 Survival-ML | `tidyverse`, `survival`, `randomForestSRC`, `timeROC` |
 | 29 Unüberwacht / Phänotypisierung | `tidyverse`, `recipes`, `cluster`, `factoextra`, `umap` |
 | 30 Deep Learning | `tidyverse`, `tidymodels`, `nnet`, `xgboost` |

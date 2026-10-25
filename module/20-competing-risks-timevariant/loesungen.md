@@ -27,6 +27,14 @@ Für Patient:in 42 sieht das Start-Stop-Format wie folgt aus:
 * **Zeile 1:** Vom Tag der Aufnahme (0) bis zur Diagnose (Tag 4) war der/die Patient:in noch nicht an Pneumonie erkrankt (`pneumonie = 0`). In diesem Intervall trat das Event (Tod) nicht auf (`event = 0`).
 * **Zeile 2:** Ab Tag 4 bis zum Tod an Tag 10 war der/die Patient:in an Pneumonie erkrankt (`pneumonie = 1`). Am Ende dieses Intervalls trat das Event auf (`event = 1`).
 
+**Zwingend erforderliche Spalten:** eine ID (die Zeilen derselben Person gehören
+zusammen), `start` und `stop` (das Intervall gilt als (start, stop], also ohne
+den Starttag, mit dem Stopptag), der Ereignisindikator (nur im letzten Intervall
+einer Person kann er 1 sein) und die zeitabhängige Kovariate mit ihrem Wert im
+jeweiligen Intervall. Ohne die ID würde das Modell die beiden Zeilen wie zwei
+verschiedene Personen behandeln, und die Standardfehler wären bei mehreren
+Intervallen je Person zu klein.
+
 ---
 
 ## Übung 3: 1−KM vs. CIF von Hand berechnen

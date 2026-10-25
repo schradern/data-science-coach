@@ -1,6 +1,6 @@
 # Übungen · Regressionsmodelle: Lineare, logistische und Cox-Regression
 
-Nutze die Kohortendaten (`load_cohort()`). Versuche jede Aufgabe zuerst in
+Nutze die Kohortendaten (`kohorte.csv` wie in der Lektion, im Projektordner auch `load_cohort()`). Versuche jede Aufgabe zuerst in
 **Python**, dann in **R**. Lösungen: [`loesungen.md`](loesungen.md).
 
 ## Aufgabe 1 – Einfache logistische Regression
@@ -11,8 +11,8 @@ Was bedeutet der Wert klinisch, und warum ist das ein unadjustierter Schätzer?
 
 ## Aufgabe 2 – Multivariables Modell und Wahrheitsvergleich
 
-Erweitere das Modell um `alter` (zentriert auf 64), `diabetes` und `sepsis`
-als weitere Prädiktoren. Vergleiche die geschätzten **Odds Ratios** mit den
+Erweitere das Modell um `alter` (zentriert auf 64), `crp_mg_l`, `diabetes` und
+`sepsis` als weitere Prädiktoren (also fünf Prädiktoren mit `sofa_score`). Vergleiche die geschätzten **Odds Ratios** mit den
 wahren ORs aus `lib/ground_truth.py`.
 
 **Achtung:** Vergleiche nicht mit `exp(0,45)` & Co. – das sind die wahren

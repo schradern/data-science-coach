@@ -99,15 +99,36 @@ auftauchen, ohne ein echtes Verschlechterungs-Signal zu sein.
 
 ## Aufgabe 4 – Schwelle klinisch wählen
 ```python
-from sklearn.metrics import roc_curve, roc_auc_score
-proba = pipe.predict_proba(X_te)[:, 1]
-fpr, tpr, thr = roc_curve(y_te, proba)
-idx = np.where(tpr >= 0.80)[0][0]
-print(f"Schwelle: {thr[idx]:.2f}  Sensitivität: {tpr[idx]:.2f}  Spezifität: {1-fpr[idx]:.2f}")
+import numpy as np
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import roc_curve
+
+# Choose the threshold on the training set only (cross-validated predictions),
+# then evaluate it once on the untouched test set.
+proba_cv = cross_val_predict(pipe, X_tr, y_tr, cv=cv, method="predict_proba")[:, 1]
+fpr, tpr, thr = roc_curve(y_tr, proba_cv)
+threshold = thr[np.where(tpr >= 0.80)[0][0]]
+
+pipe.fit(X_tr, y_tr)
+pred = pipe.predict_proba(X_te)[:, 1] >= threshold
+y_true = np.asarray(y_te)
+sens = (pred & (y_true == 1)).sum() / (y_true == 1).sum()
+spec = (~pred & (y_true == 0)).sum() / (y_true == 0).sum()
+print(f"Schwelle (aus Training): {threshold:.2f}  Test: Sensitivität {sens:.2f}  Spezifität {spec:.2f}")
 ```
-Gerechtfertigt, wenn ein übersehener Verschlechterungsfall schwere Konsequenzen
-hat (z. B. Intensivstationsverlegung) und ein falsch-positiver Alarm nur eine
-kurze klinische Überprüfung kostet.
+Die Schwelle wird nur auf den Trainingsdaten gewählt (kreuzvalidierte
+Vorhersagen), dann genau einmal am Testset geprüft. Wer sie direkt auf dem
+Testset sucht, wählt auf denselben Daten, mit denen er bewertet, und überschätzt
+die Güte (Modul 24).
+
+Auf diesen Daten liefert das eine Schwelle von 0,43. Auf dem Testset erreicht sie
+eine Sensitivität von 0,91 und eine Spezifität von 0,72: Etwa jeder vierte stabile
+Verlauf löst einen Fehlalarm aus. Bei 43 Verschlechterungen im Testset sind
+beide Werte noch unsicher (grob ±0,1).
+
+Gerechtfertigt ist das, wenn ein übersehener Verschlechterungsfall schwere
+Konsequenzen hat (z. B. eine verspätete Intensivverlegung) und ein
+falsch-positiver Alarm nur eine kurze klinische Überprüfung kostet.
 
 ## Bonus – Regularisierung
 ```python

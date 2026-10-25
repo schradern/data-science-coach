@@ -4,6 +4,9 @@ longer produces.
     ./.venv/bin/python tools/check_numbers.py            # all modules
     ./.venv/bin/python tools/check_numbers.py 12 30      # only these
 
+CI runs the full check (with R) in .github/workflows/numbers.yml on every push to
+main and weekly; it is kept out of pages.yml so it can never block a deploy.
+
 Every adversarial review round found the same defect in a new place:
 
   * module 06 said two columns were missing; the figure showed three.

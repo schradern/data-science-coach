@@ -229,8 +229,10 @@ RStudio die empfohlene Entwicklungsumgebung.
 2. **RStudio Desktop** (kostenlos) von [posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/) installieren.
 
 Benötigte Basispakete in R installieren (einmalig, in der R-Konsole). Kopiere
-diesen Block – er funktioniert immer, auch ohne das Repository. Der **Kernpfad**
-(Module 01–10, 12–25, 34) braucht:
+diesen Block – er funktioniert immer, auch ohne das Repository. Die R-Liste ist
+anders geschnitten als `requirements.txt`, weil die R-Skripte der Module 23–25
+und 34 mit diesen Basispaketen auskommen und Modul 11 nur Basis-R braucht. Der
+**Kernpfad in R** (Module 01–10, 12–25, 34) braucht:
 
 ```r
 install.packages(c(
@@ -270,7 +272,7 @@ Für die **Vertiefungen** (Module 26–33) kommen später hinzu:
 
 ```r
 install.packages(c(
-  "xgboost", "vip", "pdp", "DALEX", "DALEXtra",
+  "xgboost", "pdp", "DALEX", "DALEXtra",
   "randomForestSRC", "timeROC", "umap", "factoextra", "cluster",
   "tidytext", "nnet", "recipes", "ranger", "glmnet"
 ))
@@ -280,7 +282,7 @@ install.packages(c(
 **Zeile für Zeile:**
 
 * `install.packages(...)`: Lädt diese weiteren Pakete einmalig vom CRAN herunter – sie werden erst für die Vertiefungsmodule (26–33) gebraucht, nicht für den Kernpfad.
-* `c("xgboost", "vip", ...)`: Der Vektor der Paketnamen, die installiert werden sollen.
+* `c("xgboost", "pdp", ...)`: Der Vektor der Paketnamen, die installiert werden sollen.
 </div>
 
 Die vollständige Liste **pro Modul** steht in
@@ -391,7 +393,7 @@ Zurückrollen.
 ## 7 Projektstruktur
 
 ```
-Data Science Coach/
+data-science-coach/
 ├── data/              ← Rohdaten (nie manuell bearbeiten)
 ├── lib/               ← gemeinsame Hilfsfunktionen
 ├── module/            ← eine Lektion je Unterordner

@@ -15,9 +15,10 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import statsmodels.formula.api as smf  # noqa: E402
+from statsmodels.stats.proportion import proportion_confint  # noqa: E402
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve  # noqa: E402
 
-from lib.helpers import load_cohort, load_labs  # noqa: E402
+from lib.helpers import SEED, load_cohort, load_labs  # noqa: E402
 from lib.plotstyle import apply_style, save, PRIMARY, EVENT, SECONDARY  # noqa: E402
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
@@ -62,6 +63,26 @@ def net_benefit_all(prevalence: float, pt: float) -> float:
     return prevalence - (1 - prevalence) * (pt / (1 - pt))
 
 
+N_BOOTSTRAP = 2000
+
+
+def bootstrap_auc_ci(y: np.ndarray, score: np.ndarray) -> tuple[float, float]:
+    """Percentile bootstrap 95% CI for the AUC (resampling patients)."""
+    rng = np.random.default_rng(SEED)
+    aucs = []
+    for _ in range(N_BOOTSTRAP):
+        idx = rng.integers(0, len(y), len(y))
+        if y[idx].min() != y[idx].max():          # both classes needed for an AUC
+            aucs.append(roc_auc_score(y[idx], score[idx]))
+    lo, hi = np.percentile(aucs, [2.5, 97.5])
+    return float(lo), float(hi)
+
+
+def wilson_ci(successes: int, total: int) -> str:
+    lo, hi = proportion_confint(successes, total, method="wilson")
+    return f"[{lo:.3f}, {hi:.3f}]"
+
+
 def main() -> None:
     df = load_cohort().merge(load_labs(), on="patient_id", how="left").dropna(subset=["laktat_mmol_l"])
     y = df["verstorben_30d"]
@@ -72,8 +93,13 @@ def main() -> None:
     fpr, tpr, thresholds = roc_curve(y, score)
     best = int(np.argmax(tpr - fpr))
     youden = float(thresholds[best])
-    print(f"AUC={auc:.3f}")
-    print(f"Youden threshold={youden:.2f}, sensitivity={tpr[best]:.3f}, specificity={1 - fpr[best]:.3f}")
+    auc_lo, auc_hi = bootstrap_auc_ci(y.to_numpy(), score.to_numpy())
+    print(f"AUC={auc:.3f}  95% CI (bootstrap) [{auc_lo:.3f}, {auc_hi:.3f}]")
+    n_pos, n_neg = int(y.sum()), int((1 - y).sum())
+    true_pos = int(((score >= youden) & (y == 1)).sum())
+    true_neg = int(((score < youden) & (y == 0)).sum())
+    print(f"Youden threshold={youden:.2f}, sensitivity={tpr[best]:.3f} {wilson_ci(true_pos, n_pos)}, "
+          f"specificity={1 - fpr[best]:.3f} {wilson_ci(true_neg, n_neg)}  (Wilson 95% CI)")
     print("NOTE: the Youden threshold here is chosen AND evaluated on the same data")
     print("(in-sample) – optimistic. Validate on held-out data (see modules 24/25).")
 

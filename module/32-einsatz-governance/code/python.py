@@ -152,11 +152,28 @@ def bootstrap_auc_ci(y: np.ndarray, proba: np.ndarray, n_boot: int = N_BOOTSTRAP
     return float(lo), float(hi)
 
 
+def bootstrap_auc_difference_ci(y1: np.ndarray, p1: np.ndarray, y2: np.ndarray,
+                                p2: np.ndarray, n_boot: int = N_BOOTSTRAP,
+                                seed: int = SEED) -> tuple[float, float]:
+    """95%-bootstrap CI for AUC(group 1) - AUC(group 2), groups resampled independently."""
+    rng = np.random.default_rng(seed)
+    diffs = []
+    for _ in range(n_boot):
+        i1 = rng.integers(0, len(y1), len(y1))
+        i2 = rng.integers(0, len(y2), len(y2))
+        if len(np.unique(y1[i1])) < 2 or len(np.unique(y2[i2])) < 2:
+            continue
+        diffs.append(roc_auc_score(y1[i1], p1[i1]) - roc_auc_score(y2[i2], p2[i2]))
+    lo, hi = np.percentile(diffs, [2.5, 97.5])
+    return float(lo), float(hi)
+
+
 def _report_subgroup_auc(test_data: pd.DataFrame, proba_all: np.ndarray,
                           column: str, groups: list[str], title: str) -> None:
     """Print AUC + bootstrap 95%-CI per group, then state whether the CIs overlap."""
     print(f"\n  -- {title} --")
     summary: dict[str, tuple[float, float, float, int]] = {}
+    scored: dict[str, tuple[np.ndarray, np.ndarray]] = {}
     for group in groups:
         mask = (test_data[column] == group).values
         if mask.sum() < 5:
@@ -167,15 +184,21 @@ def _report_subgroup_auc(test_data: pd.DataFrame, proba_all: np.ndarray,
         auc_g = roc_auc_score(y_g, p_g)
         lo, hi = bootstrap_auc_ci(y_g, p_g)
         summary[group] = (auc_g, lo, hi, int(mask.sum()))
+        scored[group] = (y_g, p_g)
         print(f"  AUC {group:12s}: {auc_g:.3f}  [95%-CI {lo:.3f}-{hi:.3f}]  (n={mask.sum()})")
 
     if len(summary) == 2:
         (g1, (a1, lo1, hi1, n1)), (g2, (a2, lo2, hi2, n2)) = summary.items()
         overlap = lo1 <= hi2 and lo2 <= hi1
-        if overlap:
-            print(f"  -> CIs overlap: the {g1}/{g2} gap is NOT confidently established as real.")
+        d_lo, d_hi = bootstrap_auc_difference_ci(*scored[g1], *scored[g2])
+        print(f"  AUC difference {g1} - {g2}: {a1 - a2:+.3f}  [95%-CI {d_lo:+.3f} to {d_hi:+.3f}]")
+        if d_lo <= 0 <= d_hi:
+            print(f"  -> the difference CI includes 0: no evidence of a {g1}/{g2} gap,"
+                  " but with this n no evidence of equality either.")
         else:
-            print(f"  -> CIs do not overlap: the {g1}/{g2} gap looks like a genuine disparity.")
+            print(f"  -> the difference CI excludes 0: the {g1}/{g2} gap is unlikely to be noise.")
+        if not overlap:
+            print("     (the single-group CIs do not even overlap)")
 
 
 def demo_fairness(pipe: Pipeline) -> None:
@@ -206,7 +229,7 @@ def demo_fairness(pipe: Pipeline) -> None:
                           ["<65 Jahre", ">=65 Jahre"], "Nach Altersgruppe (Schwelle 65 Jahre)")
 
     print("\n  Overlapping CIs do not prove equality, and non-overlap is a strict criterion.")
-    print("  For the gap itself, compute a CI of the AUC difference (e.g. bootstrap).")
+    print("  The CI of the difference above is the honest test of the gap itself.")
 
 
 # ---------------------------------------------------------------------------

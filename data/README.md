@@ -115,9 +115,11 @@ raucherstatus=aktiv ┘                                │
 crp_mg_l ─────────────────────────────────────────────┘
 ```
 
-- `alter` ist ein **Confounder**: Es beeinflusst sowohl das Risiko (über
-  Komorbidität) als auch direkt den Tod – bei der Schätzung von
-  Gesamteffekten **muss** dafür adjustiert werden.
+- `alter` ist ein **Confounder** des Diabetes-Effekts: Es erhöht die
+  Diabetes-Wahrscheinlichkeit (Pfeil `alter → diabetes`, im Generator steigt
+  `p_diab` mit dem Alter) und wirkt direkt auf den Tod – bei der Schätzung von
+  Gesamteffekten **muss** dafür adjustiert werden. Auf `sofa_score` wirkt das
+  Alter im Generator nicht.
 - `sofa_score` liegt **auf dem kausalen Pfad** von `diabetes` und
   `aufnahmegrund == "Sepsis"` zu Tod (Diabetes/Sepsis erhöhen den SOFA-Score,
   der wiederum die Hazard erhöht). `sofa_score` ist damit ein **Mediator**:

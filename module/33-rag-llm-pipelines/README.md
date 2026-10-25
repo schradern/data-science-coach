@@ -5,7 +5,7 @@
 ## Lernziele
 - Das Prinzip von **Retrieval-Augmented Generation (RAG)** erklären und von reinem Feintuning abgrenzen.
 - Texte sinnvoll in Abschnitte (**Chunks**) unterteilen und in einem Vektor-Index ablegen (das Prinzip hinter Vektordatenbanken wie ChromaDB oder FAISS).
-- Eine einfache semantische Suche mittels Cosinus-Ähnlichkeit implementieren.
+- Eine einfache lexikalische Suche (TF-IDF und Cosinus-Ähnlichkeit) implementieren und von der semantischen Suche mit Embeddings abgrenzen.
 - Strategien zur **Halluzinationsvermeidung** und zum Prompt-Design im klinischen Kontext anwenden.
 
 ## Klinischer Aufhänger
@@ -21,14 +21,17 @@ LLMs haben ein statisches Wissen aus ihrem Training. Um aktuelles, spezifisches 
 1. **Feintuning:** Das Modell wird auf den Texten weitertrainiert. Das ist aufwendig, beseitigt die Neigung zu Halluzinationen nicht und liefert von sich aus keine nachprüfbaren Quellenangaben.
 2. **RAG:** Wir suchen relevante Textstellen aus einer Datenbank heraus und kopieren sie direkt in den Prompt des LLMs. Das Modell fungiert nur noch als „intelligenter Leser und Zusammenfasser“.
 
-![Abbildung: RAG-Suchfluss in sechs Schritten – von der Frage über die semantische Suche und die gefundenen Textstellen zum Prompt, der dem LLM als Kontext dient und in eine belegte Antwort mündet.](assets/rag_suche_flow.svg)
+![Abbildung: RAG-Suchfluss in sechs Schritten – von der Frage über die Suche nach ähnlichen Textstellen und die gefundenen Textstellen zum Prompt, der dem LLM als Kontext dient und in eine belegte Antwort mündet.](assets/rag_suche_flow.svg)
 
 ---
 
 ## 2 Text-Chunking und Vektordatenbanken
 
 Aktuelle Sprachmodelle können zwar sehr lange Kontexte verarbeiten, doch ganze Leitlinien-Sammlungen in jeden Prompt zu kopieren ist teuer und langsam, und einzelne Details gehen in langen Kontexten leichter unter. Daher zerlegen wir Dokumente in **Chunks** (z. B. Absätze mit Ziel 500 Zeichen und 50 Zeichen Überlappung, damit ein Satz an der Schnittstelle nicht verloren geht).
-Jeder Chunk wird über ein Embedding-Modell in einen hochdimensionalen Vektor umgewandelt. Eine **Vektordatenbank** (z. B. ChromaDB oder FAISS) speichert diese Chunks und erlaubt es, bei einer Frage den semantisch ähnlichsten Textabschnitt blitzschnell zu finden.
+Jeder Chunk wird über ein Embedding-Modell in einen hochdimensionalen Vektor umgewandelt. Eine **Vektordatenbank** (z. B. ChromaDB oder FAISS) speichert diese Chunks und erlaubt es, bei einer Frage den semantisch ähnlichsten Textabschnitt blitzschnell zu finden. Dieses
+Modul ersetzt das Embedding-Modell durch TF-IDF: Es findet Chunks, die **dieselben Wörter** enthalten,
+nicht solche mit derselben Bedeutung. „Atemnot“ findet „Dyspnoe“ damit nicht (vgl. Modul 31, Abschnitt 5);
+das leisten erst dichte Embeddings.
 
 ![RAG-Pipeline: von der Leitlinie zur belegten Antwort](assets/rag_pipeline.png)
 
@@ -101,9 +104,11 @@ for rang, (dist, idx) in enumerate(zip(distances[0], indices[0]), start=1):
 Gold-Set (Frage → belegender Chunk) und berechnet daraus **recall@k** und
 **precision@k** – misst also, ob der richtige Chunk überhaupt unter den Top-k
 landet. Auf diesem Mini-Korpus liegt der Gold-Chunk jeder beantwortbaren Frage
-auf Rang 1 (recall@3 = 1,00; precision@3 = 0,33, weil von 3 zurückgegebenen
-Chunks genau einer relevant ist). Ohne diese Messung ist „das Retrieval
-funktioniert“ nur eine Behauptung.
+auf Rang 1, recall@1 ist also 1,00. Die ebenfalls gedruckte recall@3 = 1,00 sagt
+hier wenig: Der Korpus hat nur sechs Chunks, die Top-3 decken die Hälfte davon ab
+(precision@3 = 0,33, weil von 3 zurückgegebenen Chunks genau einer relevant ist).
+Auf einem echten Korpus mit Tausenden Chunks wird recall@k erst aussagekräftig.
+Ohne diese Messung ist „das Retrieval funktioniert“ nur eine Behauptung.
 
 ---
 
@@ -119,7 +124,10 @@ Der Schwellenwert wird **nicht von Hand gesetzt**, sondern auf einem kleinen
 gelabelten Set (Fragen *mit* Antwort im Korpus vs. *ohne*, n=8: 5 im Kontext,
 3 außerhalb) kalibriert: Man nimmt je Frage den Top-1-Score, variiert die
 Schwelle und wählt die mit dem besten F1 für die Entscheidung „Antwort ist im
-Kontext“.
+Kontext“. F1 gewichtet beide Fehler gleich. Klinisch ist eine Antwort ohne Beleg
+(falsch positiv) aber gefährlicher als eine verweigerte Antwort; mit mehr Daten
+würde man die Schwelle deshalb über eine präzisionsbetonte Größe wie F0,5 oder
+eine Mindest-Precision wählen.
 
 ```python
 # Excerpt from code/python.py: runs inside the full script, not on its own.
@@ -183,5 +191,5 @@ Welcher Vasopressor wird empfohlen?
 
 ## Selbstcheck
 1. **Warum ist RAG sicherer für den klinischen Einsatz als ein feingetuntes Modell ohne RAG?** – Weil das Sprachmodell bei RAG eine feste Informationsquelle (Kontext) erhält und angewiesen werden kann, nur daraus zu zitieren. Das ermöglicht überprüfbare Quellenangaben und senkt das Halluzinationsrisiko – vorausgesetzt, das Retrieval liefert den richtigen Chunk (dieses Modul misst genau das mit recall@k/precision@k). Die Halluzinationsfreiheit selbst entscheidet sich erst im Generierungsschritt, der hier nicht ausgeführt wird; gutes Retrieval ist Voraussetzung, keine Garantie.
-2. **Was misst die Cosinus-Ähnlichkeit im RAG-Kontext?** – Sie misst die geometrische Nähe zweier Textvektoren im Vektorraum. Je ähnlicher die Wörter und Konzepte von Frage und Textchunk sind, desto näher liegt der Wert bei 1,0.
+2. **Was misst die Cosinus-Ähnlichkeit im RAG-Kontext?** – Sie misst die geometrische Nähe zweier Textvektoren im Vektorraum. Mit TF-IDF-Vektoren wie in diesem Modul heißt das: Je mehr (seltene) Wörter Frage und Chunk gemeinsam haben, desto näher liegt der Wert bei 1,0. Bedeutungsnähe ohne gemeinsame Wörter erfassen erst Embeddings.
 3. **Warum reicht ein fester Ähnlichkeits-Schwellenwert allein nicht als Sicherheitsnetz?** – Weil er von der Vektorisierungsmethode und dem Korpus abhängt: dieselbe Schwelle kann bei TF-IDF andere Trennschärfe haben als bei dichten Embeddings, und ein zu niedrig gewählter Wert lässt Fragen ohne Antwort im Kontext trotzdem „durchrutschen“ (siehe `code/python.py`/`code/r.R`, die den tatsächlichen Score bei jeder Frage ausgeben statt ihn zu verstecken).

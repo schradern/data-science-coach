@@ -14,6 +14,10 @@ Diabetes → SOFA → Mortalität
 Diabetes → Mortalität
 ```
 
+Der Pfeil Alter → SOFA ist klinisch plausibel, im Kursdatensatz aber nicht
+eingebaut (`data/README.md`, wahre DAG); am Adjustierungsset ändert das nichts,
+weil Alter ohnehin adjustiert wird.
+
 Alter ist der Confounder: Es verursacht Diabetes und Mortalität. Der
 Aufnahmegrund ist in diesem DAG **kein** Confounder des Diabetes-Effekts, weil
 kein Pfeil von ihm zu Diabetes führt; er wirkt auf SOFA und Mortalität. SOFA ist

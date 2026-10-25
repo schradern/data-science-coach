@@ -135,9 +135,12 @@ def main() -> None:
 
     n_events = int(y.sum())
     n_predictors = len(NUMERIC) + len(CATEGORICAL) + len(BINARY)
+    # EPV counts model parameters, not raw variables: one-hot encoding turns the
+    # two categorical predictors into one column per category.
+    n_columns = build_preprocessor().fit_transform(X).shape[1]
     print(f"Cohort: {len(y)} patients, {n_events} events ({y.mean():.1%}), "
-          f"{n_predictors} raw predictors -> EPV (events per variable) "
-          f"~{n_events / n_predictors:.1f}.")
+          f"{n_predictors} raw predictors -> {n_columns} model columns after one-hot "
+          f"encoding -> EPV (events per variable) ~{n_events / n_columns:.1f}.")
     print(
         "EPV ~10 is the traditional regression rule of thumb; tree ensembles"
         "\ncan fit far more effective parameters than that from the same data,"

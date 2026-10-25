@@ -24,7 +24,7 @@ Trainiere einen `RandomSurvivalForest` und berechne die zeitabhängige AUC bei
 Tag 7 und Tag 21. Vergleiche mit der Cox-AUC. Liegt eines der beiden Modelle zu
 einem Zeitpunkt klar vorn, und reicht die Testmenge, um das zu belegen?
 
-## Bonus – Konkurrierende Risiken konzeptuell
+## Bonus – Verlegung: Zensierung oder konkurrierendes Ereignis?
 Angenommen, 10 % der Patient:innen werden in eine andere Klinik verlegt und
 sterben dort, also **außerhalb** des Beobachtungsfensters. Wie würde die
 KM-Kurve verzerrt sein, wenn man diese als Nicht-Ereignis behandelt?

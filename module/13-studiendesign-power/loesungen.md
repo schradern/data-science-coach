@@ -81,7 +81,7 @@ Interaktionen wären instabil.
 
 ## Aufgabe 5 – Analyseplan
 
-Laut DAG (Modul 15): `alter` ist ein **Confounder** von Diabetes und
+Laut DAG (Modul 12, Abschnitt 4, und `data/README.md`): `alter` ist ein **Confounder** von Diabetes und
 Mortalität (verursacht beides) und gehört adjustiert. `sofa_score` liegt auf
 dem kausalen Pfad `Diabetes → SOFA → Mortalität`, ist also ein **Mediator**.
 Adjustiert man dafür, schätzt man nicht mehr den totalen Effekt von Diabetes

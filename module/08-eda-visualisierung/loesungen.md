@@ -23,11 +23,17 @@ cohort <- read_csv("{{DATEN}}kohorte.csv", show_col_types = FALSE)
 labs   <- read_csv("{{DATEN}}labor.csv", show_col_types = FALSE)
 df <- left_join(cohort, labs, by = "patient_id")
 
+# Sample skewness, same formula as pandas' .skew() (adjusted Fisher-Pearson)
+skewness <- function(x) {
+  x <- x[!is.na(x)]; n <- length(x); d <- x - mean(x)
+  g1 <- mean(d^3) / mean(d^2)^1.5
+  sqrt(n * (n - 1)) / (n - 2) * g1
+}
 for (col in c("bmi", "kreatinin_mg_dl", "haemoglobin_g_dl")) {
-  cat(sprintf("%-20s  Mittel=%.2f  Median=%.2f  SD=%.2f\n",
+  cat(sprintf("%-20s  Mittel=%.2f  Median=%.2f  SD=%.2f  Schiefe=%.2f\n",
               col, mean(df[[col]], na.rm=TRUE),
               median(df[[col]], na.rm=TRUE),
-              sd(df[[col]], na.rm=TRUE)))
+              sd(df[[col]], na.rm=TRUE), skewness(df[[col]])))
 }
 ```
 **Befund:** `kreatinin_mg_dl` ist mit einer Schiefe von ~1,27 am stärksten
@@ -58,8 +64,9 @@ colSums(is.na(df))[colSums(is.na(df)) > 0]
 mean(is.na(df$laktat_mmol_l))
 ```
 **Befund:** „nie“ (~47 %), „ehemalig“ (~31 %), „aktiv“ (~22 %). Fehlende Werte
-gibt es bei `gewicht_kg`/`bmi` (~6 %, zufällig, MCAR) und `laktat_mmol_l`
-(~17 %). Das Laktat-Fehlen ist **informativ**, aber **MAR** (nicht MNAR): die
+gibt es bei `gewicht_kg`/`bmi` (~6 %, zufällig, MCAR), `laktat_mmol_l`
+(~17 %) und `bga_ph` (~20 %, fehlt vor allem bei Verstorbenen, also MAR nach dem
+Outcome, siehe Modul 14). Das Laktat-Fehlen ist **informativ**, aber **MAR** (nicht MNAR): die
 Fehlwahrscheinlichkeit hängt vom beobachteten `sofa_score` ab, Laktat wird bei
 höherem SOFA-Score (Verdacht auf Schock/Sepsis) klinisch häufiger gemessen,
 fehlt also *seltener* bei schwer kranken Patient:innen (siehe `data/README.md`
@@ -221,10 +228,15 @@ korr <- round(cor(df[numeric_cols], use = "pairwise.complete.obs"), 2)
 sort(korr["verstorben_30d", -which(colnames(korr)=="verstorben_30d")],
      decreasing = TRUE)
 ```
+Die Lösung nimmt bewusst nur die klinischen Messwerte. `status`,
+`fu_zeit_tage` und `fu_vollstaendig_30d` beschreiben die Nachbeobachtung selbst,
+`verstorben_30d` ist aus `status` abgeleitet (r = 1,0), und `patient_id` ist eine
+Nummer. Solche Spalten gehören nicht in eine Suche nach Prädiktoren.
+
 **Befund:** `sofa_score` (r ≈ 0,36) korreliert mit Abstand am stärksten mit
 `verstorben_30d`, gefolgt von `leukozyten_g_l` (r ≈ 0,24) und `alter`
-(r ≈ 0,22). Nicht überraschend: der SOFA-Score bildet das Organversagen ab und ist
-ein etablierter Prognosemarker, höheres Alter ist ein bekannter Risikofaktor, und
-erhöhte Leukozyten sind ein klassisches Entzündungs-/Infektzeichen. Die übrigen
-Labormarker (u. a. CRP, Kreatinin) zeigen kaum linearen Zusammenhang,
-nichtlineare oder kombinierte Effekte werden erst in Modul 12 sichtbar.
+(r ≈ 0,22). Der SOFA-Score bildet das Organversagen ab, höheres Alter ist ein
+bekannter Risikofaktor. Bei den Leukozyten lohnt ein zweiter Blick: Im Datensatz
+hängen sie direkt vom SOFA-Score ab, ihre Korrelation mit dem Outcome läuft also
+über ihn. Die übrigen Labormarker (u. a. CRP, Kreatinin) zeigen kaum linearen
+Zusammenhang; CRP hat im Datengenerator nur einen kleinen Effekt je mg/l.

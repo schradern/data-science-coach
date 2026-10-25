@@ -189,7 +189,9 @@ eine echte verdeckt.
 **Beispiel:** Ältere Patient:innen haben häufiger Diabetes *und* eine höhere
 Mortalität. Wer den Diabetes-Effekt ohne Altersjustierung schätzt, überschätzt
 ihn. In unserem synthetischen Datensatz kennen wir den wahren Effekt: `β = 0,45`
-auf der **Log-Hazard**-Skala, also eine wahre direkte HR von 1,55 und eine wahre
+auf der **Log-Hazard**-Skala, also `exp(0,45)` ≈ 1,57 (auf den ganztägig
+gerundeten Beobachtungszeiten schätzt ein Cox-Modell bei N = 2 Mio. 1,55, weil
+das Runden Bindungen erzeugt) und eine wahre
 adjustierte **OR von 1,71** (§5), beide bei festem SOFA-Score. Der rohe,
 unadjustierte Schätzer liegt systematisch höher (wahre rohe OR 2,90, nur für das
 Alter adjustiert 2,12; `code/python.py`, Abschnitt 2b): Er enthält das
@@ -255,7 +257,8 @@ Ratio.
 
 > **Merksatz:** OR ≠ HR. Bei seltenen Ereignissen liegen sie nahe beieinander,
 > bei 15,6 % Mortalität nicht mehr. Eine geschätzte OR gegen eine wahre HR zu
-> halten, lässt einen **unverzerrten** Schätzer verzerrt aussehen.
+> halten, lässt einen (bei großen Stichproben) **unverzerrten** Schätzer verzerrt
+> aussehen.
 
 `lib/ground_truth.py` spielt deshalb denselben Datengenerierungsprozess bei
 N = 2 000 000 nach und schätzt dort dasselbe logistische Modell. Das liefert die
@@ -283,8 +286,9 @@ wahren Odds Ratios (rote Rauten) nebeneinander:
 ![Forest Plot der Odds Ratios für 30-Tage-Mortalität (logistische Regression, adjustiert). Blaue Punkte: geschätzte OR mit 95-%-KI. Rote Rauten: wahre OR, aus dem Datengenerierungsprozess bei N = 2 000 000 berechnet. Alle geschätzten Punktwerte liegen bei OR ≥ 1 (Risikoerhöhung); Sepsis und SOFA-Score haben die größten Effekte; das KI von Sepsis schließt bei N = 500 die 1 knapp ein.](assets/forest_odds_ratios.png)
 
 `code/python.py` druckt für jeden Lauf, ob das 95-%-KI die wahre OR überdeckt
-(nicht raten, nachrechnen!). Abweichungen sind **Stichprobenvarianz**, nicht
-Verzerrung: bei N = 500 und 78 Ereignissen ist das KI von `diabetes` breiter als
+(nicht raten, nachrechnen!). Die Abweichungen sind mit **Stichprobenvarianz**
+vereinbar; eine einzelne Stichprobe kann eine kleine Verzerrung weder zeigen noch
+ausschließen (Modul 14 misst sie über 500 Wiederholungen). Bei N = 500 und 78 Ereignissen ist das KI von `diabetes` breiter als
 der gesamte plausible Effektbereich. Zwei stabile Muster: `crp_mg_l` hat den
 kleinsten *absoluten* wahren Effekt, seine *relative* Abweichung wirkt deshalb
 oft groß. `diabetes` und `sofa_score` hängen strukturell zusammen (SOFA ist

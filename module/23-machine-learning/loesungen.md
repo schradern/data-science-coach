@@ -96,11 +96,13 @@ for (seed in c(0, 42, 99)) {
 }
 ```
 
-**Befund:** Seed 0: AUC = 0,787; Seed 42: AUC = 0,880; Seed 99: AUC = 0,874,
+**Befund** (Python): Seed 0: AUC = 0,787; Seed 42: AUC = 0,880; Seed 99: AUC = 0,874,
 eine Schwankung von ~0,09 zwischen den Extremen, rein durch Zufall, weil jedes
 Testset nur ~16 Ereignisse enthält (16 % von 100). Ein einzelner Split ist kein
 verlässliches Gütemaß. Kreuzvalidierung mittelt über mehrere Folds und liefert
-eine stabilere Schätzung mit messbarer Standardabweichung.
+eine stabilere Schätzung mit messbarer Standardabweichung. Das R-Beispiel zieht
+mit `set.seed()` andere Splits und fittet ohne Klassengewichtung; seine AUCs
+liegen deshalb anders, die Schwankung zwischen den Seeds zeigt es genauso.
 
 ## Aufgabe 3 – Merkmalssätze vergleichen
 
@@ -182,7 +184,7 @@ pipeline = Pipeline([
 pipeline.fit(X_train, y_train)
 probs = pipeline.predict_proba(X_test)[:, 1]
 
-for threshold in [0.10, 0.15, 0.20, 0.30, 0.50]:
+for threshold in [0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70]:
     preds = (probs >= threshold).astype(int)
     cm = confusion_matrix(y_test, preds)
     if cm.shape == (2, 2):
@@ -194,30 +196,37 @@ for threshold in [0.10, 0.15, 0.20, 0.30, 0.50]:
 # Threshold 0.15: Sensitivity = 1.00  Specificity = 0.07
 # Threshold 0.20: Sensitivity = 1.00  Specificity = 0.14
 # Threshold 0.30: Sensitivity = 1.00  Specificity = 0.36
+# Threshold 0.40: Sensitivity = 0.88  Specificity = 0.51
 # Threshold 0.50: Sensitivity = 0.81  Specificity = 0.69
+# Threshold 0.60: Sensitivity = 0.81  Specificity = 0.83
+# Threshold 0.70: Sensitivity = 0.75  Specificity = 0.95
 ```
 
 **Befund:** Weil `class_weight="balanced"` die Wahrscheinlichkeiten stark nach
 oben verzerrt (Abschnitt 5/Modul 25), reicht schon Schwelle 0,30, um *jeden*
 Sterbefall im Testset zu erkennen (Sensitivität 1,00), allerdings auf Kosten
 fast aller Spezifität (0,36 und darunter bei Schwellen ≤0,30, das bedeutet
-sehr viele Fehlalarme). Erst bei Schwelle 0,50 sinkt die Sensitivität auf 0,81
-und die Spezifität steigt auf 0,69, ein ausgewogenerer Punkt.
+sehr viele Fehlalarme). Ab 0,40 sinkt die Sensitivität (0,88), die Spezifität
+steigt (0,51), bei 0,60 liegen beide bei 0,81 bzw. 0,83, bei 0,70 erreicht die
+Spezifität 0,95. Alle Werte beruhen auf nur 16 Todesfällen im Testset: Eine
+Sensitivität von 0,81 heißt 13 von 16, ein Fall mehr oder weniger verschiebt sie
+um 6 Prozentpunkte.
 
 **Klinische Abwägung:**
 
-- **Knappe ICU-Kapazitäten:** Schwelle nahe 0,50, sonst wird praktisch jede
- Person als Hochrisiko markiert (siehe Spezifität 0,01–0,36 bei Schwellen
- ≤0,30), das sprengt jede reale Kapazität.
+- **Knappe ICU-Kapazitäten:** Die Schwelle ergibt sich aus der Zahl der Betten:
+ Markiert werden darf nur so viele, wie aufgenommen werden können. Bei 0,50
+ landen rund 40 % des Testsets über der Schwelle, bei 0,60 etwa ein Viertel;
+ unter 0,30 wäre es praktisch jede Person (Spezifität 0,01–0,36).
 
-- **Fehlalarme sehr kostspielig:** Schwelle bei oder über 0,50, höhere
- Spezifität, weniger unnötige Eskalationen, auch wenn dafür Sensitivität
- sinkt.
+- **Fehlalarme sehr kostspielig** (etwa eine belastende Intervention): eine
+ hohe Schwelle wie 0,70, Spezifität 0,95, dafür wird jeder vierte Todesfall
+ übersehen.
 
-- **Kein verpasster Hochrisikofall tolerierbar:** Schwelle ≤0,30 garantiert auf
- diesen Daten Sensitivität 1,00, aber praktisch nur mit Fehlalarmquoten, die in
- der Realität kaum tragbar wären, ein Beispiel dafür, warum die Schwelle nicht
- isoliert von der Kapazität gewählt werden darf.
+- **Kein verpasster Hochrisikofall tolerierbar:** Schwelle 0,30 erkennt auf
+ diesen Daten alle 16 Todesfälle, aber nur mit einer Fehlalarmquote, die in der
+ Realität kaum tragbar wäre. „Garantiert“ ist hier nichts: In einem neuen
+ Datensatz kann schon der nächste Todesfall darunter liegen.
 
 Die Schwelle ist eine klinische Entscheidung, kein statistischer Standard, und
 sie hängt hier zusätzlich stark davon ab, dass die Wahrscheinlichkeiten selbst
@@ -241,8 +250,11 @@ Patient:innen oder für Ressourcenplanung. Ein hoher AUC (gute Rangreihenfolge)
 und schlechte Kalibrierung (falsche absolute Werte) können gleichzeitig
 auftreten, genau das sehen wir hier.
 
-**Der Effekt heißt:** class-weight-induzierte Verzerrung der Vorhersage-
-wahrscheinlichkeiten (nicht „Overfitting“, die Rangordnung ist ja intakt).
+**Der Effekt:** Die Gewichtung lässt das Modell so rechnen, als läge die
+Basisrate bei 50 % statt bei 16 %. Fachlich ist das eine verschobene
+Basisrate (*prior shift*), die sich als schlechte Kalibrierung zeigt:
+Calibration-in-the-large liegt deutlich zu hoch (Modul 25). Overfitting ist es
+nicht, die Rangordnung bleibt fast unverändert.
 
 **Post-hoc-Korrektur:**
 

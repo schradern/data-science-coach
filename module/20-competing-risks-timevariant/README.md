@@ -180,6 +180,7 @@ eine eigene, ungeprüfte Implementierung zu riskieren, nutzt dieses Modul für F
 umbaut, dass ein normales `coxph()` direkt die Subdistribution Hazard Ratio liefert:
 
 ```r
+# Excerpt from code/r.R: runs inside the full script, not on its own.
 library(survival)
 
 fg_data <- finegray(Surv(event_time, event_state_f) ~ alter + sofa_score + diabetes,

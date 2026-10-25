@@ -80,6 +80,8 @@ cph.check_assumptions(df[["fu_zeit_tage", "status", "sepsis", "alter", "sofa_sco
 ```
 
 Auf den Kursdaten meldet `check_assumptions` keine Verletzung (alle
-Schoenfeld-Residuen-Tests p > 0,05), die PH-Annahme ist plausibel. Bei
+Schoenfeld-Residuen-Tests p > 0,05): kein Hinweis auf eine Verletzung. Bei 78
+Ereignissen haben diese Tests aber wenig Power, ein Blick auf die
+Residuenplots gehört dazu. Bei
 verletzter PH-Annahme: stratifizieren, zeitabhängige Koeffizienten modellieren
 oder absolute Zeitpunkte/restricted mean survival time berichten.

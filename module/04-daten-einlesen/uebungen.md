@@ -33,13 +33,17 @@ Normalisiere die verschachtelte `vitals`-Struktur so, dass `hr` und `map`
 eigene Spalten werden.
 
 ## Aufgabe 5 – API-Fallback-Funktion
-Schreibe eine Funktion `load_api_or_local(url, local_file)`, die:
+Schreibe eine Funktion `load_api_or_cache(url, cache_file)` nach dem Muster
+**Cache-on-Success** aus der Lektion:
 
-1. Versucht, die URL abzurufen (Timeout: 5 s).
-2. Bei Fehler die lokale Datei einliest und einen Hinweis ausgibt.
-3. Immer einen DataFrame zurückgibt.
+1. Versuche, die URL abzurufen (Timeout: 5 s).
+2. Bei Erfolg speichere die Antwort als CSV in `cache_file` (eine *lokale* Datei)
+   und gib sie als DataFrame zurück.
+3. Bei einem Fehler lies `cache_file`, falls vorhanden, und gib einen Hinweis aus.
+   Gibt es noch keinen Cache, brich mit einer klaren Fehlermeldung ab.
 
-Teste sie mit der disease.sh-API und `{{DATEN}}kohorte.csv` als Fallback.
+Teste sie zweimal mit der disease.sh-API: einmal normal, einmal mit einer
+absichtlich falschen Adresse. Der zweite Aufruf muss aus dem Cache lesen.
 
 ## Bonus
 Lese `{{DATEN}}vitalwerte.csv` ein. Prüfe, ob alle `patient_id`-Werte aus

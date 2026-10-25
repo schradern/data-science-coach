@@ -5,7 +5,7 @@
 1. **Dreiphasiger Validierungsplan:**
     * **Phase 1 (Retrospektiv):** Test des Modells auf einem unabhängigen, historischen Datensatz eines anderen Krankenhauses (externe Validierung), um die rein mathematische Generalisierbarkeit zu prüfen.
     * **Phase 2 (Prospektiv-stumm / Silent Deployment):** Der Algorithmus analysiert im Hintergrund alle eingehenden Röntgenbilder der Notaufnahme. Die Befunde werden protokolliert, aber den Ärzt:innen nicht angezeigt. Nach 3 Monaten wird die Übereinstimmung mit dem späteren Goldstandard (Radiologiebericht) geprüft. Dies zeigt, ob das Modell unter Live-Bedingungen (z. B. schwankende Bildqualität) stabil läuft.
-    * **Phase 3 (Interventionell):** Das System wird aktiv geschaltet und liefert Vorschläge an die behandelnden Ärzt:innen in der Notaufnahme.
+    * **Phase 3 (Interventionell):** Das System wird aktiv geschaltet und liefert Vorschläge an die behandelnden Ärzt:innen in der Notaufnahme, zuerst in einer kleinen frühen klinischen Evaluation (Nutzung, Sicherheit, Human Factors; berichtet nach DECIDE-AI), danach in einer vergleichenden Studie mit Kontrollgruppe, etwa einer cluster-randomisierten Studie über mehrere Notaufnahmen. Ohne Vergleichsgruppe lässt sich kein Nutzen für Patient:innen belegen.
 
 2. **Endpunkte für die interventionelle Phase:**
     * **Technische Endpunkte:** Prospektive Sensitivität, Spezifität und Falsch-Positiv-Rate im Vergleich zum radiologischen Konsil.
@@ -20,7 +20,7 @@
    Wenn Ärzt:innen auf derselben Station für Patient:in A (KI-Gruppe) Alarme erhalten und daraufhin bestimmte Handlungsmuster erlernen (z. B. frühzeitige Flüssigkeitsgaben bei minimalem Kreatininanstieg), werden sie dieses veränderte Verhalten unbewusst auch bei Patient:in B (Kontrollgruppe) anwenden, obwohl für Patient:in B keine Alarme angezeigt werden. Der Lerneffekt der Ärzt:innen „kontaminiert“ die Kontrollgruppe, wodurch der messbare Unterschied zwischen den Gruppen schrumpft.
 
 2. **Lösungs-Studiendesign:**
-   Eine **cluster-randomisierte kontrollierte Studie (cRCT)**. Hierbei werden nicht einzelne Patient:innen randomisiert, sondern ganze Stationen oder Krankenhäuser (Cluster). Beispielsweise nutzt Intensivstation 1 das CDSS, während Intensivstation 2 als Kontrolle dient. Alternativ kann ein *Stepped-Wedge-Design* gewählt werden, bei dem die Stationen das System zeitversetzt und in randomisierter Reihenfolge einführen.
+   Eine **cluster-randomisierte kontrollierte Studie (cRCT)**. Hierbei werden nicht einzelne Patient:innen randomisiert, sondern ganze Stationen oder Krankenhäuser (Cluster). Beispielsweise werden zwanzig Intensivstationen per Los je zur Hälfte der CDSS- und der Kontrollgruppe zugeteilt. Zwei Stationen allein reichen nicht: Mit einer Station pro Arm lässt sich der Effekt des Systems nicht von Unterschieden zwischen den Stationen trennen. Die Fallzahl muss den Design-Effekt 1 + (m − 1) · ICC berücksichtigen. Alternativ kann ein *Stepped-Wedge-Design* gewählt werden, bei dem die Stationen das System zeitversetzt und in randomisierter Reihenfolge einführen.
 
 ---
 

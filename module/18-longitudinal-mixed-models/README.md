@@ -1,6 +1,6 @@
 # 18 · Mixed-Effects-Modelle für Longitudinaldaten
 
-> **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~75 min · Voraussetzung: Modul 12 (Regression)
+> **Teil 4 – Statistische Inferenz und medizinische Statistik** · Dauer: ~75 min · Voraussetzung: Modul 12 (Regression), für den Abschnitt zu fehlenden Messungen Modul 14 (MCAR/MAR)
 
 ## Lernziele
 - Den Unterschied zwischen **unabhängigen** und **gruppierten/longitudinalen** Daten erklären.
@@ -174,15 +174,18 @@ Person?“) bleibt das Mixed Model die richtige Wahl.
 
 **Stolperstein:** Wenn die Varianz des Random Effects extrem nahe an Null liegt, wirft `lme4`
 (bzw. `statsmodels`) eine „Singular Fit“-Warnung aus. Genau das passiert, wenn du im Beispiel oben
-zusätzlich einen Random Slope für `tag` schätzt: Mit maximal vier Messungen pro Patient:in reicht die
-Information nicht aus, um pro Person eine eigene Zeit-Steigung von der Baseline zu trennen – das Modell
-ist überparametrisiert, und das einfachere Random-Intercept-Modell ist die richtige Wahl.
+zusätzlich einen Random Slope für `tag` schätzt. Der Hauptgrund liegt in den Daten: Die Vitalwerte sind
+ohne personenspezifische Trends simuliert, die wahre Slope-Varianz ist also null. Mit höchstens vier
+Messungen pro Person ließe sich aber auch eine kleine echte Slope-Varianz nur schwer von der
+Tag-zu-Tag-Streuung trennen. Hier ist das einfachere Random-Intercept-Modell die richtige Wahl.
 
 **Stolperstein: Fehlende Messung ≠ kein Patient mehr am Leben.** LMMs sind robust gegenüber echten
 fehlenden Messzeitpunkten (MCAR/MAR – die Messung existiert im Prinzip, wurde aber aus Gründen nicht
 erhoben, die mit dem unbeobachteten Wert selbst nichts zu tun haben), solange die Patient:innen
-mindestens eine Messung aufweisen. Eine Lücke durch planmäßige frühe Entlassung ist so ein Fall. Du musst
-diese Patient:innen nicht ausschließen, nur weil ein Messtag fehlt.
+mindestens eine Messung aufweisen. Unter MAR gilt das allerdings nur, wenn Mittelwert- und
+Kovarianzstruktur des Modells stimmen und per (RE)ML geschätzt wird. Eine Lücke durch frühe Entlassung
+ist meist MAR, nicht MCAR: Wer früher entlassen wird, hatte oft den besseren beobachteten Verlauf
+(Modul 14). Du musst diese Patient:innen nicht ausschließen, nur weil ein Messtag fehlt.
 
 Endet die Messreihe dagegen, **weil** die Person gestorben ist, gilt das **nicht**. Der MAP-Wert an Tag 3
 einer Person, die an Tag 2 gestorben ist, fehlt nicht zufällig, er **existiert nicht**. Das ist
