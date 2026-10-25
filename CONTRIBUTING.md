@@ -26,8 +26,16 @@ Modul und Abschnitt, was falsch ist, und (bei fachlichen Punkten) eine Quelle.
    ./.venv/bin/python tools/check_numbers.py 12   # nur Modul 12 (schnell)
    ```
 
-4. Pull Request öffnen. CI muss grün sein: `pages.yml` (Struktur-Checks und Build)
-   und `numbers.yml` (Zahlenabgleich mit Python und R).
+   Alle drei Prüfungen bündelt `tools/pre_push.py`. Einmal pro Klon aktiviert,
+   läuft es vor jedem `git push` und prüft die Zahlen nur für die Module, die
+   deine Commits berühren:
+
+   ```bash
+   git config core.hooksPath tools/hooks
+   ```
+
+4. Pull Request öffnen. CI (`pages.yml`: Struktur-Checks und Build) muss grün
+   sein; den Zahlenabgleich mit Python und R prüft CI nicht, er läuft lokal.
 
 ## Grundregeln des Kurses
 

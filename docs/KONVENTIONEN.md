@@ -43,7 +43,9 @@ Data Science Coach/
 ├── tools/
 │   ├── install_r_packages.R   # installiert die R-Pakete aus DEPENDENCIES-R.md
 │   ├── check_repo.py          # Konsistenz-Check, CI-Gate (.github/workflows/pages.yml)
-│   ├── check_numbers.py       # jede Ergebniszahl der Prosa kommt aus dem Code (CI: numbers.yml)
+│   ├── check_numbers.py       # jede Ergebniszahl der Prosa kommt aus dem Code (lokal)
+│   ├── pre_push.py            # vor jedem Push: Konsistenz, Build, Zahlen geänderter Module
+│   ├── hooks/pre-push         # Git-Hook dafür (git config core.hooksPath tools/hooks)
 │   └── numbers_allow.json     # begründete Ausnahmen für check_numbers.py
 └── module/
     ├── README.md              # Modulübersicht (Index aller 34 Module)
@@ -246,9 +248,12 @@ Zwei Werkzeuge prüfen den Kurs automatisiert; beide laufen lokal und in CI.
   ./.venv/bin/python tools/check_numbers.py 12
   ```
 
-  `DSC_SKIP_SLOW=1` überspringt den Benchmark. In CI läuft der volle Check mit
-  R in `.github/workflows/numbers.yml` (bei jedem Push auf `main` und wöchentlich),
-  getrennt vom Deployment: Ein roter Lauf dort hält keine Veröffentlichung auf.
+  `DSC_SKIP_SLOW=1` überspringt den Benchmark; seine Zahlen gelten dann als
+  ungeprüft (Exitcode 3), nicht als Drift. Der Check läuft nicht in CI,
+  sondern lokal: `tools/pre_push.py` ruft ihn vor jedem Push für die geänderten
+  Module auf (Hook aktivieren mit `git config core.hooksPath tools/hooks`).
+  Den vollen Lauf mit Benchmark startest du von Hand, wenn sich `data/`, `lib/`
+  oder die Benchmark-Tabelle in Modul 14 ändert.
 
   **Blinde Flecken – bewusst, damit niemand einem grünen Lauf zu viel
   vertraut:** Das Skript liest keine Zahlen in Prosa, in ```` ```python ````-Blöcken

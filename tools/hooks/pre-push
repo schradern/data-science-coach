@@ -1,0 +1,8 @@
+#!/bin/sh
+# Runs tools/pre_push.py before every push: a push to main deploys the site.
+# Activate once per clone:  git config core.hooksPath tools/hooks
+# Skip once:                git push --no-verify
+root=$(git rev-parse --show-toplevel)
+python="$root/.venv/bin/python"
+[ -x "$python" ] || python=python3
+exec "$python" "$root/tools/pre_push.py"

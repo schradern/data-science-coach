@@ -4,8 +4,8 @@ longer produces.
     ./.venv/bin/python tools/check_numbers.py            # all modules
     ./.venv/bin/python tools/check_numbers.py 12 30      # only these
 
-CI runs the full check (with R) in .github/workflows/numbers.yml on every push to
-main and weekly; it is kept out of pages.yml so it can never block a deploy.
+Not part of CI (it needs R and minutes per run). tools/pre_push.py runs it before
+every push for the modules the pushed commits touch.
 
 Every adversarial review round found the same defect in a new place:
 
@@ -204,6 +204,9 @@ def run_module(slug: str) -> tuple[str, list[str]]:
 
     for script in sorted(code_dir.glob("*.py")):
         if SKIP_SLOW and script.name in _SLOW_SCRIPTS:
+            # Skipped, not failed -- but its numbers are just as unchecked, so
+            # they must land in "could not be checked", never in "drift".
+            broken.append(f"{script.name} skipped (DSC_SKIP_SLOW=1)")
             continue
         proc = subprocess.run(
             [str(PYTHON), script.name], cwd=code_dir, capture_output=True,
